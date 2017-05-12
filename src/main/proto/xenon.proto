@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "nl.esciencecenter.xenon.grpc";
+option java_outer_classname = "XenonJobsProto";
+
+package xenon;
+
+service XenonJobs {
+    rpc GetAdaptorStatuses(Empty) returns (AdaptorStatuses) {}
+}
+
+message Empty {
+
+}
+
+message MAdaptorStatus {
+    // The name of the scheduler type eg. slurm
+    string name = 1;
+    repeated string schemes = 2;
+}
+
+message AdaptorStatuses {
+    repeated MAdaptorStatus adaptors = 1;
+}
