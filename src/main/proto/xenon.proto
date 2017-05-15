@@ -1,25 +1,171 @@
 syntax = "proto3";
 
-option java_multiple_files = true;
 option java_package = "nl.esciencecenter.xenon.grpc";
-option java_outer_classname = "XenonJobsProto";
+option java_outer_classname = "XenonProto";
 
 package xenon;
-
-service XenonJobs {
-    rpc GetAdaptorStatuses(Empty) returns (AdaptorStatuses) {}
-}
 
 message Empty {
 
 }
 
-message MAdaptorStatus {
-    // The name of the scheduler type eg. slurm
-    string name = 1;
-    repeated string schemes = 2;
+message Schemes {
+    repeated string schemes = 1;
 }
 
-message AdaptorStatuses {
-    repeated MAdaptorStatus adaptors = 1;
+message CertificateCredential {
+    string certfilepath = 1;
+    string passphrase = 2;
+    map<string, string> properties = 3;
+}
+
+message PasswordCredential {
+    string username = 1;
+    string passowrd = 2;
+    map<string, string> properties = 3;
+}
+
+message NewFileSystemRequest {
+    string scheme = 1;
+    string location = 2;
+    map<string, string> properties = 3;
+    oneof credential {
+        CertificateCredential certificate = 4;
+        PasswordCredential password = 5;
+    }
+}
+
+message FileSystem {
+    string id = 1;
+    NewFileSystemRequest request = 2;
+}
+
+message FileSystems {
+    repeated FileSystems filesystems = 1;
+}
+
+message Path {
+    FileSystem filesystem = 1;
+    // path == RelativePath.class
+    string path = 2;
+}
+
+enum CopyOption {
+    CREATE = 0;
+    REPLACE = 1;
+    IGNORE = 2;
+    APPEND = 3;
+    RESUME = 4;
+    VERIFY = 5;
+}
+
+message CopyRequest {
+    Path source = 1;
+    Path target = 2;
+    repeated CopyOption options = 3;
+}
+
+message NewSchedulerRequest {
+    string scheme = 1;
+    string location = 2;
+    map<string, string> properties = 3;
+    oneof credential {
+        CertificateCredential certificate = 4;
+        PasswordCredential password = 5;
+    }
+}
+
+message Scheduler {
+    string id = 1;
+    NewSchedulerRequest request = 2;
+}
+
+message Schedulers {
+    repeated Scheduler schedulers = 1;
+}
+
+message JobDescription {
+    string executable = 1;
+    repeated string arguments = 2;
+    string workingDirectory = 3;
+    map<string, string> environment = 4;
+    string queueName = 5;
+    bool interactive = 6;
+    uint64 maxTime = 7;
+    uint32 nodeCount = 8;
+    uint32 processesPerNode = 9;
+    bool startSingleProcess = 10;
+    string stdErr = 11;
+    string stdIn = 12;
+    string stdOut = 13;
+    map<string, string> options = 14;
+}
+
+message SubmitJobRequest {
+    Scheduler scheduler = 1;
+    JobDescription description = 2;
+}
+
+message Job {
+    string id = 1;
+    JobDescription description = 2;
+}
+
+message Queues {
+    repeated string name = 1;
+}
+
+message JobStatus {
+    string state = 1;
+    bool running = 2;
+    bool done = 3;
+    map<string, string> schedulerSpecificInformation = 4;
+    int32 exitCode = 6;
+    string errorMessage = 7;
+    enum ErrorType {
+        Empty = 0;
+        NotFound = 1;
+        Cancelled = 2;
+        SchedulerError = 3;
+        SchedulerNotFound = 4;
+        Other = 5;
+    }
+    ErrorType errorType = 8;
+    Job job = 9;
+}
+
+message JobInputStream {
+    Job job = 1;
+    bytes stdin = 2;
+}
+
+message JobOutputStreams {
+    bytes stdout = 1;
+    bytes stderr = 2;
+}
+
+service XenonFiles {
+    rpc getSchemes(Empty) returns (Schemes) {}
+    rpc newFileSystem(NewFileSystemRequest) returns (FileSystem) {}
+    rpc createDirectories(Path) returns (Empty) {}
+    // TODO async copy
+    rpc copy(CopyRequest) returns (Empty) {}
+    rpc delete(Path) returns (Empty) {}
+    rpc closeFileSystem(FileSystem) returns (Empty) {}
+    rpc listFileSystems(Empty) returns (FileSystems) {}
+}
+
+service XenonJobs {
+    rpc getSchemes(Empty) returns (Schemes) {}
+    rpc newScheduler(NewSchedulerRequest) returns (Scheduler) {}
+    rpc submitJob(SubmitJobRequest) returns (Job) {}
+    rpc getQueues(Empty) returns (Queues) {}
+    rpc getJobStatus(Job) returns (JobStatus) {}
+    rpc waitUntilDone(Job) returns (stream JobStatus) {}
+    rpc waitUntilRunning(Job) returns (stream JobStatus) {}
+    rpc getStreams(stream JobInputStream) returns (stream JobOutputStreams) {}
+    rpc cancelJob(Job) returns (JobStatus) {}
+    rpc deleteJob(Job) returns (Empty) {}
+    rpc closeScheduler(Scheduler) returns (Empty) {}
+    rpc listSchedulers(Empty) returns (Schedulers) {}
 }

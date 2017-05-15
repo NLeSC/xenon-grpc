@@ -4,6 +4,134 @@ import grpc
 import xenon_pb2 as xenon__pb2
 
 
+class XenonFilesStub(object):
+
+  def __init__(self, channel):
+    """Constructor.
+
+    Args:
+      channel: A grpc.Channel.
+    """
+    self.getSchemes = channel.unary_unary(
+        '/xenon.XenonFiles/getSchemes',
+        request_serializer=xenon__pb2.Empty.SerializeToString,
+        response_deserializer=xenon__pb2.Schemes.FromString,
+        )
+    self.newFileSystem = channel.unary_unary(
+        '/xenon.XenonFiles/newFileSystem',
+        request_serializer=xenon__pb2.NewFileSystemRequest.SerializeToString,
+        response_deserializer=xenon__pb2.FileSystem.FromString,
+        )
+    self.createDirectories = channel.unary_unary(
+        '/xenon.XenonFiles/createDirectories',
+        request_serializer=xenon__pb2.Path.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
+        )
+    self.copy = channel.unary_unary(
+        '/xenon.XenonFiles/copy',
+        request_serializer=xenon__pb2.CopyRequest.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
+        )
+    self.delete = channel.unary_unary(
+        '/xenon.XenonFiles/delete',
+        request_serializer=xenon__pb2.Path.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
+        )
+    self.closeFileSystem = channel.unary_unary(
+        '/xenon.XenonFiles/closeFileSystem',
+        request_serializer=xenon__pb2.FileSystem.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
+        )
+    self.listFileSystems = channel.unary_unary(
+        '/xenon.XenonFiles/listFileSystems',
+        request_serializer=xenon__pb2.Empty.SerializeToString,
+        response_deserializer=xenon__pb2.FileSystems.FromString,
+        )
+
+
+class XenonFilesServicer(object):
+
+  def getSchemes(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def newFileSystem(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def createDirectories(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def copy(self, request, context):
+    """TODO async copy
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def delete(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def closeFileSystem(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def listFileSystems(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+
+def add_XenonFilesServicer_to_server(servicer, server):
+  rpc_method_handlers = {
+      'getSchemes': grpc.unary_unary_rpc_method_handler(
+          servicer.getSchemes,
+          request_deserializer=xenon__pb2.Empty.FromString,
+          response_serializer=xenon__pb2.Schemes.SerializeToString,
+      ),
+      'newFileSystem': grpc.unary_unary_rpc_method_handler(
+          servicer.newFileSystem,
+          request_deserializer=xenon__pb2.NewFileSystemRequest.FromString,
+          response_serializer=xenon__pb2.FileSystem.SerializeToString,
+      ),
+      'createDirectories': grpc.unary_unary_rpc_method_handler(
+          servicer.createDirectories,
+          request_deserializer=xenon__pb2.Path.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
+      ),
+      'copy': grpc.unary_unary_rpc_method_handler(
+          servicer.copy,
+          request_deserializer=xenon__pb2.CopyRequest.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
+      ),
+      'delete': grpc.unary_unary_rpc_method_handler(
+          servicer.delete,
+          request_deserializer=xenon__pb2.Path.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
+      ),
+      'closeFileSystem': grpc.unary_unary_rpc_method_handler(
+          servicer.closeFileSystem,
+          request_deserializer=xenon__pb2.FileSystem.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
+      ),
+      'listFileSystems': grpc.unary_unary_rpc_method_handler(
+          servicer.listFileSystems,
+          request_deserializer=xenon__pb2.Empty.FromString,
+          response_serializer=xenon__pb2.FileSystems.SerializeToString,
+      ),
+  }
+  generic_handler = grpc.method_handlers_generic_handler(
+      'xenon.XenonFiles', rpc_method_handlers)
+  server.add_generic_rpc_handlers((generic_handler,))
+
+
 class XenonJobsStub(object):
 
   def __init__(self, channel):
@@ -12,16 +140,126 @@ class XenonJobsStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.GetAdaptorStatuses = channel.unary_unary(
-        '/xenon.XenonJobs/GetAdaptorStatuses',
+    self.getSchemes = channel.unary_unary(
+        '/xenon.XenonJobs/getSchemes',
         request_serializer=xenon__pb2.Empty.SerializeToString,
-        response_deserializer=xenon__pb2.AdaptorStatuses.FromString,
+        response_deserializer=xenon__pb2.Schemes.FromString,
+        )
+    self.newScheduler = channel.unary_unary(
+        '/xenon.XenonJobs/newScheduler',
+        request_serializer=xenon__pb2.NewSchedulerRequest.SerializeToString,
+        response_deserializer=xenon__pb2.Scheduler.FromString,
+        )
+    self.submitJob = channel.unary_unary(
+        '/xenon.XenonJobs/submitJob',
+        request_serializer=xenon__pb2.SubmitJobRequest.SerializeToString,
+        response_deserializer=xenon__pb2.Job.FromString,
+        )
+    self.getQueues = channel.unary_unary(
+        '/xenon.XenonJobs/getQueues',
+        request_serializer=xenon__pb2.Empty.SerializeToString,
+        response_deserializer=xenon__pb2.Queues.FromString,
+        )
+    self.getJobStatus = channel.unary_unary(
+        '/xenon.XenonJobs/getJobStatus',
+        request_serializer=xenon__pb2.Job.SerializeToString,
+        response_deserializer=xenon__pb2.JobStatus.FromString,
+        )
+    self.waitUntilDone = channel.unary_stream(
+        '/xenon.XenonJobs/waitUntilDone',
+        request_serializer=xenon__pb2.Job.SerializeToString,
+        response_deserializer=xenon__pb2.JobStatus.FromString,
+        )
+    self.waitUntilRunning = channel.unary_stream(
+        '/xenon.XenonJobs/waitUntilRunning',
+        request_serializer=xenon__pb2.Job.SerializeToString,
+        response_deserializer=xenon__pb2.JobStatus.FromString,
+        )
+    self.getStreams = channel.stream_stream(
+        '/xenon.XenonJobs/getStreams',
+        request_serializer=xenon__pb2.JobInputStream.SerializeToString,
+        response_deserializer=xenon__pb2.JobOutputStreams.FromString,
+        )
+    self.cancelJob = channel.unary_unary(
+        '/xenon.XenonJobs/cancelJob',
+        request_serializer=xenon__pb2.Job.SerializeToString,
+        response_deserializer=xenon__pb2.JobStatus.FromString,
+        )
+    self.deleteJob = channel.unary_unary(
+        '/xenon.XenonJobs/deleteJob',
+        request_serializer=xenon__pb2.Job.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
+        )
+    self.closeScheduler = channel.unary_unary(
+        '/xenon.XenonJobs/closeScheduler',
+        request_serializer=xenon__pb2.Scheduler.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
+        )
+    self.listSchedulers = channel.unary_unary(
+        '/xenon.XenonJobs/listSchedulers',
+        request_serializer=xenon__pb2.Empty.SerializeToString,
+        response_deserializer=xenon__pb2.Schedulers.FromString,
         )
 
 
 class XenonJobsServicer(object):
 
-  def GetAdaptorStatuses(self, request, context):
+  def getSchemes(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def newScheduler(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def submitJob(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def getQueues(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def getJobStatus(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def waitUntilDone(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def waitUntilRunning(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def getStreams(self, request_iterator, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def cancelJob(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def deleteJob(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def closeScheduler(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def listSchedulers(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -29,10 +267,65 @@ class XenonJobsServicer(object):
 
 def add_XenonJobsServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'GetAdaptorStatuses': grpc.unary_unary_rpc_method_handler(
-          servicer.GetAdaptorStatuses,
+      'getSchemes': grpc.unary_unary_rpc_method_handler(
+          servicer.getSchemes,
           request_deserializer=xenon__pb2.Empty.FromString,
-          response_serializer=xenon__pb2.AdaptorStatuses.SerializeToString,
+          response_serializer=xenon__pb2.Schemes.SerializeToString,
+      ),
+      'newScheduler': grpc.unary_unary_rpc_method_handler(
+          servicer.newScheduler,
+          request_deserializer=xenon__pb2.NewSchedulerRequest.FromString,
+          response_serializer=xenon__pb2.Scheduler.SerializeToString,
+      ),
+      'submitJob': grpc.unary_unary_rpc_method_handler(
+          servicer.submitJob,
+          request_deserializer=xenon__pb2.SubmitJobRequest.FromString,
+          response_serializer=xenon__pb2.Job.SerializeToString,
+      ),
+      'getQueues': grpc.unary_unary_rpc_method_handler(
+          servicer.getQueues,
+          request_deserializer=xenon__pb2.Empty.FromString,
+          response_serializer=xenon__pb2.Queues.SerializeToString,
+      ),
+      'getJobStatus': grpc.unary_unary_rpc_method_handler(
+          servicer.getJobStatus,
+          request_deserializer=xenon__pb2.Job.FromString,
+          response_serializer=xenon__pb2.JobStatus.SerializeToString,
+      ),
+      'waitUntilDone': grpc.unary_stream_rpc_method_handler(
+          servicer.waitUntilDone,
+          request_deserializer=xenon__pb2.Job.FromString,
+          response_serializer=xenon__pb2.JobStatus.SerializeToString,
+      ),
+      'waitUntilRunning': grpc.unary_stream_rpc_method_handler(
+          servicer.waitUntilRunning,
+          request_deserializer=xenon__pb2.Job.FromString,
+          response_serializer=xenon__pb2.JobStatus.SerializeToString,
+      ),
+      'getStreams': grpc.stream_stream_rpc_method_handler(
+          servicer.getStreams,
+          request_deserializer=xenon__pb2.JobInputStream.FromString,
+          response_serializer=xenon__pb2.JobOutputStreams.SerializeToString,
+      ),
+      'cancelJob': grpc.unary_unary_rpc_method_handler(
+          servicer.cancelJob,
+          request_deserializer=xenon__pb2.Job.FromString,
+          response_serializer=xenon__pb2.JobStatus.SerializeToString,
+      ),
+      'deleteJob': grpc.unary_unary_rpc_method_handler(
+          servicer.deleteJob,
+          request_deserializer=xenon__pb2.Job.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
+      ),
+      'closeScheduler': grpc.unary_unary_rpc_method_handler(
+          servicer.closeScheduler,
+          request_deserializer=xenon__pb2.Scheduler.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
+      ),
+      'listSchedulers': grpc.unary_unary_rpc_method_handler(
+          servicer.listSchedulers,
+          request_deserializer=xenon__pb2.Empty.FromString,
+          response_serializer=xenon__pb2.Schedulers.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
