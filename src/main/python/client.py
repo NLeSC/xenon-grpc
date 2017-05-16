@@ -42,6 +42,32 @@ def run_job():
     jobs.closeScheduler(scheduler)
 
 
+def run_trigger_exception(scheme, location=''):
+    """
+    Examples:
+
+    >>> import client
+    >>> client.run_trigger_exception("local")
+    id: "local:/"
+    request {
+        scheme: "local"
+    }
+    >>> client.run_trigger_exception("ssh", 'localhost')
+    <_Rendezvous of RPC that terminated with (StatusCode.FAILED_PRECONDITION, ssh adaptor: Auth cancel)>
+    >>> client.run_trigger_exception("sfdfdsh", 'localhost')
+    <_Rendezvous of RPC that terminated with (StatusCode.FAILED_PRECONDITION, engine adaptor: Could not find adaptor for scheme sfdfdsh)>
+
+    """
+    channel = grpc.insecure_channel('localhost:50051')
+    jobs = xenon_pb2_grpc.XenonJobsStub(channel)
+    try:
+        return jobs.newScheduler(xenon_pb2.NewSchedulerRequest(scheme=scheme, location=location))
+    except Exception as e:
+        print(repr(e))
+        # message is in e.details()
+        return e
+
+
 def run_schemes():
     channel = grpc.insecure_channel('localhost:50051')
     stub = xenon_pb2_grpc.XenonJobsStub(channel)
