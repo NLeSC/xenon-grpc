@@ -161,8 +161,8 @@ service XenonJobs {
     rpc submitJob(SubmitJobRequest) returns (Job) {}
     rpc getQueues(Empty) returns (Queues) {}
     rpc getJobStatus(Job) returns (JobStatus) {}
-    rpc waitUntilDone(Job) returns (stream JobStatus) {}
-    rpc waitUntilRunning(Job) returns (stream JobStatus) {}
+    rpc waitUntilDone(Job) returns (JobStatus) {}
+    rpc waitUntilRunning(Job) returns (JobStatus) {}
     rpc getStreams(stream JobInputStream) returns (stream JobOutputStreams) {}
     rpc cancelJob(Job) returns (JobStatus) {}
     rpc deleteJob(Job) returns (Empty) {}

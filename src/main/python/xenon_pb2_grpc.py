@@ -165,12 +165,12 @@ class XenonJobsStub(object):
         request_serializer=xenon__pb2.Job.SerializeToString,
         response_deserializer=xenon__pb2.JobStatus.FromString,
         )
-    self.waitUntilDone = channel.unary_stream(
+    self.waitUntilDone = channel.unary_unary(
         '/xenon.XenonJobs/waitUntilDone',
         request_serializer=xenon__pb2.Job.SerializeToString,
         response_deserializer=xenon__pb2.JobStatus.FromString,
         )
-    self.waitUntilRunning = channel.unary_stream(
+    self.waitUntilRunning = channel.unary_unary(
         '/xenon.XenonJobs/waitUntilRunning',
         request_serializer=xenon__pb2.Job.SerializeToString,
         response_deserializer=xenon__pb2.JobStatus.FromString,
@@ -292,12 +292,12 @@ def add_XenonJobsServicer_to_server(servicer, server):
           request_deserializer=xenon__pb2.Job.FromString,
           response_serializer=xenon__pb2.JobStatus.SerializeToString,
       ),
-      'waitUntilDone': grpc.unary_stream_rpc_method_handler(
+      'waitUntilDone': grpc.unary_unary_rpc_method_handler(
           servicer.waitUntilDone,
           request_deserializer=xenon__pb2.Job.FromString,
           response_serializer=xenon__pb2.JobStatus.SerializeToString,
       ),
-      'waitUntilRunning': grpc.unary_stream_rpc_method_handler(
+      'waitUntilRunning': grpc.unary_unary_rpc_method_handler(
           servicer.waitUntilRunning,
           request_deserializer=xenon__pb2.Job.FromString,
           response_serializer=xenon__pb2.JobStatus.SerializeToString,
