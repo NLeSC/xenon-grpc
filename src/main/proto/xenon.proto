@@ -66,15 +66,14 @@ message AdaptorName {
 }
 
 message CertificateCredential {
-    string certfilepath = 1;
+    // Path to certificate file
+    string certfile = 1;
     string passphrase = 2;
-    map<string, string> properties = 3;
 }
 
 message PasswordCredential {
     string username = 1;
-    string passowrd = 2;
-    map<string, string> properties = 3;
+    string password = 2;
 }
 
 message NewFileSystemRequest {
@@ -94,7 +93,7 @@ message FileSystem {
 }
 
 message FileSystems {
-    repeated FileSystems filesystems = 1;
+    repeated FileSystem filesystems = 1;
 }
 
 message Path {
@@ -196,11 +195,19 @@ message WriteRequest {
     repeated OpenOption options = 3;
 }
 
-message DirectoryStream {
-    Path path = 1;
+message WalkFileTreeRequest {
+    // Start directory
+    Path start = 1;
+    // When true attributes will be returned
+    bool attributes = 2;
+    // When 1 only files/directories/symlinks in start path will be returned. If not set will recurse as deep as it can.
+    uint32 maxDepth = 3;
+    bool followLinks = 4;
+    // Only files matching regexp will be returned. For example '\.txt$' will only return *.txt files.
+    string filenameRegexp = 5;
 }
 
-message AttributesDirectoryStream {
+message PathWithAttributes {
     Path path = 1;
     FileAttributes attributes = 2;
 }
@@ -357,8 +364,11 @@ service XenonFiles {
     rpc read(Path) returns (stream FileStream) {}
     // in Xenon it is called newOutputStream()
     rpc write(stream WriteRequest) returns (Empty) {}
-    rpc walkAttributesDirectory(Path) returns (stream AttributesDirectoryStream) {}
-    rpc walkDirectory(Path) returns (stream DirectoryStream) {}
+    // In Xenon its functonality is split into newAttributesDirectoryStream, newDirectoryStream and
+    // utils.walkFileTree methods.
+    // In Xenon a filter object or visitor object can be used, this is not possible in rpc method,
+    // limited filtering is offered as a regexp filter on filename.
+    rpc walkFileTree(WalkFileTreeRequest) returns (stream PathWithAttributes) {}
     rpc getAttributes(Path) returns (FileAttributes) {}
     rpc setPosixFilePermissions(PosixFilePermissionsRequest) returns (Empty) {}
     rpc readSymbolicLink(Path) returns (Path) {}
@@ -368,7 +378,8 @@ service XenonFiles {
     // List currently created filesystems
     // Specific to grpc, not part of Xenon library
     rpc listFileSystems(Empty) returns (FileSystems) {}
-    rpc localFileSystem(Empty) returns (FileSystem) {}
+    // Returns filesystems for all local drives
+    rpc localFileSystems(Empty) returns (FileSystems) {}
 }
 
 // Xenon files methods not implemented in grpc

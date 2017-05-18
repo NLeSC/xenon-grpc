@@ -4,7 +4,9 @@ import grpc
 import xenon_pb2 as xenon__pb2
 
 
-class XenonStub(object):
+class XenonGlobalStub(object):
+  """The functionality of the Xenon XenonFactory class
+  """
 
   def __init__(self, channel):
     """Constructor.
@@ -13,21 +15,26 @@ class XenonStub(object):
       channel: A grpc.Channel.
     """
     self.newXenon = channel.unary_unary(
-        '/xenon.Xenon/newXenon',
+        '/xenon.XenonGlobal/newXenon',
         request_serializer=xenon__pb2.Properties.SerializeToString,
         response_deserializer=xenon__pb2.Empty.FromString,
         )
     self.getSupportedProperties = channel.unary_unary(
-        '/xenon.Xenon/getSupportedProperties',
+        '/xenon.XenonGlobal/getSupportedProperties',
         request_serializer=xenon__pb2.Empty.SerializeToString,
         response_deserializer=xenon__pb2.PropertyDescriptions.FromString,
         )
 
 
-class XenonServicer(object):
+class XenonGlobalServicer(object):
+  """The functionality of the Xenon XenonFactory class
+  """
 
   def newXenon(self, request, context):
-    """Create a new Xenon instance, WATCH OUT! will destroy existing instance with all its schedulers/filesystems/jobs
+    """Create a new Xenon instance
+
+    WATCH OUT!!! Must be called before calling any XenonFiles or XenonJob methods
+    otherwise a Xenon instance is created without properties
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -39,7 +46,7 @@ class XenonServicer(object):
     raise NotImplementedError('Method not implemented!')
 
 
-def add_XenonServicer_to_server(servicer, server):
+def add_XenonGlobalServicer_to_server(servicer, server):
   rpc_method_handlers = {
       'newXenon': grpc.unary_unary_rpc_method_handler(
           servicer.newXenon,
@@ -53,12 +60,16 @@ def add_XenonServicer_to_server(servicer, server):
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
-      'xenon.Xenon', rpc_method_handlers)
+      'xenon.XenonGlobal', rpc_method_handlers)
   server.add_generic_rpc_handlers((generic_handler,))
 
 
 class XenonFilesStub(object):
-  """XenonFiles represents the Files interface Xenon. This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
+  """XenonFactory methods not implemented in grpc
+  - endAll(), stop server to end all Xenon instances
+  - end(), stop server to end all Xenon instances
+
+  XenonFiles represents the Files interface Xenon. This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
   """
 
   def __init__(self, channel):
@@ -147,15 +158,10 @@ class XenonFilesStub(object):
         request_serializer=xenon__pb2.WriteRequest.SerializeToString,
         response_deserializer=xenon__pb2.Empty.FromString,
         )
-    self.walkAttributesDirectory = channel.unary_stream(
-        '/xenon.XenonFiles/walkAttributesDirectory',
-        request_serializer=xenon__pb2.Path.SerializeToString,
-        response_deserializer=xenon__pb2.AttributesDirectoryStream.FromString,
-        )
-    self.walkDirectory = channel.unary_stream(
-        '/xenon.XenonFiles/walkDirectory',
-        request_serializer=xenon__pb2.Path.SerializeToString,
-        response_deserializer=xenon__pb2.DirectoryStream.FromString,
+    self.walkFileTree = channel.unary_stream(
+        '/xenon.XenonFiles/walkFileTree',
+        request_serializer=xenon__pb2.WalkFileTreeRequest.SerializeToString,
+        response_deserializer=xenon__pb2.PathWithAttributes.FromString,
         )
     self.getAttributes = channel.unary_unary(
         '/xenon.XenonFiles/getAttributes',
@@ -187,15 +193,19 @@ class XenonFilesStub(object):
         request_serializer=xenon__pb2.Empty.SerializeToString,
         response_deserializer=xenon__pb2.FileSystems.FromString,
         )
-    self.localFileSystem = channel.unary_unary(
-        '/xenon.XenonFiles/localFileSystem',
+    self.localFileSystems = channel.unary_unary(
+        '/xenon.XenonFiles/localFileSystems',
         request_serializer=xenon__pb2.Empty.SerializeToString,
-        response_deserializer=xenon__pb2.FileSystem.FromString,
+        response_deserializer=xenon__pb2.FileSystems.FromString,
         )
 
 
 class XenonFilesServicer(object):
-  """XenonFiles represents the Files interface Xenon. This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
+  """XenonFactory methods not implemented in grpc
+  - endAll(), stop server to end all Xenon instances
+  - end(), stop server to end all Xenon instances
+
+  XenonFiles represents the Files interface Xenon. This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
   """
 
   def getAdaptorDescriptions(self, request, context):
@@ -230,7 +240,7 @@ class XenonFilesServicer(object):
 
   def backgroundCopy(self, request, context):
     """Asynchronous recursive opy
-    in Xenon it is called copy() without CopyOption.ASYNCHRONOUS
+    in Xenon it is called copy() with CopyOption.ASYNCHRONOUS
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -291,12 +301,12 @@ class XenonFilesServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def walkAttributesDirectory(self, request, context):
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def walkDirectory(self, request, context):
+  def walkFileTree(self, request, context):
+    """In Xenon its functonality is split into newAttributesDirectoryStream, newDirectoryStream and
+    utils.walkFileTree methods.
+    In Xenon a filter object or visitor object can be used, this is not possible in rpc method,
+    limited filtering is offered as a regexp filter on filename.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -336,7 +346,9 @@ class XenonFilesServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def localFileSystem(self, request, context):
+  def localFileSystems(self, request, context):
+    """Returns filesystems for all local drives
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -424,15 +436,10 @@ def add_XenonFilesServicer_to_server(servicer, server):
           request_deserializer=xenon__pb2.WriteRequest.FromString,
           response_serializer=xenon__pb2.Empty.SerializeToString,
       ),
-      'walkAttributesDirectory': grpc.unary_stream_rpc_method_handler(
-          servicer.walkAttributesDirectory,
-          request_deserializer=xenon__pb2.Path.FromString,
-          response_serializer=xenon__pb2.AttributesDirectoryStream.SerializeToString,
-      ),
-      'walkDirectory': grpc.unary_stream_rpc_method_handler(
-          servicer.walkDirectory,
-          request_deserializer=xenon__pb2.Path.FromString,
-          response_serializer=xenon__pb2.DirectoryStream.SerializeToString,
+      'walkFileTree': grpc.unary_stream_rpc_method_handler(
+          servicer.walkFileTree,
+          request_deserializer=xenon__pb2.WalkFileTreeRequest.FromString,
+          response_serializer=xenon__pb2.PathWithAttributes.SerializeToString,
       ),
       'getAttributes': grpc.unary_unary_rpc_method_handler(
           servicer.getAttributes,
@@ -464,10 +471,10 @@ def add_XenonFilesServicer_to_server(servicer, server):
           request_deserializer=xenon__pb2.Empty.FromString,
           response_serializer=xenon__pb2.FileSystems.SerializeToString,
       ),
-      'localFileSystem': grpc.unary_unary_rpc_method_handler(
-          servicer.localFileSystem,
+      'localFileSystems': grpc.unary_unary_rpc_method_handler(
+          servicer.localFileSystems,
           request_deserializer=xenon__pb2.Empty.FromString,
-          response_serializer=xenon__pb2.FileSystem.SerializeToString,
+          response_serializer=xenon__pb2.FileSystems.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
@@ -477,8 +484,6 @@ def add_XenonFilesServicer_to_server(servicer, server):
 
 class XenonJobsStub(object):
   """Xenon files methods not implemented in grpc
-  - cancelCopy, grpc has async client, so do not need to offer Xenon version
-  - getCopyStatus, see cancelCopy
   - newAttributesDirectoryStream with filter, filter is a lambda function which can not be used in rpc
   - newDirectoryStream with filter, filter is a lambda function which can not be used in rpc
   - newPath, a Xenon Path is contructed by FileSystem + RelativePath, in grpc the message Path has FileSystem + RelativePath, making the Xenon Path hidden from the grpc API
@@ -601,8 +606,6 @@ class XenonJobsStub(object):
 
 class XenonJobsServicer(object):
   """Xenon files methods not implemented in grpc
-  - cancelCopy, grpc has async client, so do not need to offer Xenon version
-  - getCopyStatus, see cancelCopy
   - newAttributesDirectoryStream with filter, filter is a lambda function which can not be used in rpc
   - newDirectoryStream with filter, filter is a lambda function which can not be used in rpc
   - newPath, a Xenon Path is contructed by FileSystem + RelativePath, in grpc the message Path has FileSystem + RelativePath, making the Xenon Path hidden from the grpc API
