@@ -9,8 +9,8 @@ message Empty {
 
 }
 
-message Schemes {
-    repeated string schemes = 1;
+message AdaptorDescriptions {
+    repeated string adaptors = 1;
 }
 
 message CertificateCredential {
@@ -26,7 +26,7 @@ message PasswordCredential {
 }
 
 message NewFileSystemRequest {
-    string scheme = 1;
+    string adaptor = 1;
     string location = 2;
     map<string, string> properties = 3;
     oneof credential {
@@ -66,7 +66,7 @@ message CopyRequest {
 }
 
 message NewSchedulerRequest {
-    string scheme = 1;
+    string adaptor = 1;
     string location = 2;
     map<string, string> properties = 3;
     oneof credential {
@@ -111,8 +111,21 @@ message Job {
     JobDescription description = 2;
 }
 
+message Jobs {
+    repeated Job jobs = 1;
+}
+
+message Queue {
+    string name = 1;
+}
+
 message Queues {
     repeated string name = 1;
+}
+
+message SchedulerAndQueues {
+    Scheduler scheduler = 1;
+    repeated Queues queues = 2;
 }
 
 message JobStatus {
@@ -134,6 +147,21 @@ message JobStatus {
     Job job = 9;
 }
 
+message JobStatuses {
+    repeated JobStatus statuses = 1;
+}
+
+message QueueStatus {
+    string name = 1;
+    Scheduler scheduler = 2;
+    map<string, string> schedulerSpecificInformation = 3;
+    string error = 4;
+}
+
+message QueueStatuses {
+    repeated QueueStatus statuses = 1;
+}
+
 message JobInputStream {
     Job job = 1;
     bytes stdin = 2;
@@ -144,8 +172,12 @@ message JobOutputStreams {
     bytes stderr = 2;
 }
 
+message Is {
+    bool is = 1;
+}
+
 service XenonFiles {
-    rpc getSchemes(Empty) returns (Schemes) {}
+    rpc getAdaptorDescriptions(Empty) returns (AdaptorDescriptions) {}
     rpc newFileSystem(NewFileSystemRequest) returns (FileSystem) {}
     rpc createDirectories(Path) returns (Empty) {}
     // TODO async copy
@@ -156,16 +188,22 @@ service XenonFiles {
 }
 
 service XenonJobs {
-    rpc getSchemes(Empty) returns (Schemes) {}
+    rpc getAdaptorDescriptions(Empty) returns (AdaptorDescriptions) {}
     rpc newScheduler(NewSchedulerRequest) returns (Scheduler) {}
     rpc submitJob(SubmitJobRequest) returns (Job) {}
-    rpc getQueues(Empty) returns (Queues) {}
+    rpc getQueues(Scheduler) returns (Queues) {}
+    rpc getDefaultQueueName(Scheduler) returns (Queue) {}
+    rpc getJobs(SchedulerAndQueues) returns (Jobs) {}
     rpc getJobStatus(Job) returns (JobStatus) {}
+    rpc getJobStatuses(Jobs) returns (JobStatuses) {}
+    rpc getQueueStatus(SchedulerAndQueues) returns (QueueStatus) {}
+    rpc getQueueStatuses(SchedulerAndQueues) returns (QueueStatuses) {}
     rpc waitUntilDone(Job) returns (JobStatus) {}
     rpc waitUntilRunning(Job) returns (JobStatus) {}
     rpc getStreams(stream JobInputStream) returns (stream JobOutputStreams) {}
+    rpc isOpen(Scheduler) returns (Open) {}
     rpc cancelJob(Job) returns (JobStatus) {}
-    rpc deleteJob(Job) returns (Empty) {}
+    rpc deleteJob(Job) returns (Is) {}
     rpc closeScheduler(Scheduler) returns (Empty) {}
     rpc listSchedulers(Empty) returns (Schedulers) {}
 }
