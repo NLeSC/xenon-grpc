@@ -7,8 +7,8 @@ def run_job():
     channel = grpc.insecure_channel('localhost:50051')
     files = xenon_pb2_grpc.XenonFilesStub(channel)
     # put input
-    localfs = files.newFileSystem(xenon_pb2.NewFileSystemRequest(scheme='file'))
-    remotefs = files.newFileSystem(xenon_pb2.NewFileSystemRequest(scheme='sftp', location='localhost'))
+    localfs = files.newFileSystem(xenon_pb2.NewFileSystemRequest(adaptor='file'))
+    remotefs = files.newFileSystem(xenon_pb2.NewFileSystemRequest(adaptor='sftp', location='localhost'))
     jobdir = '/tmp/myxenonjob'
     jobdir_path = xenon_pb2.Path(fs=remotefs, path=jobdir)
     files.createDirectories(jobdir_path)
@@ -18,7 +18,7 @@ def run_job():
     ))
     # call wc
     jobs = xenon_pb2_grpc.XenonJobsStub(channel)
-    scheduler = jobs.newScheduler(xenon_pb2.NewSchedulerRequest(scheme='ssh', location='localhost'))
+    scheduler = jobs.newScheduler(xenon_pb2.NewSchedulerRequest(adaptor='ssh', location='localhost'))
     job_description = xenon_pb2.JobDescription(
         executable='wc',
         arguments=[jobdir + '/somefile.txt'],
@@ -42,7 +42,7 @@ def run_job():
     jobs.closeScheduler(scheduler)
 
 
-def run_trigger_exception(scheme, location=''):
+def run_trigger_exception(adaptor, location=''):
     """
     Examples:
 
@@ -50,29 +50,29 @@ def run_trigger_exception(scheme, location=''):
     >>> client.run_trigger_exception("local")
     id: "local:/"
     request {
-        scheme: "local"
+        adaptor: "local"
     }
     >>> client.run_trigger_exception("ssh", 'localhost')
     <_Rendezvous of RPC that terminated with (StatusCode.FAILED_PRECONDITION, ssh adaptor: Auth cancel)>
     >>> client.run_trigger_exception("sfdfdsh", 'localhost')
-    <_Rendezvous of RPC that terminated with (StatusCode.FAILED_PRECONDITION, engine adaptor: Could not find adaptor for scheme sfdfdsh)>
+    <_Rendezvous of RPC that terminated with (StatusCode.FAILED_PRECONDITION, engine adaptor: Could not find adaptor for adaptor sfdfdsh)>
 
     """
     channel = grpc.insecure_channel('localhost:50051')
     jobs = xenon_pb2_grpc.XenonJobsStub(channel)
     try:
-        return jobs.newScheduler(xenon_pb2.NewSchedulerRequest(scheme=scheme, location=location))
+        return jobs.newScheduler(xenon_pb2.NewSchedulerRequest(adaptor=adaptor, location=location))
     except Exception as e:
         print(repr(e))
         # message is in e.details()
         return e
 
 
-def run_schemes():
+def run_adaptordescriptions():
     channel = grpc.insecure_channel('localhost:50051')
     stub = xenon_pb2_grpc.XenonJobsStub(channel)
-    response = stub.getSchemes(xenon_pb2.Empty())
+    response = stub.getAdaptorDescriptions(xenon_pb2.Empty())
     print(response)
 
 if __name__ == '__main__':
-    run_schemes()
+    run_adaptors()

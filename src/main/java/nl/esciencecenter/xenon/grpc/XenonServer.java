@@ -2,6 +2,10 @@ package nl.esciencecenter.xenon.grpc;
 
 import java.io.IOException;
 
+import nl.esciencecenter.xenon.XenonFactory;
+import nl.esciencecenter.xenon.grpc.files.FilesService;
+import nl.esciencecenter.xenon.grpc.jobs.JobsService;
+
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.slf4j.Logger;
@@ -26,10 +30,11 @@ public class XenonServer {
 
     private void start() throws IOException {
         int port = 50051;
+        XenonSingleton singleton = new XenonSingleton();
         server = ServerBuilder.forPort(port)
-                .addService(new XenonImpl())
-                .addService(new XenonJobsImpl())
-                .addService(new XenonFilesImpl())
+                .addService(new GlobalService(singleton))
+                .addService(new JobsService(singleton))
+                .addService(new FilesService(singleton))
                 .build()
                 .start();
         LOGGER.info("Server started, listening on " + port);
@@ -45,5 +50,6 @@ public class XenonServer {
         if (server != null) {
             server.shutdown();
         }
+        XenonFactory.endAll();
     }
 }

@@ -317,11 +317,19 @@ message Is {
     bool is = 1;
 }
 
-service Xenon {
-    // Create a new Xenon instance, WATCH OUT!!! Will destroy existing instance with all its schedulers/filesystems/jobs
+// The functionality of the Xenon XenonFactory class
+service XenonGlobal {
+    // Create a new Xenon instance
+    //
+    // WATCH OUT!!! Must be called before calling any XenonFiles or XenonJob methods
+    // otherwise a Xenon instance is created without properties
     rpc newXenon(Properties) returns (Empty) {}
     rpc getSupportedProperties(Empty) returns (PropertyDescriptions) {}
 }
+
+// XenonFactory methods not implemented in grpc
+// - endAll(), stop server to end all Xenon instances
+// - end(), stop server to end all Xenon instances
 
 // XenonFiles represents the Files interface Xenon. This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
 service XenonFiles {
