@@ -4,7 +4,7 @@ import grpc
 import xenon_pb2 as xenon__pb2
 
 
-class XenonFilesStub(object):
+class XenonStub(object):
 
   def __init__(self, channel):
     """Constructor.
@@ -12,10 +12,70 @@ class XenonFilesStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.getSchemes = channel.unary_unary(
-        '/xenon.XenonFiles/getSchemes',
+    self.newXenon = channel.unary_unary(
+        '/xenon.Xenon/newXenon',
+        request_serializer=xenon__pb2.Properties.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
+        )
+    self.getSupportedProperties = channel.unary_unary(
+        '/xenon.Xenon/getSupportedProperties',
         request_serializer=xenon__pb2.Empty.SerializeToString,
-        response_deserializer=xenon__pb2.Schemes.FromString,
+        response_deserializer=xenon__pb2.PropertyDescriptions.FromString,
+        )
+
+
+class XenonServicer(object):
+
+  def newXenon(self, request, context):
+    """Create a new Xenon instance, WATCH OUT! will destroy existing instance with all its schedulers/filesystems/jobs
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def getSupportedProperties(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+
+def add_XenonServicer_to_server(servicer, server):
+  rpc_method_handlers = {
+      'newXenon': grpc.unary_unary_rpc_method_handler(
+          servicer.newXenon,
+          request_deserializer=xenon__pb2.Properties.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
+      ),
+      'getSupportedProperties': grpc.unary_unary_rpc_method_handler(
+          servicer.getSupportedProperties,
+          request_deserializer=xenon__pb2.Empty.FromString,
+          response_serializer=xenon__pb2.PropertyDescriptions.SerializeToString,
+      ),
+  }
+  generic_handler = grpc.method_handlers_generic_handler(
+      'xenon.Xenon', rpc_method_handlers)
+  server.add_generic_rpc_handlers((generic_handler,))
+
+
+class XenonFilesStub(object):
+  """XenonFiles represents the Files interface Xenon. This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
+  """
+
+  def __init__(self, channel):
+    """Constructor.
+
+    Args:
+      channel: A grpc.Channel.
+    """
+    self.getAdaptorDescriptions = channel.unary_unary(
+        '/xenon.XenonFiles/getAdaptorDescriptions',
+        request_serializer=xenon__pb2.Empty.SerializeToString,
+        response_deserializer=xenon__pb2.FileAdaptorDescriptions.FromString,
+        )
+    self.getAdaptorDescription = channel.unary_unary(
+        '/xenon.XenonFiles/getAdaptorDescription',
+        request_serializer=xenon__pb2.AdaptorName.SerializeToString,
+        response_deserializer=xenon__pb2.FileAdaptorDescription.FromString,
         )
     self.newFileSystem = channel.unary_unary(
         '/xenon.XenonFiles/newFileSystem',
@@ -27,9 +87,44 @@ class XenonFilesStub(object):
         request_serializer=xenon__pb2.Path.SerializeToString,
         response_deserializer=xenon__pb2.Empty.FromString,
         )
+    self.createDirectory = channel.unary_unary(
+        '/xenon.XenonFiles/createDirectory',
+        request_serializer=xenon__pb2.Path.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
+        )
+    self.createFile = channel.unary_unary(
+        '/xenon.XenonFiles/createFile',
+        request_serializer=xenon__pb2.Path.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
+        )
+    self.backgroundCopy = channel.unary_unary(
+        '/xenon.XenonFiles/backgroundCopy',
+        request_serializer=xenon__pb2.CopyRequest.SerializeToString,
+        response_deserializer=xenon__pb2.Copy.FromString,
+        )
+    self.cancelCopy = channel.unary_unary(
+        '/xenon.XenonFiles/cancelCopy',
+        request_serializer=xenon__pb2.Copy.SerializeToString,
+        response_deserializer=xenon__pb2.CopyStatus.FromString,
+        )
+    self.getCopyStatus = channel.unary_unary(
+        '/xenon.XenonFiles/getCopyStatus',
+        request_serializer=xenon__pb2.Copy.SerializeToString,
+        response_deserializer=xenon__pb2.CopyStatus.FromString,
+        )
+    self.listCopyStatuses = channel.unary_unary(
+        '/xenon.XenonFiles/listCopyStatuses',
+        request_serializer=xenon__pb2.Empty.SerializeToString,
+        response_deserializer=xenon__pb2.CopyStatuses.FromString,
+        )
     self.copy = channel.unary_unary(
         '/xenon.XenonFiles/copy',
         request_serializer=xenon__pb2.CopyRequest.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
+        )
+    self.move = channel.unary_unary(
+        '/xenon.XenonFiles/move',
+        request_serializer=xenon__pb2.SourceTarget.SerializeToString,
         response_deserializer=xenon__pb2.Empty.FromString,
         )
     self.delete = channel.unary_unary(
@@ -37,8 +132,53 @@ class XenonFilesStub(object):
         request_serializer=xenon__pb2.Path.SerializeToString,
         response_deserializer=xenon__pb2.Empty.FromString,
         )
-    self.closeFileSystem = channel.unary_unary(
-        '/xenon.XenonFiles/closeFileSystem',
+    self.exists = channel.unary_unary(
+        '/xenon.XenonFiles/exists',
+        request_serializer=xenon__pb2.Path.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
+        )
+    self.read = channel.unary_stream(
+        '/xenon.XenonFiles/read',
+        request_serializer=xenon__pb2.Path.SerializeToString,
+        response_deserializer=xenon__pb2.FileStream.FromString,
+        )
+    self.write = channel.stream_unary(
+        '/xenon.XenonFiles/write',
+        request_serializer=xenon__pb2.WriteRequest.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
+        )
+    self.walkAttributesDirectory = channel.unary_stream(
+        '/xenon.XenonFiles/walkAttributesDirectory',
+        request_serializer=xenon__pb2.Path.SerializeToString,
+        response_deserializer=xenon__pb2.AttributesDirectoryStream.FromString,
+        )
+    self.walkDirectory = channel.unary_stream(
+        '/xenon.XenonFiles/walkDirectory',
+        request_serializer=xenon__pb2.Path.SerializeToString,
+        response_deserializer=xenon__pb2.DirectoryStream.FromString,
+        )
+    self.getAttributes = channel.unary_unary(
+        '/xenon.XenonFiles/getAttributes',
+        request_serializer=xenon__pb2.Path.SerializeToString,
+        response_deserializer=xenon__pb2.FileAttributes.FromString,
+        )
+    self.setPosixFilePermissions = channel.unary_unary(
+        '/xenon.XenonFiles/setPosixFilePermissions',
+        request_serializer=xenon__pb2.PosixFilePermissionsRequest.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
+        )
+    self.readSymbolicLink = channel.unary_unary(
+        '/xenon.XenonFiles/readSymbolicLink',
+        request_serializer=xenon__pb2.Path.SerializeToString,
+        response_deserializer=xenon__pb2.Path.FromString,
+        )
+    self.isOpen = channel.unary_unary(
+        '/xenon.XenonFiles/isOpen',
+        request_serializer=xenon__pb2.FileSystem.SerializeToString,
+        response_deserializer=xenon__pb2.Is.FromString,
+        )
+    self.close = channel.unary_unary(
+        '/xenon.XenonFiles/close',
         request_serializer=xenon__pb2.FileSystem.SerializeToString,
         response_deserializer=xenon__pb2.Empty.FromString,
         )
@@ -47,11 +187,23 @@ class XenonFilesStub(object):
         request_serializer=xenon__pb2.Empty.SerializeToString,
         response_deserializer=xenon__pb2.FileSystems.FromString,
         )
+    self.localFileSystem = channel.unary_unary(
+        '/xenon.XenonFiles/localFileSystem',
+        request_serializer=xenon__pb2.Empty.SerializeToString,
+        response_deserializer=xenon__pb2.FileSystem.FromString,
+        )
 
 
 class XenonFilesServicer(object):
+  """XenonFiles represents the Files interface Xenon. This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
+  """
 
-  def getSchemes(self, request, context):
+  def getAdaptorDescriptions(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def getAdaptorDescription(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -66,9 +218,51 @@ class XenonFilesServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def copy(self, request, context):
-    """TODO async copy
+  def createDirectory(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def createFile(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def backgroundCopy(self, request, context):
+    """Asynchronous recursive opy
+    in Xenon it is called copy() without CopyOption.ASYNCHRONOUS
     """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def cancelCopy(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def getCopyStatus(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def listCopyStatuses(self, request, context):
+    """List currently active copy operations
+    Specific to grpc, not part of Xenon library
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def copy(self, request, context):
+    """Synchronous recursive opy
+    in Xenon it is called copy() without CopyOption.ASYNCHRONOUS
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def move(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -78,12 +272,71 @@ class XenonFilesServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def closeFileSystem(self, request, context):
+  def exists(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def read(self, request, context):
+    """in Xenon it is called newInputStream()
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def write(self, request_iterator, context):
+    """in Xenon it is called newOutputStream()
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def walkAttributesDirectory(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def walkDirectory(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def getAttributes(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def setPosixFilePermissions(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def readSymbolicLink(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def isOpen(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def close(self, request, context):
+    """Closes a filestem, any actions running it with this filestystem will be terminated
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def listFileSystems(self, request, context):
+    """List currently created filesystems
+    Specific to grpc, not part of Xenon library
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def localFileSystem(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -91,10 +344,15 @@ class XenonFilesServicer(object):
 
 def add_XenonFilesServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'getSchemes': grpc.unary_unary_rpc_method_handler(
-          servicer.getSchemes,
+      'getAdaptorDescriptions': grpc.unary_unary_rpc_method_handler(
+          servicer.getAdaptorDescriptions,
           request_deserializer=xenon__pb2.Empty.FromString,
-          response_serializer=xenon__pb2.Schemes.SerializeToString,
+          response_serializer=xenon__pb2.FileAdaptorDescriptions.SerializeToString,
+      ),
+      'getAdaptorDescription': grpc.unary_unary_rpc_method_handler(
+          servicer.getAdaptorDescription,
+          request_deserializer=xenon__pb2.AdaptorName.FromString,
+          response_serializer=xenon__pb2.FileAdaptorDescription.SerializeToString,
       ),
       'newFileSystem': grpc.unary_unary_rpc_method_handler(
           servicer.newFileSystem,
@@ -106,9 +364,44 @@ def add_XenonFilesServicer_to_server(servicer, server):
           request_deserializer=xenon__pb2.Path.FromString,
           response_serializer=xenon__pb2.Empty.SerializeToString,
       ),
+      'createDirectory': grpc.unary_unary_rpc_method_handler(
+          servicer.createDirectory,
+          request_deserializer=xenon__pb2.Path.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
+      ),
+      'createFile': grpc.unary_unary_rpc_method_handler(
+          servicer.createFile,
+          request_deserializer=xenon__pb2.Path.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
+      ),
+      'backgroundCopy': grpc.unary_unary_rpc_method_handler(
+          servicer.backgroundCopy,
+          request_deserializer=xenon__pb2.CopyRequest.FromString,
+          response_serializer=xenon__pb2.Copy.SerializeToString,
+      ),
+      'cancelCopy': grpc.unary_unary_rpc_method_handler(
+          servicer.cancelCopy,
+          request_deserializer=xenon__pb2.Copy.FromString,
+          response_serializer=xenon__pb2.CopyStatus.SerializeToString,
+      ),
+      'getCopyStatus': grpc.unary_unary_rpc_method_handler(
+          servicer.getCopyStatus,
+          request_deserializer=xenon__pb2.Copy.FromString,
+          response_serializer=xenon__pb2.CopyStatus.SerializeToString,
+      ),
+      'listCopyStatuses': grpc.unary_unary_rpc_method_handler(
+          servicer.listCopyStatuses,
+          request_deserializer=xenon__pb2.Empty.FromString,
+          response_serializer=xenon__pb2.CopyStatuses.SerializeToString,
+      ),
       'copy': grpc.unary_unary_rpc_method_handler(
           servicer.copy,
           request_deserializer=xenon__pb2.CopyRequest.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
+      ),
+      'move': grpc.unary_unary_rpc_method_handler(
+          servicer.move,
+          request_deserializer=xenon__pb2.SourceTarget.FromString,
           response_serializer=xenon__pb2.Empty.SerializeToString,
       ),
       'delete': grpc.unary_unary_rpc_method_handler(
@@ -116,8 +409,53 @@ def add_XenonFilesServicer_to_server(servicer, server):
           request_deserializer=xenon__pb2.Path.FromString,
           response_serializer=xenon__pb2.Empty.SerializeToString,
       ),
-      'closeFileSystem': grpc.unary_unary_rpc_method_handler(
-          servicer.closeFileSystem,
+      'exists': grpc.unary_unary_rpc_method_handler(
+          servicer.exists,
+          request_deserializer=xenon__pb2.Path.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
+      ),
+      'read': grpc.unary_stream_rpc_method_handler(
+          servicer.read,
+          request_deserializer=xenon__pb2.Path.FromString,
+          response_serializer=xenon__pb2.FileStream.SerializeToString,
+      ),
+      'write': grpc.stream_unary_rpc_method_handler(
+          servicer.write,
+          request_deserializer=xenon__pb2.WriteRequest.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
+      ),
+      'walkAttributesDirectory': grpc.unary_stream_rpc_method_handler(
+          servicer.walkAttributesDirectory,
+          request_deserializer=xenon__pb2.Path.FromString,
+          response_serializer=xenon__pb2.AttributesDirectoryStream.SerializeToString,
+      ),
+      'walkDirectory': grpc.unary_stream_rpc_method_handler(
+          servicer.walkDirectory,
+          request_deserializer=xenon__pb2.Path.FromString,
+          response_serializer=xenon__pb2.DirectoryStream.SerializeToString,
+      ),
+      'getAttributes': grpc.unary_unary_rpc_method_handler(
+          servicer.getAttributes,
+          request_deserializer=xenon__pb2.Path.FromString,
+          response_serializer=xenon__pb2.FileAttributes.SerializeToString,
+      ),
+      'setPosixFilePermissions': grpc.unary_unary_rpc_method_handler(
+          servicer.setPosixFilePermissions,
+          request_deserializer=xenon__pb2.PosixFilePermissionsRequest.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
+      ),
+      'readSymbolicLink': grpc.unary_unary_rpc_method_handler(
+          servicer.readSymbolicLink,
+          request_deserializer=xenon__pb2.Path.FromString,
+          response_serializer=xenon__pb2.Path.SerializeToString,
+      ),
+      'isOpen': grpc.unary_unary_rpc_method_handler(
+          servicer.isOpen,
+          request_deserializer=xenon__pb2.FileSystem.FromString,
+          response_serializer=xenon__pb2.Is.SerializeToString,
+      ),
+      'close': grpc.unary_unary_rpc_method_handler(
+          servicer.close,
           request_deserializer=xenon__pb2.FileSystem.FromString,
           response_serializer=xenon__pb2.Empty.SerializeToString,
       ),
@@ -126,6 +464,11 @@ def add_XenonFilesServicer_to_server(servicer, server):
           request_deserializer=xenon__pb2.Empty.FromString,
           response_serializer=xenon__pb2.FileSystems.SerializeToString,
       ),
+      'localFileSystem': grpc.unary_unary_rpc_method_handler(
+          servicer.localFileSystem,
+          request_deserializer=xenon__pb2.Empty.FromString,
+          response_serializer=xenon__pb2.FileSystem.SerializeToString,
+      ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
       'xenon.XenonFiles', rpc_method_handlers)
@@ -133,6 +476,15 @@ def add_XenonFilesServicer_to_server(servicer, server):
 
 
 class XenonJobsStub(object):
+  """Xenon files methods not implemented in grpc
+  - cancelCopy, grpc has async client, so do not need to offer Xenon version
+  - getCopyStatus, see cancelCopy
+  - newAttributesDirectoryStream with filter, filter is a lambda function which can not be used in rpc
+  - newDirectoryStream with filter, filter is a lambda function which can not be used in rpc
+  - newPath, a Xenon Path is contructed by FileSystem + RelativePath, in grpc the message Path has FileSystem + RelativePath, making the Xenon Path hidden from the grpc API
+
+  The Jobs API of Xenon. This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about schedulers and jobs.
+  """
 
   def __init__(self, channel):
     """Constructor.
@@ -140,10 +492,15 @@ class XenonJobsStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.getSchemes = channel.unary_unary(
-        '/xenon.XenonJobs/getSchemes',
+    self.getAdaptorDescriptions = channel.unary_unary(
+        '/xenon.XenonJobs/getAdaptorDescriptions',
         request_serializer=xenon__pb2.Empty.SerializeToString,
-        response_deserializer=xenon__pb2.Schemes.FromString,
+        response_deserializer=xenon__pb2.JobAdaptorDescriptions.FromString,
+        )
+    self.getAdaptorDescription = channel.unary_unary(
+        '/xenon.XenonJobs/getAdaptorDescription',
+        request_serializer=xenon__pb2.AdaptorName.SerializeToString,
+        response_deserializer=xenon__pb2.JobAdaptorDescription.FromString,
         )
     self.newScheduler = channel.unary_unary(
         '/xenon.XenonJobs/newScheduler',
@@ -157,13 +514,38 @@ class XenonJobsStub(object):
         )
     self.getQueues = channel.unary_unary(
         '/xenon.XenonJobs/getQueues',
-        request_serializer=xenon__pb2.Empty.SerializeToString,
+        request_serializer=xenon__pb2.Scheduler.SerializeToString,
         response_deserializer=xenon__pb2.Queues.FromString,
+        )
+    self.getDefaultQueueName = channel.unary_unary(
+        '/xenon.XenonJobs/getDefaultQueueName',
+        request_serializer=xenon__pb2.Scheduler.SerializeToString,
+        response_deserializer=xenon__pb2.Queue.FromString,
+        )
+    self.getJobs = channel.unary_unary(
+        '/xenon.XenonJobs/getJobs',
+        request_serializer=xenon__pb2.SchedulerAndQueues.SerializeToString,
+        response_deserializer=xenon__pb2.Jobs.FromString,
         )
     self.getJobStatus = channel.unary_unary(
         '/xenon.XenonJobs/getJobStatus',
         request_serializer=xenon__pb2.Job.SerializeToString,
         response_deserializer=xenon__pb2.JobStatus.FromString,
+        )
+    self.getJobStatuses = channel.unary_unary(
+        '/xenon.XenonJobs/getJobStatuses',
+        request_serializer=xenon__pb2.Jobs.SerializeToString,
+        response_deserializer=xenon__pb2.JobStatuses.FromString,
+        )
+    self.getQueueStatus = channel.unary_unary(
+        '/xenon.XenonJobs/getQueueStatus',
+        request_serializer=xenon__pb2.SchedulerAndQueues.SerializeToString,
+        response_deserializer=xenon__pb2.QueueStatus.FromString,
+        )
+    self.getQueueStatuses = channel.unary_unary(
+        '/xenon.XenonJobs/getQueueStatuses',
+        request_serializer=xenon__pb2.SchedulerAndQueues.SerializeToString,
+        response_deserializer=xenon__pb2.QueueStatuses.FromString,
         )
     self.waitUntilDone = channel.unary_unary(
         '/xenon.XenonJobs/waitUntilDone',
@@ -180,6 +562,11 @@ class XenonJobsStub(object):
         request_serializer=xenon__pb2.JobInputStream.SerializeToString,
         response_deserializer=xenon__pb2.JobOutputStreams.FromString,
         )
+    self.isOpen = channel.unary_unary(
+        '/xenon.XenonJobs/isOpen',
+        request_serializer=xenon__pb2.Scheduler.SerializeToString,
+        response_deserializer=xenon__pb2.Is.FromString,
+        )
     self.cancelJob = channel.unary_unary(
         '/xenon.XenonJobs/cancelJob',
         request_serializer=xenon__pb2.Job.SerializeToString,
@@ -190,8 +577,8 @@ class XenonJobsStub(object):
         request_serializer=xenon__pb2.Job.SerializeToString,
         response_deserializer=xenon__pb2.Empty.FromString,
         )
-    self.closeScheduler = channel.unary_unary(
-        '/xenon.XenonJobs/closeScheduler',
+    self.close = channel.unary_unary(
+        '/xenon.XenonJobs/close',
         request_serializer=xenon__pb2.Scheduler.SerializeToString,
         response_deserializer=xenon__pb2.Empty.FromString,
         )
@@ -200,11 +587,35 @@ class XenonJobsStub(object):
         request_serializer=xenon__pb2.Empty.SerializeToString,
         response_deserializer=xenon__pb2.Schedulers.FromString,
         )
+    self.listJobs = channel.unary_unary(
+        '/xenon.XenonJobs/listJobs',
+        request_serializer=xenon__pb2.Empty.SerializeToString,
+        response_deserializer=xenon__pb2.Jobs.FromString,
+        )
+    self.localScheduler = channel.unary_unary(
+        '/xenon.XenonJobs/localScheduler',
+        request_serializer=xenon__pb2.Empty.SerializeToString,
+        response_deserializer=xenon__pb2.Scheduler.FromString,
+        )
 
 
 class XenonJobsServicer(object):
+  """Xenon files methods not implemented in grpc
+  - cancelCopy, grpc has async client, so do not need to offer Xenon version
+  - getCopyStatus, see cancelCopy
+  - newAttributesDirectoryStream with filter, filter is a lambda function which can not be used in rpc
+  - newDirectoryStream with filter, filter is a lambda function which can not be used in rpc
+  - newPath, a Xenon Path is contructed by FileSystem + RelativePath, in grpc the message Path has FileSystem + RelativePath, making the Xenon Path hidden from the grpc API
 
-  def getSchemes(self, request, context):
+  The Jobs API of Xenon. This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about schedulers and jobs.
+  """
+
+  def getAdaptorDescriptions(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def getAdaptorDescription(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -224,7 +635,32 @@ class XenonJobsServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def getDefaultQueueName(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def getJobs(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
   def getJobStatus(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def getJobStatuses(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def getQueueStatus(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def getQueueStatuses(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -244,22 +680,43 @@ class XenonJobsServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def isOpen(self, request, context):
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
   def cancelJob(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def deleteJob(self, request, context):
+    """Specific to grpc, not part of Xenon library
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def closeScheduler(self, request, context):
+  def close(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def listSchedulers(self, request, context):
+    """Specific to grpc, not part of Xenon library
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def listJobs(self, request, context):
+    """Specific to grpc, not part of Xenon library
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def localScheduler(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -267,10 +724,15 @@ class XenonJobsServicer(object):
 
 def add_XenonJobsServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'getSchemes': grpc.unary_unary_rpc_method_handler(
-          servicer.getSchemes,
+      'getAdaptorDescriptions': grpc.unary_unary_rpc_method_handler(
+          servicer.getAdaptorDescriptions,
           request_deserializer=xenon__pb2.Empty.FromString,
-          response_serializer=xenon__pb2.Schemes.SerializeToString,
+          response_serializer=xenon__pb2.JobAdaptorDescriptions.SerializeToString,
+      ),
+      'getAdaptorDescription': grpc.unary_unary_rpc_method_handler(
+          servicer.getAdaptorDescription,
+          request_deserializer=xenon__pb2.AdaptorName.FromString,
+          response_serializer=xenon__pb2.JobAdaptorDescription.SerializeToString,
       ),
       'newScheduler': grpc.unary_unary_rpc_method_handler(
           servicer.newScheduler,
@@ -284,13 +746,38 @@ def add_XenonJobsServicer_to_server(servicer, server):
       ),
       'getQueues': grpc.unary_unary_rpc_method_handler(
           servicer.getQueues,
-          request_deserializer=xenon__pb2.Empty.FromString,
+          request_deserializer=xenon__pb2.Scheduler.FromString,
           response_serializer=xenon__pb2.Queues.SerializeToString,
+      ),
+      'getDefaultQueueName': grpc.unary_unary_rpc_method_handler(
+          servicer.getDefaultQueueName,
+          request_deserializer=xenon__pb2.Scheduler.FromString,
+          response_serializer=xenon__pb2.Queue.SerializeToString,
+      ),
+      'getJobs': grpc.unary_unary_rpc_method_handler(
+          servicer.getJobs,
+          request_deserializer=xenon__pb2.SchedulerAndQueues.FromString,
+          response_serializer=xenon__pb2.Jobs.SerializeToString,
       ),
       'getJobStatus': grpc.unary_unary_rpc_method_handler(
           servicer.getJobStatus,
           request_deserializer=xenon__pb2.Job.FromString,
           response_serializer=xenon__pb2.JobStatus.SerializeToString,
+      ),
+      'getJobStatuses': grpc.unary_unary_rpc_method_handler(
+          servicer.getJobStatuses,
+          request_deserializer=xenon__pb2.Jobs.FromString,
+          response_serializer=xenon__pb2.JobStatuses.SerializeToString,
+      ),
+      'getQueueStatus': grpc.unary_unary_rpc_method_handler(
+          servicer.getQueueStatus,
+          request_deserializer=xenon__pb2.SchedulerAndQueues.FromString,
+          response_serializer=xenon__pb2.QueueStatus.SerializeToString,
+      ),
+      'getQueueStatuses': grpc.unary_unary_rpc_method_handler(
+          servicer.getQueueStatuses,
+          request_deserializer=xenon__pb2.SchedulerAndQueues.FromString,
+          response_serializer=xenon__pb2.QueueStatuses.SerializeToString,
       ),
       'waitUntilDone': grpc.unary_unary_rpc_method_handler(
           servicer.waitUntilDone,
@@ -307,6 +794,11 @@ def add_XenonJobsServicer_to_server(servicer, server):
           request_deserializer=xenon__pb2.JobInputStream.FromString,
           response_serializer=xenon__pb2.JobOutputStreams.SerializeToString,
       ),
+      'isOpen': grpc.unary_unary_rpc_method_handler(
+          servicer.isOpen,
+          request_deserializer=xenon__pb2.Scheduler.FromString,
+          response_serializer=xenon__pb2.Is.SerializeToString,
+      ),
       'cancelJob': grpc.unary_unary_rpc_method_handler(
           servicer.cancelJob,
           request_deserializer=xenon__pb2.Job.FromString,
@@ -317,8 +809,8 @@ def add_XenonJobsServicer_to_server(servicer, server):
           request_deserializer=xenon__pb2.Job.FromString,
           response_serializer=xenon__pb2.Empty.SerializeToString,
       ),
-      'closeScheduler': grpc.unary_unary_rpc_method_handler(
-          servicer.closeScheduler,
+      'close': grpc.unary_unary_rpc_method_handler(
+          servicer.close,
           request_deserializer=xenon__pb2.Scheduler.FromString,
           response_serializer=xenon__pb2.Empty.SerializeToString,
       ),
@@ -326,6 +818,16 @@ def add_XenonJobsServicer_to_server(servicer, server):
           servicer.listSchedulers,
           request_deserializer=xenon__pb2.Empty.FromString,
           response_serializer=xenon__pb2.Schedulers.SerializeToString,
+      ),
+      'listJobs': grpc.unary_unary_rpc_method_handler(
+          servicer.listJobs,
+          request_deserializer=xenon__pb2.Empty.FromString,
+          response_serializer=xenon__pb2.Jobs.SerializeToString,
+      ),
+      'localScheduler': grpc.unary_unary_rpc_method_handler(
+          servicer.localScheduler,
+          request_deserializer=xenon__pb2.Empty.FromString,
+          response_serializer=xenon__pb2.Scheduler.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

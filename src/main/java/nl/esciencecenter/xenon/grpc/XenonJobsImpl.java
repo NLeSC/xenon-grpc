@@ -1,11 +1,12 @@
 package nl.esciencecenter.xenon.grpc;
 
-import io.grpc.Status;
-import io.grpc.stub.StreamObserver;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.jobs.Scheduler;
+
+import io.grpc.Status;
+import io.grpc.stub.StreamObserver;
 
 public class XenonJobsImpl extends XenonJobsGrpc.XenonJobsImplBase {
     @Override
@@ -17,12 +18,12 @@ public class XenonJobsImpl extends XenonJobsGrpc.XenonJobsImplBase {
             System.err.print("Location empty = ");
             System.err.println(request.getLocation().isEmpty());
 
-            if (!"local".equals(request.getScheme()) && request.getLocation().isEmpty()) {
-                throw new XenonException(request.getScheme(), "Location can not be empty");
+            if (!"local".equals(request.getAdaptor()) && request.getLocation().isEmpty()) {
+                throw new XenonException(request.getAdaptor(), "Location can not be empty");
             }
 
             Scheduler scheduler = xenon.jobs().newScheduler(
-                    request.getScheme(),
+                    request.getAdaptor(),
                     request.getLocation(),
                     null,
                     null

@@ -20,13 +20,113 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='xenon.proto',
   package='xenon',
   syntax='proto3',
-  serialized_pb=_b('\n\x0bxenon.proto\x12\x05xenon\"\x07\n\x05\x45mpty\"\x1a\n\x07Schemes\x12\x0f\n\x07schemes\x18\x01 \x03(\t\"\xb6\x01\n\x15\x43\x65rtificateCredential\x12\x14\n\x0c\x63\x65rtfilepath\x18\x01 \x01(\t\x12\x12\n\npassphrase\x18\x02 \x01(\t\x12@\n\nproperties\x18\x03 \x03(\x0b\x32,.xenon.CertificateCredential.PropertiesEntry\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xaa\x01\n\x12PasswordCredential\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08passowrd\x18\x02 \x01(\t\x12=\n\nproperties\x18\x03 \x03(\x0b\x32).xenon.PasswordCredential.PropertiesEntry\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x9e\x02\n\x14NewFileSystemRequest\x12\x0e\n\x06scheme\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x01(\t\x12?\n\nproperties\x18\x03 \x03(\x0b\x32+.xenon.NewFileSystemRequest.PropertiesEntry\x12\x33\n\x0b\x63\x65rtificate\x18\x04 \x01(\x0b\x32\x1c.xenon.CertificateCredentialH\x00\x12-\n\x08password\x18\x05 \x01(\x0b\x32\x19.xenon.PasswordCredentialH\x00\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0c\n\ncredential\"F\n\nFileSystem\x12\n\n\x02id\x18\x01 \x01(\t\x12,\n\x07request\x18\x02 \x01(\x0b\x32\x1b.xenon.NewFileSystemRequest\"6\n\x0b\x46ileSystems\x12\'\n\x0b\x66ilesystems\x18\x01 \x03(\x0b\x32\x12.xenon.FileSystems\";\n\x04Path\x12%\n\nfilesystem\x18\x01 \x01(\x0b\x32\x11.xenon.FileSystem\x12\x0c\n\x04path\x18\x02 \x01(\t\"k\n\x0b\x43opyRequest\x12\x1b\n\x06source\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12\x1b\n\x06target\x18\x02 \x01(\x0b\x32\x0b.xenon.Path\x12\"\n\x07options\x18\x03 \x03(\x0e\x32\x11.xenon.CopyOption\"\x9c\x02\n\x13NewSchedulerRequest\x12\x0e\n\x06scheme\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x01(\t\x12>\n\nproperties\x18\x03 \x03(\x0b\x32*.xenon.NewSchedulerRequest.PropertiesEntry\x12\x33\n\x0b\x63\x65rtificate\x18\x04 \x01(\x0b\x32\x1c.xenon.CertificateCredentialH\x00\x12-\n\x08password\x18\x05 \x01(\x0b\x32\x19.xenon.PasswordCredentialH\x00\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0c\n\ncredential\"D\n\tScheduler\x12\n\n\x02id\x18\x01 \x01(\t\x12+\n\x07request\x18\x02 \x01(\x0b\x32\x1a.xenon.NewSchedulerRequest\"2\n\nSchedulers\x12$\n\nschedulers\x18\x01 \x03(\x0b\x32\x10.xenon.Scheduler\"\xd8\x03\n\x0eJobDescription\x12\x12\n\nexecutable\x18\x01 \x01(\t\x12\x11\n\targuments\x18\x02 \x03(\t\x12\x18\n\x10workingDirectory\x18\x03 \x01(\t\x12;\n\x0b\x65nvironment\x18\x04 \x03(\x0b\x32&.xenon.JobDescription.EnvironmentEntry\x12\x11\n\tqueueName\x18\x05 \x01(\t\x12\x13\n\x0binteractive\x18\x06 \x01(\x08\x12\x0f\n\x07maxTime\x18\x07 \x01(\x04\x12\x11\n\tnodeCount\x18\x08 \x01(\r\x12\x18\n\x10processesPerNode\x18\t \x01(\r\x12\x1a\n\x12startSingleProcess\x18\n \x01(\x08\x12\x0e\n\x06stdErr\x18\x0b \x01(\t\x12\r\n\x05stdIn\x18\x0c \x01(\t\x12\x0e\n\x06stdOut\x18\r \x01(\t\x12\x33\n\x07options\x18\x0e \x03(\x0b\x32\".xenon.JobDescription.OptionsEntry\x1a\x32\n\x10\x45nvironmentEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a.\n\x0cOptionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"c\n\x10SubmitJobRequest\x12#\n\tscheduler\x18\x01 \x01(\x0b\x32\x10.xenon.Scheduler\x12*\n\x0b\x64\x65scription\x18\x02 \x01(\x0b\x32\x15.xenon.JobDescription\"=\n\x03Job\x12\n\n\x02id\x18\x01 \x01(\t\x12*\n\x0b\x64\x65scription\x18\x02 \x01(\x0b\x32\x15.xenon.JobDescription\"\x16\n\x06Queues\x12\x0c\n\x04name\x18\x01 \x03(\t\"\xb3\x03\n\tJobStatus\x12\r\n\x05state\x18\x01 \x01(\t\x12\x0f\n\x07running\x18\x02 \x01(\x08\x12\x0c\n\x04\x64one\x18\x03 \x01(\x08\x12X\n\x1cschedulerSpecificInformation\x18\x04 \x03(\x0b\x32\x32.xenon.JobStatus.SchedulerSpecificInformationEntry\x12\x10\n\x08\x65xitCode\x18\x06 \x01(\x05\x12\x14\n\x0c\x65rrorMessage\x18\x07 \x01(\t\x12-\n\terrorType\x18\x08 \x01(\x0e\x32\x1a.xenon.JobStatus.ErrorType\x12\x17\n\x03job\x18\t \x01(\x0b\x32\n.xenon.Job\x1a\x43\n!SchedulerSpecificInformationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"i\n\tErrorType\x12\t\n\x05\x45mpty\x10\x00\x12\x0c\n\x08NotFound\x10\x01\x12\r\n\tCancelled\x10\x02\x12\x12\n\x0eSchedulerError\x10\x03\x12\x15\n\x11SchedulerNotFound\x10\x04\x12\t\n\x05Other\x10\x05\"8\n\x0eJobInputStream\x12\x17\n\x03job\x18\x01 \x01(\x0b\x32\n.xenon.Job\x12\r\n\x05stdin\x18\x02 \x01(\x0c\"2\n\x10JobOutputStreams\x12\x0e\n\x06stdout\x18\x01 \x01(\x0c\x12\x0e\n\x06stderr\x18\x02 \x01(\x0c*U\n\nCopyOption\x12\n\n\x06\x43REATE\x10\x00\x12\x0b\n\x07REPLACE\x10\x01\x12\n\n\x06IGNORE\x10\x02\x12\n\n\x06\x41PPEND\x10\x03\x12\n\n\x06RESUME\x10\x04\x12\n\n\x06VERIFY\x10\x05\x32\xef\x02\n\nXenonFiles\x12,\n\ngetSchemes\x12\x0c.xenon.Empty\x1a\x0e.xenon.Schemes\"\x00\x12\x41\n\rnewFileSystem\x12\x1b.xenon.NewFileSystemRequest\x1a\x11.xenon.FileSystem\"\x00\x12\x30\n\x11\x63reateDirectories\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12*\n\x04\x63opy\x12\x12.xenon.CopyRequest\x1a\x0c.xenon.Empty\"\x00\x12%\n\x06\x64\x65lete\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12\x34\n\x0f\x63loseFileSystem\x12\x11.xenon.FileSystem\x1a\x0c.xenon.Empty\"\x00\x12\x35\n\x0flistFileSystems\x12\x0c.xenon.Empty\x1a\x12.xenon.FileSystems\"\x00\x32\xf1\x04\n\tXenonJobs\x12,\n\ngetSchemes\x12\x0c.xenon.Empty\x1a\x0e.xenon.Schemes\"\x00\x12>\n\x0cnewScheduler\x12\x1a.xenon.NewSchedulerRequest\x1a\x10.xenon.Scheduler\"\x00\x12\x32\n\tsubmitJob\x12\x17.xenon.SubmitJobRequest\x1a\n.xenon.Job\"\x00\x12*\n\tgetQueues\x12\x0c.xenon.Empty\x1a\r.xenon.Queues\"\x00\x12.\n\x0cgetJobStatus\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12/\n\rwaitUntilDone\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\x32\n\x10waitUntilRunning\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\x42\n\ngetStreams\x12\x15.xenon.JobInputStream\x1a\x17.xenon.JobOutputStreams\"\x00(\x01\x30\x01\x12+\n\tcancelJob\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\'\n\tdeleteJob\x12\n.xenon.Job\x1a\x0c.xenon.Empty\"\x00\x12\x32\n\x0e\x63loseScheduler\x12\x10.xenon.Scheduler\x1a\x0c.xenon.Empty\"\x00\x12\x33\n\x0elistSchedulers\x12\x0c.xenon.Empty\x1a\x11.xenon.Schedulers\"\x00\x42*\n\x1cnl.esciencecenter.xenon.grpcB\nXenonProtob\x06proto3')
+  serialized_pb=_b('\n\x0bxenon.proto\x12\x05xenon\"\x07\n\x05\x45mpty\"v\n\nProperties\x12\x35\n\nproperties\x18\x01 \x03(\x0b\x32!.xenon.Properties.PropertiesEntry\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xcb\x01\n\x13PropertyDescription\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x14\n\x0c\x64\x65\x66\x61ultValue\x18\x03 \x01(\t\x12-\n\x04type\x18\x04 \x01(\x0e\x32\x1f.xenon.PropertyDescription.Type\"L\n\x04Type\x12\n\n\x06STRING\x10\x00\x12\x0b\n\x07\x42OOLEAN\x10\x01\x12\x0b\n\x07INTEGER\x10\x02\x12\n\n\x06\x44OUBLE\x10\x03\x12\x08\n\x04LONG\x10\x04\x12\x08\n\x04SIZE\x10\x05\"F\n\x14PropertyDescriptions\x12.\n\nproperties\x18\x01 \x03(\x0b\x32\x1a.xenon.PropertyDescription\"\xee\x01\n\x15JobAdaptorDescription\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x1a\n\x12supportedLocations\x18\x03 \x03(\t\x12\x37\n\x13supportedProperties\x18\x04 \x03(\x0b\x32\x1a.xenon.PropertyDescription\x12\x0e\n\x06online\x18\x05 \x01(\x08\x12\x1b\n\x13supportsInteractive\x18\x06 \x01(\x08\x12\x15\n\rsupportsBatch\x18\x07 \x01(\x08\x12\x19\n\x11supportedVersions\x18\x08 \x03(\t\"L\n\x16JobAdaptorDescriptions\x12\x32\n\x0c\x64\x65scriptions\x18\x01 \x03(\x0b\x32\x1c.xenon.JobAdaptorDescription\"\xb0\x01\n\x16\x46ileAdaptorDescription\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x1a\n\x12supportedLocations\x18\x03 \x03(\t\x12\x37\n\x13supportedProperties\x18\x04 \x03(\x0b\x32\x1a.xenon.PropertyDescription\x12\x1e\n\x16supportsThirdPartyCopy\x18\x05 \x01(\x08\"N\n\x17\x46ileAdaptorDescriptions\x12\x33\n\x0c\x64\x65scriptions\x18\x01 \x03(\x0b\x32\x1d.xenon.FileAdaptorDescription\"\x1b\n\x0b\x41\x64\x61ptorName\x12\x0c\n\x04name\x18\x01 \x01(\t\"\xb6\x01\n\x15\x43\x65rtificateCredential\x12\x14\n\x0c\x63\x65rtfilepath\x18\x01 \x01(\t\x12\x12\n\npassphrase\x18\x02 \x01(\t\x12@\n\nproperties\x18\x03 \x03(\x0b\x32,.xenon.CertificateCredential.PropertiesEntry\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xaa\x01\n\x12PasswordCredential\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08passowrd\x18\x02 \x01(\t\x12=\n\nproperties\x18\x03 \x03(\x0b\x32).xenon.PasswordCredential.PropertiesEntry\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x9f\x02\n\x14NewFileSystemRequest\x12\x0f\n\x07\x61\x64\x61ptor\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x01(\t\x12?\n\nproperties\x18\x03 \x03(\x0b\x32+.xenon.NewFileSystemRequest.PropertiesEntry\x12\x33\n\x0b\x63\x65rtificate\x18\x04 \x01(\x0b\x32\x1c.xenon.CertificateCredentialH\x00\x12-\n\x08password\x18\x05 \x01(\x0b\x32\x19.xenon.PasswordCredentialH\x00\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0c\n\ncredential\"F\n\nFileSystem\x12\n\n\x02id\x18\x01 \x01(\t\x12,\n\x07request\x18\x02 \x01(\x0b\x32\x1b.xenon.NewFileSystemRequest\"6\n\x0b\x46ileSystems\x12\'\n\x0b\x66ilesystems\x18\x01 \x03(\x0b\x32\x12.xenon.FileSystems\";\n\x04Path\x12%\n\nfilesystem\x18\x01 \x01(\x0b\x32\x11.xenon.FileSystem\x12\x0c\n\x04path\x18\x02 \x01(\t\"\xce\x01\n\x0b\x43opyRequest\x12\x1b\n\x06source\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12\x1b\n\x06target\x18\x02 \x01(\x0b\x32\x0b.xenon.Path\x12.\n\x07options\x18\x03 \x03(\x0e\x32\x1d.xenon.CopyRequest.CopyOption\"U\n\nCopyOption\x12\n\n\x06\x43REATE\x10\x00\x12\x0b\n\x07REPLACE\x10\x01\x12\n\n\x06IGNORE\x10\x02\x12\n\n\x06\x41PPEND\x10\x03\x12\n\n\x06RESUME\x10\x04\x12\n\n\x06VERIFY\x10\x05\"H\n\x0cSourceTarget\x12\x1b\n\x06source\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12\x1b\n\x06target\x18\x02 \x01(\x0b\x32\x0b.xenon.Path\"7\n\x04\x43opy\x12\n\n\x02id\x18\x01 \x01(\t\x12#\n\x07request\x18\x02 \x01(\x0b\x32\x12.xenon.CopyRequest\"\x8e\x01\n\nCopyStatus\x12\x19\n\x04\x63opy\x18\x01 \x01(\x0b\x32\x0b.xenon.Copy\x12\x13\n\x0b\x62ytesCopied\x18\x02 \x01(\x04\x12\x13\n\x0b\x62ytesToCopy\x18\x03 \x01(\x04\x12\x0c\n\x04\x64one\x18\x04 \x01(\x08\x12\x0f\n\x07running\x18\x05 \x01(\x08\x12\r\n\x05state\x18\x06 \x01(\t\x12\r\n\x05\x65rror\x18\x07 \x01(\t\"3\n\x0c\x43opyStatuses\x12#\n\x08statuses\x18\x01 \x03(\x0b\x32\x11.xenon.CopyStatus\"\xda\x02\n\x0e\x46ileAttributes\x12\x14\n\x0c\x63reationTime\x18\x01 \x01(\x04\x12\r\n\x05group\x18\x02 \x01(\t\x12\x13\n\x0bisDirectory\x18\x03 \x01(\x08\x12\x14\n\x0cisExecutable\x18\x04 \x01(\x08\x12\x10\n\x08isHidden\x18\x05 \x01(\x08\x12\x0f\n\x07isOther\x18\x06 \x01(\x08\x12\x12\n\nisReadable\x18\x07 \x01(\x08\x12\x15\n\risRegularFile\x18\x08 \x01(\x08\x12\x16\n\x0eisSymbolicLink\x18\t \x01(\x08\x12\x12\n\nisWritable\x18\n \x01(\x08\x12\x16\n\x0elastAccessTime\x18\x0b \x01(\x04\x12\x18\n\x10lastModifiedTime\x18\x0c \x01(\x04\x12\r\n\x05owner\x18\r \x01(\t\x12/\n\x0bpermissions\x18\x0e \x03(\x0e\x32\x1a.xenon.PosixFilePermission\x12\x0c\n\x04size\x18\x0f \x01(\x04\"i\n\x1bPosixFilePermissionsRequest\x12\x19\n\x04path\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12/\n\x0bpermissions\x18\x02 \x03(\x0e\x32\x1a.xenon.PosixFilePermission\"\x1c\n\nFileStream\x12\x0e\n\x06\x62uffer\x18\x01 \x01(\x0c\"\xd1\x01\n\x0cWriteRequest\x12\x19\n\x04path\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12\x0e\n\x06\x62uffer\x18\x02 \x01(\x0c\x12/\n\x07options\x18\x03 \x03(\x0e\x32\x1e.xenon.WriteRequest.OpenOption\"e\n\nOpenOption\x12\x08\n\x04READ\x10\x00\x12\t\n\x05WRITE\x10\x01\x12\n\n\x06\x41PPEND\x10\x02\x12\n\n\x06\x43REATE\x10\x03\x12\x08\n\x04OPEN\x10\x04\x12\x12\n\x0eOPEN_OR_CREATE\x10\x05\x12\x0c\n\x08TRUNCATE\x10\x07\",\n\x0f\x44irectoryStream\x12\x19\n\x04path\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\"a\n\x19\x41ttributesDirectoryStream\x12\x19\n\x04path\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12)\n\nattributes\x18\x02 \x01(\x0b\x32\x15.xenon.FileAttributes\"\x9d\x02\n\x13NewSchedulerRequest\x12\x0f\n\x07\x61\x64\x61ptor\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x01(\t\x12>\n\nproperties\x18\x03 \x03(\x0b\x32*.xenon.NewSchedulerRequest.PropertiesEntry\x12\x33\n\x0b\x63\x65rtificate\x18\x04 \x01(\x0b\x32\x1c.xenon.CertificateCredentialH\x00\x12-\n\x08password\x18\x05 \x01(\x0b\x32\x19.xenon.PasswordCredentialH\x00\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0c\n\ncredential\"D\n\tScheduler\x12\n\n\x02id\x18\x01 \x01(\t\x12+\n\x07request\x18\x02 \x01(\x0b\x32\x1a.xenon.NewSchedulerRequest\"2\n\nSchedulers\x12$\n\nschedulers\x18\x01 \x03(\x0b\x32\x10.xenon.Scheduler\"\xd8\x03\n\x0eJobDescription\x12\x12\n\nexecutable\x18\x01 \x01(\t\x12\x11\n\targuments\x18\x02 \x03(\t\x12\x18\n\x10workingDirectory\x18\x03 \x01(\t\x12;\n\x0b\x65nvironment\x18\x04 \x03(\x0b\x32&.xenon.JobDescription.EnvironmentEntry\x12\x11\n\tqueueName\x18\x05 \x01(\t\x12\x13\n\x0binteractive\x18\x06 \x01(\x08\x12\x0f\n\x07maxTime\x18\x07 \x01(\x04\x12\x11\n\tnodeCount\x18\x08 \x01(\r\x12\x18\n\x10processesPerNode\x18\t \x01(\r\x12\x1a\n\x12startSingleProcess\x18\n \x01(\x08\x12\x0e\n\x06stdErr\x18\x0b \x01(\t\x12\r\n\x05stdIn\x18\x0c \x01(\t\x12\x0e\n\x06stdOut\x18\r \x01(\t\x12\x33\n\x07options\x18\x0e \x03(\x0b\x32\".xenon.JobDescription.OptionsEntry\x1a\x32\n\x10\x45nvironmentEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a.\n\x0cOptionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"c\n\x10SubmitJobRequest\x12#\n\tscheduler\x18\x01 \x01(\x0b\x32\x10.xenon.Scheduler\x12*\n\x0b\x64\x65scription\x18\x02 \x01(\x0b\x32\x15.xenon.JobDescription\"=\n\x03Job\x12\n\n\x02id\x18\x01 \x01(\t\x12*\n\x0b\x64\x65scription\x18\x02 \x01(\x0b\x32\x15.xenon.JobDescription\" \n\x04Jobs\x12\x18\n\x04jobs\x18\x01 \x03(\x0b\x32\n.xenon.Job\"\x15\n\x05Queue\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x16\n\x06Queues\x12\x0c\n\x04name\x18\x01 \x03(\t\"X\n\x12SchedulerAndQueues\x12#\n\tscheduler\x18\x01 \x01(\x0b\x32\x10.xenon.Scheduler\x12\x1d\n\x06queues\x18\x02 \x03(\x0b\x32\r.xenon.Queues\"\xb3\x03\n\tJobStatus\x12\r\n\x05state\x18\x01 \x01(\t\x12\x0f\n\x07running\x18\x02 \x01(\x08\x12\x0c\n\x04\x64one\x18\x03 \x01(\x08\x12X\n\x1cschedulerSpecificInformation\x18\x04 \x03(\x0b\x32\x32.xenon.JobStatus.SchedulerSpecificInformationEntry\x12\x10\n\x08\x65xitCode\x18\x06 \x01(\x05\x12\x14\n\x0c\x65rrorMessage\x18\x07 \x01(\t\x12-\n\terrorType\x18\x08 \x01(\x0e\x32\x1a.xenon.JobStatus.ErrorType\x12\x17\n\x03job\x18\t \x01(\x0b\x32\n.xenon.Job\x1a\x43\n!SchedulerSpecificInformationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"i\n\tErrorType\x12\t\n\x05\x45mpty\x10\x00\x12\x0c\n\x08NotFound\x10\x01\x12\r\n\tCancelled\x10\x02\x12\x12\n\x0eSchedulerError\x10\x03\x12\x15\n\x11SchedulerNotFound\x10\x04\x12\t\n\x05Other\x10\x05\"1\n\x0bJobStatuses\x12\"\n\x08statuses\x18\x01 \x03(\x0b\x32\x10.xenon.JobStatus\"\xf0\x01\n\x0bQueueStatus\x12\x0c\n\x04name\x18\x01 \x01(\t\x12#\n\tscheduler\x18\x02 \x01(\x0b\x32\x10.xenon.Scheduler\x12Z\n\x1cschedulerSpecificInformation\x18\x03 \x03(\x0b\x32\x34.xenon.QueueStatus.SchedulerSpecificInformationEntry\x12\r\n\x05\x65rror\x18\x04 \x01(\t\x1a\x43\n!SchedulerSpecificInformationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"5\n\rQueueStatuses\x12$\n\x08statuses\x18\x01 \x03(\x0b\x32\x12.xenon.QueueStatus\"8\n\x0eJobInputStream\x12\x17\n\x03job\x18\x01 \x01(\x0b\x32\n.xenon.Job\x12\r\n\x05stdin\x18\x02 \x01(\x0c\"2\n\x10JobOutputStreams\x12\x0e\n\x06stdout\x18\x01 \x01(\x0c\x12\x0e\n\x06stderr\x18\x02 \x01(\x0c\"\x10\n\x02Is\x12\n\n\x02is\x18\x01 \x01(\x08*\xb4\x01\n\x13PosixFilePermission\x12\x0e\n\nOWNER_READ\x10\x00\x12\x0f\n\x0bOWNER_WRITE\x10\x01\x12\x11\n\rOWNER_EXECUTE\x10\x02\x12\x0e\n\nGROUP_READ\x10\x03\x12\x0f\n\x0bGROUP_WRITE\x10\x04\x12\x11\n\rGROUP_EXECUTE\x10\x05\x12\x0f\n\x0bOTHERS_READ\x10\x06\x12\x10\n\x0cOTHERS_WRITE\x10\x07\x12\x12\n\x0eOTHERS_EXECUTE\x10\x08\x32}\n\x05Xenon\x12-\n\x08newXenon\x12\x11.xenon.Properties\x1a\x0c.xenon.Empty\"\x00\x12\x45\n\x16getSupportedProperties\x12\x0c.xenon.Empty\x1a\x1b.xenon.PropertyDescriptions\"\x00\x32\xc9\n\n\nXenonFiles\x12H\n\x16getAdaptorDescriptions\x12\x0c.xenon.Empty\x1a\x1e.xenon.FileAdaptorDescriptions\"\x00\x12L\n\x15getAdaptorDescription\x12\x12.xenon.AdaptorName\x1a\x1d.xenon.FileAdaptorDescription\"\x00\x12\x41\n\rnewFileSystem\x12\x1b.xenon.NewFileSystemRequest\x1a\x11.xenon.FileSystem\"\x00\x12\x30\n\x11\x63reateDirectories\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12.\n\x0f\x63reateDirectory\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12)\n\ncreateFile\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12\x33\n\x0e\x62\x61\x63kgroundCopy\x12\x12.xenon.CopyRequest\x1a\x0b.xenon.Copy\"\x00\x12.\n\ncancelCopy\x12\x0b.xenon.Copy\x1a\x11.xenon.CopyStatus\"\x00\x12\x31\n\rgetCopyStatus\x12\x0b.xenon.Copy\x1a\x11.xenon.CopyStatus\"\x00\x12\x37\n\x10listCopyStatuses\x12\x0c.xenon.Empty\x1a\x13.xenon.CopyStatuses\"\x00\x12*\n\x04\x63opy\x12\x12.xenon.CopyRequest\x1a\x0c.xenon.Empty\"\x00\x12+\n\x04move\x12\x13.xenon.SourceTarget\x1a\x0c.xenon.Empty\"\x00\x12%\n\x06\x64\x65lete\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12%\n\x06\x65xists\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12*\n\x04read\x12\x0b.xenon.Path\x1a\x11.xenon.FileStream\"\x00\x30\x01\x12.\n\x05write\x12\x13.xenon.WriteRequest\x1a\x0c.xenon.Empty\"\x00(\x01\x12L\n\x17walkAttributesDirectory\x12\x0b.xenon.Path\x1a .xenon.AttributesDirectoryStream\"\x00\x30\x01\x12\x38\n\rwalkDirectory\x12\x0b.xenon.Path\x1a\x16.xenon.DirectoryStream\"\x00\x30\x01\x12\x35\n\rgetAttributes\x12\x0b.xenon.Path\x1a\x15.xenon.FileAttributes\"\x00\x12M\n\x17setPosixFilePermissions\x12\".xenon.PosixFilePermissionsRequest\x1a\x0c.xenon.Empty\"\x00\x12.\n\x10readSymbolicLink\x12\x0b.xenon.Path\x1a\x0b.xenon.Path\"\x00\x12(\n\x06isOpen\x12\x11.xenon.FileSystem\x1a\t.xenon.Is\"\x00\x12*\n\x05\x63lose\x12\x11.xenon.FileSystem\x1a\x0c.xenon.Empty\"\x00\x12\x35\n\x0flistFileSystems\x12\x0c.xenon.Empty\x1a\x12.xenon.FileSystems\"\x00\x12\x34\n\x0flocalFileSystem\x12\x0c.xenon.Empty\x1a\x11.xenon.FileSystem\"\x00\x32\x87\t\n\tXenonJobs\x12G\n\x16getAdaptorDescriptions\x12\x0c.xenon.Empty\x1a\x1d.xenon.JobAdaptorDescriptions\"\x00\x12K\n\x15getAdaptorDescription\x12\x12.xenon.AdaptorName\x1a\x1c.xenon.JobAdaptorDescription\"\x00\x12>\n\x0cnewScheduler\x12\x1a.xenon.NewSchedulerRequest\x1a\x10.xenon.Scheduler\"\x00\x12\x32\n\tsubmitJob\x12\x17.xenon.SubmitJobRequest\x1a\n.xenon.Job\"\x00\x12.\n\tgetQueues\x12\x10.xenon.Scheduler\x1a\r.xenon.Queues\"\x00\x12\x37\n\x13getDefaultQueueName\x12\x10.xenon.Scheduler\x1a\x0c.xenon.Queue\"\x00\x12\x33\n\x07getJobs\x12\x19.xenon.SchedulerAndQueues\x1a\x0b.xenon.Jobs\"\x00\x12.\n\x0cgetJobStatus\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\x33\n\x0egetJobStatuses\x12\x0b.xenon.Jobs\x1a\x12.xenon.JobStatuses\"\x00\x12\x41\n\x0egetQueueStatus\x12\x19.xenon.SchedulerAndQueues\x1a\x12.xenon.QueueStatus\"\x00\x12\x45\n\x10getQueueStatuses\x12\x19.xenon.SchedulerAndQueues\x1a\x14.xenon.QueueStatuses\"\x00\x12/\n\rwaitUntilDone\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\x32\n\x10waitUntilRunning\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\x42\n\ngetStreams\x12\x15.xenon.JobInputStream\x1a\x17.xenon.JobOutputStreams\"\x00(\x01\x30\x01\x12\'\n\x06isOpen\x12\x10.xenon.Scheduler\x1a\t.xenon.Is\"\x00\x12+\n\tcancelJob\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\'\n\tdeleteJob\x12\n.xenon.Job\x1a\x0c.xenon.Empty\"\x00\x12)\n\x05\x63lose\x12\x10.xenon.Scheduler\x1a\x0c.xenon.Empty\"\x00\x12\x33\n\x0elistSchedulers\x12\x0c.xenon.Empty\x1a\x11.xenon.Schedulers\"\x00\x12\'\n\x08listJobs\x12\x0c.xenon.Empty\x1a\x0b.xenon.Jobs\"\x00\x12\x32\n\x0elocalScheduler\x12\x0c.xenon.Empty\x1a\x10.xenon.Scheduler\"\x00\x42*\n\x1cnl.esciencecenter.xenon.grpcB\nXenonProtob\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-_COPYOPTION = _descriptor.EnumDescriptor(
+_POSIXFILEPERMISSION = _descriptor.EnumDescriptor(
+  name='PosixFilePermission',
+  full_name='xenon.PosixFilePermission',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='OWNER_READ', index=0, number=0,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='OWNER_WRITE', index=1, number=1,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='OWNER_EXECUTE', index=2, number=2,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='GROUP_READ', index=3, number=3,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='GROUP_WRITE', index=4, number=4,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='GROUP_EXECUTE', index=5, number=5,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='OTHERS_READ', index=6, number=6,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='OTHERS_WRITE', index=7, number=7,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='OTHERS_EXECUTE', index=8, number=8,
+      options=None,
+      type=None),
+  ],
+  containing_type=None,
+  options=None,
+  serialized_start=5390,
+  serialized_end=5570,
+)
+_sym_db.RegisterEnumDescriptor(_POSIXFILEPERMISSION)
+
+PosixFilePermission = enum_type_wrapper.EnumTypeWrapper(_POSIXFILEPERMISSION)
+OWNER_READ = 0
+OWNER_WRITE = 1
+OWNER_EXECUTE = 2
+GROUP_READ = 3
+GROUP_WRITE = 4
+GROUP_EXECUTE = 5
+OTHERS_READ = 6
+OTHERS_WRITE = 7
+OTHERS_EXECUTE = 8
+
+
+_PROPERTYDESCRIPTION_TYPE = _descriptor.EnumDescriptor(
+  name='Type',
+  full_name='xenon.PropertyDescription.Type',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='STRING', index=0, number=0,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='BOOLEAN', index=1, number=1,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='INTEGER', index=2, number=2,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='DOUBLE', index=3, number=3,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='LONG', index=4, number=4,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='SIZE', index=5, number=5,
+      options=None,
+      type=None),
+  ],
+  containing_type=None,
+  options=None,
+  serialized_start=279,
+  serialized_end=355,
+)
+_sym_db.RegisterEnumDescriptor(_PROPERTYDESCRIPTION_TYPE)
+
+_COPYREQUEST_COPYOPTION = _descriptor.EnumDescriptor(
   name='CopyOption',
-  full_name='xenon.CopyOption',
+  full_name='xenon.CopyRequest.CopyOption',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -57,19 +157,52 @@ _COPYOPTION = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=2624,
-  serialized_end=2709,
+  serialized_start=1995,
+  serialized_end=2080,
 )
-_sym_db.RegisterEnumDescriptor(_COPYOPTION)
+_sym_db.RegisterEnumDescriptor(_COPYREQUEST_COPYOPTION)
 
-CopyOption = enum_type_wrapper.EnumTypeWrapper(_COPYOPTION)
-CREATE = 0
-REPLACE = 1
-IGNORE = 2
-APPEND = 3
-RESUME = 4
-VERIFY = 5
-
+_WRITEREQUEST_OPENOPTION = _descriptor.EnumDescriptor(
+  name='OpenOption',
+  full_name='xenon.WriteRequest.OpenOption',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='READ', index=0, number=0,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='WRITE', index=1, number=1,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='APPEND', index=2, number=2,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='CREATE', index=3, number=3,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='OPEN', index=4, number=4,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='OPEN_OR_CREATE', index=5, number=5,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='TRUNCATE', index=6, number=7,
+      options=None,
+      type=None),
+  ],
+  containing_type=None,
+  options=None,
+  serialized_start=3006,
+  serialized_end=3107,
+)
+_sym_db.RegisterEnumDescriptor(_WRITEREQUEST_OPENOPTION)
 
 _JOBSTATUS_ERRORTYPE = _descriptor.EnumDescriptor(
   name='ErrorType',
@@ -104,8 +237,8 @@ _JOBSTATUS_ERRORTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=2407,
-  serialized_end=2512,
+  serialized_start=4805,
+  serialized_end=4910,
 )
 _sym_db.RegisterEnumDescriptor(_JOBSTATUS_ERRORTYPE)
 
@@ -134,16 +267,137 @@ _EMPTY = _descriptor.Descriptor(
 )
 
 
-_SCHEMES = _descriptor.Descriptor(
-  name='Schemes',
-  full_name='xenon.Schemes',
+_PROPERTIES_PROPERTIESENTRY = _descriptor.Descriptor(
+  name='PropertiesEntry',
+  full_name='xenon.Properties.PropertiesEntry',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='schemes', full_name='xenon.Schemes.schemes', index=0,
-      number=1, type=9, cpp_type=9, label=3,
+      name='key', full_name='xenon.Properties.PropertiesEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='xenon.Properties.PropertiesEntry.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=100,
+  serialized_end=149,
+)
+
+_PROPERTIES = _descriptor.Descriptor(
+  name='Properties',
+  full_name='xenon.Properties',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='properties', full_name='xenon.Properties.properties', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[_PROPERTIES_PROPERTIESENTRY, ],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=31,
+  serialized_end=149,
+)
+
+
+_PROPERTYDESCRIPTION = _descriptor.Descriptor(
+  name='PropertyDescription',
+  full_name='xenon.PropertyDescription',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='xenon.PropertyDescription.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='description', full_name='xenon.PropertyDescription.description', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='defaultValue', full_name='xenon.PropertyDescription.defaultValue', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='type', full_name='xenon.PropertyDescription.type', index=3,
+      number=4, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+    _PROPERTYDESCRIPTION_TYPE,
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=152,
+  serialized_end=355,
+)
+
+
+_PROPERTYDESCRIPTIONS = _descriptor.Descriptor(
+  name='PropertyDescriptions',
+  full_name='xenon.PropertyDescriptions',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='properties', full_name='xenon.PropertyDescriptions.properties', index=0,
+      number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -160,8 +414,240 @@ _SCHEMES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=31,
-  serialized_end=57,
+  serialized_start=357,
+  serialized_end=427,
+)
+
+
+_JOBADAPTORDESCRIPTION = _descriptor.Descriptor(
+  name='JobAdaptorDescription',
+  full_name='xenon.JobAdaptorDescription',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='xenon.JobAdaptorDescription.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='description', full_name='xenon.JobAdaptorDescription.description', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='supportedLocations', full_name='xenon.JobAdaptorDescription.supportedLocations', index=2,
+      number=3, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='supportedProperties', full_name='xenon.JobAdaptorDescription.supportedProperties', index=3,
+      number=4, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='online', full_name='xenon.JobAdaptorDescription.online', index=4,
+      number=5, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='supportsInteractive', full_name='xenon.JobAdaptorDescription.supportsInteractive', index=5,
+      number=6, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='supportsBatch', full_name='xenon.JobAdaptorDescription.supportsBatch', index=6,
+      number=7, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='supportedVersions', full_name='xenon.JobAdaptorDescription.supportedVersions', index=7,
+      number=8, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=430,
+  serialized_end=668,
+)
+
+
+_JOBADAPTORDESCRIPTIONS = _descriptor.Descriptor(
+  name='JobAdaptorDescriptions',
+  full_name='xenon.JobAdaptorDescriptions',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='descriptions', full_name='xenon.JobAdaptorDescriptions.descriptions', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=670,
+  serialized_end=746,
+)
+
+
+_FILEADAPTORDESCRIPTION = _descriptor.Descriptor(
+  name='FileAdaptorDescription',
+  full_name='xenon.FileAdaptorDescription',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='xenon.FileAdaptorDescription.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='description', full_name='xenon.FileAdaptorDescription.description', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='supportedLocations', full_name='xenon.FileAdaptorDescription.supportedLocations', index=2,
+      number=3, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='supportedProperties', full_name='xenon.FileAdaptorDescription.supportedProperties', index=3,
+      number=4, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='supportsThirdPartyCopy', full_name='xenon.FileAdaptorDescription.supportsThirdPartyCopy', index=4,
+      number=5, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=749,
+  serialized_end=925,
+)
+
+
+_FILEADAPTORDESCRIPTIONS = _descriptor.Descriptor(
+  name='FileAdaptorDescriptions',
+  full_name='xenon.FileAdaptorDescriptions',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='descriptions', full_name='xenon.FileAdaptorDescriptions.descriptions', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=927,
+  serialized_end=1005,
+)
+
+
+_ADAPTORNAME = _descriptor.Descriptor(
+  name='AdaptorName',
+  full_name='xenon.AdaptorName',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='xenon.AdaptorName.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1007,
+  serialized_end=1034,
 )
 
 
@@ -198,8 +684,8 @@ _CERTIFICATECREDENTIAL_PROPERTIESENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=193,
-  serialized_end=242,
+  serialized_start=100,
+  serialized_end=149,
 )
 
 _CERTIFICATECREDENTIAL = _descriptor.Descriptor(
@@ -242,8 +728,8 @@ _CERTIFICATECREDENTIAL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=60,
-  serialized_end=242,
+  serialized_start=1037,
+  serialized_end=1219,
 )
 
 
@@ -280,8 +766,8 @@ _PASSWORDCREDENTIAL_PROPERTIESENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=193,
-  serialized_end=242,
+  serialized_start=100,
+  serialized_end=149,
 )
 
 _PASSWORDCREDENTIAL = _descriptor.Descriptor(
@@ -324,8 +810,8 @@ _PASSWORDCREDENTIAL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=245,
-  serialized_end=415,
+  serialized_start=1222,
+  serialized_end=1392,
 )
 
 
@@ -362,8 +848,8 @@ _NEWFILESYSTEMREQUEST_PROPERTIESENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=193,
-  serialized_end=242,
+  serialized_start=100,
+  serialized_end=149,
 )
 
 _NEWFILESYSTEMREQUEST = _descriptor.Descriptor(
@@ -374,7 +860,7 @@ _NEWFILESYSTEMREQUEST = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='scheme', full_name='xenon.NewFileSystemRequest.scheme', index=0,
+      name='adaptor', full_name='xenon.NewFileSystemRequest.adaptor', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -423,8 +909,8 @@ _NEWFILESYSTEMREQUEST = _descriptor.Descriptor(
       name='credential', full_name='xenon.NewFileSystemRequest.credential',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=418,
-  serialized_end=704,
+  serialized_start=1395,
+  serialized_end=1682,
 )
 
 
@@ -461,8 +947,8 @@ _FILESYSTEM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=706,
-  serialized_end=776,
+  serialized_start=1684,
+  serialized_end=1754,
 )
 
 
@@ -492,8 +978,8 @@ _FILESYSTEMS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=778,
-  serialized_end=832,
+  serialized_start=1756,
+  serialized_end=1810,
 )
 
 
@@ -530,8 +1016,8 @@ _PATH = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=834,
-  serialized_end=893,
+  serialized_start=1812,
+  serialized_end=1871,
 )
 
 
@@ -568,6 +1054,7 @@ _COPYREQUEST = _descriptor.Descriptor(
   ],
   nested_types=[],
   enum_types=[
+    _COPYREQUEST_COPYOPTION,
   ],
   options=None,
   is_extendable=False,
@@ -575,8 +1062,501 @@ _COPYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=895,
-  serialized_end=1002,
+  serialized_start=1874,
+  serialized_end=2080,
+)
+
+
+_SOURCETARGET = _descriptor.Descriptor(
+  name='SourceTarget',
+  full_name='xenon.SourceTarget',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='source', full_name='xenon.SourceTarget.source', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='target', full_name='xenon.SourceTarget.target', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2082,
+  serialized_end=2154,
+)
+
+
+_COPY = _descriptor.Descriptor(
+  name='Copy',
+  full_name='xenon.Copy',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='xenon.Copy.id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='request', full_name='xenon.Copy.request', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2156,
+  serialized_end=2211,
+)
+
+
+_COPYSTATUS = _descriptor.Descriptor(
+  name='CopyStatus',
+  full_name='xenon.CopyStatus',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='copy', full_name='xenon.CopyStatus.copy', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='bytesCopied', full_name='xenon.CopyStatus.bytesCopied', index=1,
+      number=2, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='bytesToCopy', full_name='xenon.CopyStatus.bytesToCopy', index=2,
+      number=3, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='done', full_name='xenon.CopyStatus.done', index=3,
+      number=4, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='running', full_name='xenon.CopyStatus.running', index=4,
+      number=5, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='state', full_name='xenon.CopyStatus.state', index=5,
+      number=6, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='error', full_name='xenon.CopyStatus.error', index=6,
+      number=7, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2214,
+  serialized_end=2356,
+)
+
+
+_COPYSTATUSES = _descriptor.Descriptor(
+  name='CopyStatuses',
+  full_name='xenon.CopyStatuses',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='statuses', full_name='xenon.CopyStatuses.statuses', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2358,
+  serialized_end=2409,
+)
+
+
+_FILEATTRIBUTES = _descriptor.Descriptor(
+  name='FileAttributes',
+  full_name='xenon.FileAttributes',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='creationTime', full_name='xenon.FileAttributes.creationTime', index=0,
+      number=1, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='group', full_name='xenon.FileAttributes.group', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='isDirectory', full_name='xenon.FileAttributes.isDirectory', index=2,
+      number=3, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='isExecutable', full_name='xenon.FileAttributes.isExecutable', index=3,
+      number=4, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='isHidden', full_name='xenon.FileAttributes.isHidden', index=4,
+      number=5, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='isOther', full_name='xenon.FileAttributes.isOther', index=5,
+      number=6, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='isReadable', full_name='xenon.FileAttributes.isReadable', index=6,
+      number=7, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='isRegularFile', full_name='xenon.FileAttributes.isRegularFile', index=7,
+      number=8, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='isSymbolicLink', full_name='xenon.FileAttributes.isSymbolicLink', index=8,
+      number=9, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='isWritable', full_name='xenon.FileAttributes.isWritable', index=9,
+      number=10, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='lastAccessTime', full_name='xenon.FileAttributes.lastAccessTime', index=10,
+      number=11, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='lastModifiedTime', full_name='xenon.FileAttributes.lastModifiedTime', index=11,
+      number=12, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='owner', full_name='xenon.FileAttributes.owner', index=12,
+      number=13, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='permissions', full_name='xenon.FileAttributes.permissions', index=13,
+      number=14, type=14, cpp_type=8, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='size', full_name='xenon.FileAttributes.size', index=14,
+      number=15, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2412,
+  serialized_end=2758,
+)
+
+
+_POSIXFILEPERMISSIONSREQUEST = _descriptor.Descriptor(
+  name='PosixFilePermissionsRequest',
+  full_name='xenon.PosixFilePermissionsRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='path', full_name='xenon.PosixFilePermissionsRequest.path', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='permissions', full_name='xenon.PosixFilePermissionsRequest.permissions', index=1,
+      number=2, type=14, cpp_type=8, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2760,
+  serialized_end=2865,
+)
+
+
+_FILESTREAM = _descriptor.Descriptor(
+  name='FileStream',
+  full_name='xenon.FileStream',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='buffer', full_name='xenon.FileStream.buffer', index=0,
+      number=1, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b(""),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2867,
+  serialized_end=2895,
+)
+
+
+_WRITEREQUEST = _descriptor.Descriptor(
+  name='WriteRequest',
+  full_name='xenon.WriteRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='path', full_name='xenon.WriteRequest.path', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='buffer', full_name='xenon.WriteRequest.buffer', index=1,
+      number=2, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b(""),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='options', full_name='xenon.WriteRequest.options', index=2,
+      number=3, type=14, cpp_type=8, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+    _WRITEREQUEST_OPENOPTION,
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2898,
+  serialized_end=3107,
+)
+
+
+_DIRECTORYSTREAM = _descriptor.Descriptor(
+  name='DirectoryStream',
+  full_name='xenon.DirectoryStream',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='path', full_name='xenon.DirectoryStream.path', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=3109,
+  serialized_end=3153,
+)
+
+
+_ATTRIBUTESDIRECTORYSTREAM = _descriptor.Descriptor(
+  name='AttributesDirectoryStream',
+  full_name='xenon.AttributesDirectoryStream',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='path', full_name='xenon.AttributesDirectoryStream.path', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='attributes', full_name='xenon.AttributesDirectoryStream.attributes', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=3155,
+  serialized_end=3252,
 )
 
 
@@ -613,8 +1593,8 @@ _NEWSCHEDULERREQUEST_PROPERTIESENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=193,
-  serialized_end=242,
+  serialized_start=100,
+  serialized_end=149,
 )
 
 _NEWSCHEDULERREQUEST = _descriptor.Descriptor(
@@ -625,7 +1605,7 @@ _NEWSCHEDULERREQUEST = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='scheme', full_name='xenon.NewSchedulerRequest.scheme', index=0,
+      name='adaptor', full_name='xenon.NewSchedulerRequest.adaptor', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -674,8 +1654,8 @@ _NEWSCHEDULERREQUEST = _descriptor.Descriptor(
       name='credential', full_name='xenon.NewSchedulerRequest.credential',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=1005,
-  serialized_end=1289,
+  serialized_start=3255,
+  serialized_end=3540,
 )
 
 
@@ -712,8 +1692,8 @@ _SCHEDULER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1291,
-  serialized_end=1359,
+  serialized_start=3542,
+  serialized_end=3610,
 )
 
 
@@ -743,8 +1723,8 @@ _SCHEDULERS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1361,
-  serialized_end=1411,
+  serialized_start=3612,
+  serialized_end=3662,
 )
 
 
@@ -781,8 +1761,8 @@ _JOBDESCRIPTION_ENVIRONMENTENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1788,
-  serialized_end=1838,
+  serialized_start=4039,
+  serialized_end=4089,
 )
 
 _JOBDESCRIPTION_OPTIONSENTRY = _descriptor.Descriptor(
@@ -818,8 +1798,8 @@ _JOBDESCRIPTION_OPTIONSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1840,
-  serialized_end=1886,
+  serialized_start=4091,
+  serialized_end=4137,
 )
 
 _JOBDESCRIPTION = _descriptor.Descriptor(
@@ -939,8 +1919,8 @@ _JOBDESCRIPTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1414,
-  serialized_end=1886,
+  serialized_start=3665,
+  serialized_end=4137,
 )
 
 
@@ -977,8 +1957,8 @@ _SUBMITJOBREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1888,
-  serialized_end=1987,
+  serialized_start=4139,
+  serialized_end=4238,
 )
 
 
@@ -1015,8 +1995,70 @@ _JOB = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1989,
-  serialized_end=2050,
+  serialized_start=4240,
+  serialized_end=4301,
+)
+
+
+_JOBS = _descriptor.Descriptor(
+  name='Jobs',
+  full_name='xenon.Jobs',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='jobs', full_name='xenon.Jobs.jobs', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=4303,
+  serialized_end=4335,
+)
+
+
+_QUEUE = _descriptor.Descriptor(
+  name='Queue',
+  full_name='xenon.Queue',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='xenon.Queue.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=4337,
+  serialized_end=4358,
 )
 
 
@@ -1046,8 +2088,46 @@ _QUEUES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2052,
-  serialized_end=2074,
+  serialized_start=4360,
+  serialized_end=4382,
+)
+
+
+_SCHEDULERANDQUEUES = _descriptor.Descriptor(
+  name='SchedulerAndQueues',
+  full_name='xenon.SchedulerAndQueues',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='scheduler', full_name='xenon.SchedulerAndQueues.scheduler', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='queues', full_name='xenon.SchedulerAndQueues.queues', index=1,
+      number=2, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=4384,
+  serialized_end=4472,
 )
 
 
@@ -1084,8 +2164,8 @@ _JOBSTATUS_SCHEDULERSPECIFICINFORMATIONENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2338,
-  serialized_end=2405,
+  serialized_start=4736,
+  serialized_end=4803,
 )
 
 _JOBSTATUS = _descriptor.Descriptor(
@@ -1164,8 +2244,159 @@ _JOBSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2077,
-  serialized_end=2512,
+  serialized_start=4475,
+  serialized_end=4910,
+)
+
+
+_JOBSTATUSES = _descriptor.Descriptor(
+  name='JobStatuses',
+  full_name='xenon.JobStatuses',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='statuses', full_name='xenon.JobStatuses.statuses', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=4912,
+  serialized_end=4961,
+)
+
+
+_QUEUESTATUS_SCHEDULERSPECIFICINFORMATIONENTRY = _descriptor.Descriptor(
+  name='SchedulerSpecificInformationEntry',
+  full_name='xenon.QueueStatus.SchedulerSpecificInformationEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='xenon.QueueStatus.SchedulerSpecificInformationEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='xenon.QueueStatus.SchedulerSpecificInformationEntry.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=4736,
+  serialized_end=4803,
+)
+
+_QUEUESTATUS = _descriptor.Descriptor(
+  name='QueueStatus',
+  full_name='xenon.QueueStatus',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='xenon.QueueStatus.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='scheduler', full_name='xenon.QueueStatus.scheduler', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='schedulerSpecificInformation', full_name='xenon.QueueStatus.schedulerSpecificInformation', index=2,
+      number=3, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='error', full_name='xenon.QueueStatus.error', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[_QUEUESTATUS_SCHEDULERSPECIFICINFORMATIONENTRY, ],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=4964,
+  serialized_end=5204,
+)
+
+
+_QUEUESTATUSES = _descriptor.Descriptor(
+  name='QueueStatuses',
+  full_name='xenon.QueueStatuses',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='statuses', full_name='xenon.QueueStatuses.statuses', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=5206,
+  serialized_end=5259,
 )
 
 
@@ -1202,8 +2433,8 @@ _JOBINPUTSTREAM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2514,
-  serialized_end=2570,
+  serialized_start=5261,
+  serialized_end=5317,
 )
 
 
@@ -1240,10 +2471,50 @@ _JOBOUTPUTSTREAMS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2572,
-  serialized_end=2622,
+  serialized_start=5319,
+  serialized_end=5369,
 )
 
+
+_IS = _descriptor.Descriptor(
+  name='Is',
+  full_name='xenon.Is',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='is', full_name='xenon.Is.is', index=0,
+      number=1, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=5371,
+  serialized_end=5387,
+)
+
+_PROPERTIES_PROPERTIESENTRY.containing_type = _PROPERTIES
+_PROPERTIES.fields_by_name['properties'].message_type = _PROPERTIES_PROPERTIESENTRY
+_PROPERTYDESCRIPTION.fields_by_name['type'].enum_type = _PROPERTYDESCRIPTION_TYPE
+_PROPERTYDESCRIPTION_TYPE.containing_type = _PROPERTYDESCRIPTION
+_PROPERTYDESCRIPTIONS.fields_by_name['properties'].message_type = _PROPERTYDESCRIPTION
+_JOBADAPTORDESCRIPTION.fields_by_name['supportedProperties'].message_type = _PROPERTYDESCRIPTION
+_JOBADAPTORDESCRIPTIONS.fields_by_name['descriptions'].message_type = _JOBADAPTORDESCRIPTION
+_FILEADAPTORDESCRIPTION.fields_by_name['supportedProperties'].message_type = _PROPERTYDESCRIPTION
+_FILEADAPTORDESCRIPTIONS.fields_by_name['descriptions'].message_type = _FILEADAPTORDESCRIPTION
 _CERTIFICATECREDENTIAL_PROPERTIESENTRY.containing_type = _CERTIFICATECREDENTIAL
 _CERTIFICATECREDENTIAL.fields_by_name['properties'].message_type = _CERTIFICATECREDENTIAL_PROPERTIESENTRY
 _PASSWORDCREDENTIAL_PROPERTIESENTRY.containing_type = _PASSWORDCREDENTIAL
@@ -1263,7 +2534,22 @@ _FILESYSTEMS.fields_by_name['filesystems'].message_type = _FILESYSTEMS
 _PATH.fields_by_name['filesystem'].message_type = _FILESYSTEM
 _COPYREQUEST.fields_by_name['source'].message_type = _PATH
 _COPYREQUEST.fields_by_name['target'].message_type = _PATH
-_COPYREQUEST.fields_by_name['options'].enum_type = _COPYOPTION
+_COPYREQUEST.fields_by_name['options'].enum_type = _COPYREQUEST_COPYOPTION
+_COPYREQUEST_COPYOPTION.containing_type = _COPYREQUEST
+_SOURCETARGET.fields_by_name['source'].message_type = _PATH
+_SOURCETARGET.fields_by_name['target'].message_type = _PATH
+_COPY.fields_by_name['request'].message_type = _COPYREQUEST
+_COPYSTATUS.fields_by_name['copy'].message_type = _COPY
+_COPYSTATUSES.fields_by_name['statuses'].message_type = _COPYSTATUS
+_FILEATTRIBUTES.fields_by_name['permissions'].enum_type = _POSIXFILEPERMISSION
+_POSIXFILEPERMISSIONSREQUEST.fields_by_name['path'].message_type = _PATH
+_POSIXFILEPERMISSIONSREQUEST.fields_by_name['permissions'].enum_type = _POSIXFILEPERMISSION
+_WRITEREQUEST.fields_by_name['path'].message_type = _PATH
+_WRITEREQUEST.fields_by_name['options'].enum_type = _WRITEREQUEST_OPENOPTION
+_WRITEREQUEST_OPENOPTION.containing_type = _WRITEREQUEST
+_DIRECTORYSTREAM.fields_by_name['path'].message_type = _PATH
+_ATTRIBUTESDIRECTORYSTREAM.fields_by_name['path'].message_type = _PATH
+_ATTRIBUTESDIRECTORYSTREAM.fields_by_name['attributes'].message_type = _FILEATTRIBUTES
 _NEWSCHEDULERREQUEST_PROPERTIESENTRY.containing_type = _NEWSCHEDULERREQUEST
 _NEWSCHEDULERREQUEST.fields_by_name['properties'].message_type = _NEWSCHEDULERREQUEST_PROPERTIESENTRY
 _NEWSCHEDULERREQUEST.fields_by_name['certificate'].message_type = _CERTIFICATECREDENTIAL
@@ -1283,14 +2569,29 @@ _JOBDESCRIPTION.fields_by_name['options'].message_type = _JOBDESCRIPTION_OPTIONS
 _SUBMITJOBREQUEST.fields_by_name['scheduler'].message_type = _SCHEDULER
 _SUBMITJOBREQUEST.fields_by_name['description'].message_type = _JOBDESCRIPTION
 _JOB.fields_by_name['description'].message_type = _JOBDESCRIPTION
+_JOBS.fields_by_name['jobs'].message_type = _JOB
+_SCHEDULERANDQUEUES.fields_by_name['scheduler'].message_type = _SCHEDULER
+_SCHEDULERANDQUEUES.fields_by_name['queues'].message_type = _QUEUES
 _JOBSTATUS_SCHEDULERSPECIFICINFORMATIONENTRY.containing_type = _JOBSTATUS
 _JOBSTATUS.fields_by_name['schedulerSpecificInformation'].message_type = _JOBSTATUS_SCHEDULERSPECIFICINFORMATIONENTRY
 _JOBSTATUS.fields_by_name['errorType'].enum_type = _JOBSTATUS_ERRORTYPE
 _JOBSTATUS.fields_by_name['job'].message_type = _JOB
 _JOBSTATUS_ERRORTYPE.containing_type = _JOBSTATUS
+_JOBSTATUSES.fields_by_name['statuses'].message_type = _JOBSTATUS
+_QUEUESTATUS_SCHEDULERSPECIFICINFORMATIONENTRY.containing_type = _QUEUESTATUS
+_QUEUESTATUS.fields_by_name['scheduler'].message_type = _SCHEDULER
+_QUEUESTATUS.fields_by_name['schedulerSpecificInformation'].message_type = _QUEUESTATUS_SCHEDULERSPECIFICINFORMATIONENTRY
+_QUEUESTATUSES.fields_by_name['statuses'].message_type = _QUEUESTATUS
 _JOBINPUTSTREAM.fields_by_name['job'].message_type = _JOB
 DESCRIPTOR.message_types_by_name['Empty'] = _EMPTY
-DESCRIPTOR.message_types_by_name['Schemes'] = _SCHEMES
+DESCRIPTOR.message_types_by_name['Properties'] = _PROPERTIES
+DESCRIPTOR.message_types_by_name['PropertyDescription'] = _PROPERTYDESCRIPTION
+DESCRIPTOR.message_types_by_name['PropertyDescriptions'] = _PROPERTYDESCRIPTIONS
+DESCRIPTOR.message_types_by_name['JobAdaptorDescription'] = _JOBADAPTORDESCRIPTION
+DESCRIPTOR.message_types_by_name['JobAdaptorDescriptions'] = _JOBADAPTORDESCRIPTIONS
+DESCRIPTOR.message_types_by_name['FileAdaptorDescription'] = _FILEADAPTORDESCRIPTION
+DESCRIPTOR.message_types_by_name['FileAdaptorDescriptions'] = _FILEADAPTORDESCRIPTIONS
+DESCRIPTOR.message_types_by_name['AdaptorName'] = _ADAPTORNAME
 DESCRIPTOR.message_types_by_name['CertificateCredential'] = _CERTIFICATECREDENTIAL
 DESCRIPTOR.message_types_by_name['PasswordCredential'] = _PASSWORDCREDENTIAL
 DESCRIPTOR.message_types_by_name['NewFileSystemRequest'] = _NEWFILESYSTEMREQUEST
@@ -1298,17 +2599,34 @@ DESCRIPTOR.message_types_by_name['FileSystem'] = _FILESYSTEM
 DESCRIPTOR.message_types_by_name['FileSystems'] = _FILESYSTEMS
 DESCRIPTOR.message_types_by_name['Path'] = _PATH
 DESCRIPTOR.message_types_by_name['CopyRequest'] = _COPYREQUEST
+DESCRIPTOR.message_types_by_name['SourceTarget'] = _SOURCETARGET
+DESCRIPTOR.message_types_by_name['Copy'] = _COPY
+DESCRIPTOR.message_types_by_name['CopyStatus'] = _COPYSTATUS
+DESCRIPTOR.message_types_by_name['CopyStatuses'] = _COPYSTATUSES
+DESCRIPTOR.message_types_by_name['FileAttributes'] = _FILEATTRIBUTES
+DESCRIPTOR.message_types_by_name['PosixFilePermissionsRequest'] = _POSIXFILEPERMISSIONSREQUEST
+DESCRIPTOR.message_types_by_name['FileStream'] = _FILESTREAM
+DESCRIPTOR.message_types_by_name['WriteRequest'] = _WRITEREQUEST
+DESCRIPTOR.message_types_by_name['DirectoryStream'] = _DIRECTORYSTREAM
+DESCRIPTOR.message_types_by_name['AttributesDirectoryStream'] = _ATTRIBUTESDIRECTORYSTREAM
 DESCRIPTOR.message_types_by_name['NewSchedulerRequest'] = _NEWSCHEDULERREQUEST
 DESCRIPTOR.message_types_by_name['Scheduler'] = _SCHEDULER
 DESCRIPTOR.message_types_by_name['Schedulers'] = _SCHEDULERS
 DESCRIPTOR.message_types_by_name['JobDescription'] = _JOBDESCRIPTION
 DESCRIPTOR.message_types_by_name['SubmitJobRequest'] = _SUBMITJOBREQUEST
 DESCRIPTOR.message_types_by_name['Job'] = _JOB
+DESCRIPTOR.message_types_by_name['Jobs'] = _JOBS
+DESCRIPTOR.message_types_by_name['Queue'] = _QUEUE
 DESCRIPTOR.message_types_by_name['Queues'] = _QUEUES
+DESCRIPTOR.message_types_by_name['SchedulerAndQueues'] = _SCHEDULERANDQUEUES
 DESCRIPTOR.message_types_by_name['JobStatus'] = _JOBSTATUS
+DESCRIPTOR.message_types_by_name['JobStatuses'] = _JOBSTATUSES
+DESCRIPTOR.message_types_by_name['QueueStatus'] = _QUEUESTATUS
+DESCRIPTOR.message_types_by_name['QueueStatuses'] = _QUEUESTATUSES
 DESCRIPTOR.message_types_by_name['JobInputStream'] = _JOBINPUTSTREAM
 DESCRIPTOR.message_types_by_name['JobOutputStreams'] = _JOBOUTPUTSTREAMS
-DESCRIPTOR.enum_types_by_name['CopyOption'] = _COPYOPTION
+DESCRIPTOR.message_types_by_name['Is'] = _IS
+DESCRIPTOR.enum_types_by_name['PosixFilePermission'] = _POSIXFILEPERMISSION
 
 Empty = _reflection.GeneratedProtocolMessageType('Empty', (_message.Message,), dict(
   DESCRIPTOR = _EMPTY,
@@ -1317,12 +2635,69 @@ Empty = _reflection.GeneratedProtocolMessageType('Empty', (_message.Message,), d
   ))
 _sym_db.RegisterMessage(Empty)
 
-Schemes = _reflection.GeneratedProtocolMessageType('Schemes', (_message.Message,), dict(
-  DESCRIPTOR = _SCHEMES,
+Properties = _reflection.GeneratedProtocolMessageType('Properties', (_message.Message,), dict(
+
+  PropertiesEntry = _reflection.GeneratedProtocolMessageType('PropertiesEntry', (_message.Message,), dict(
+    DESCRIPTOR = _PROPERTIES_PROPERTIESENTRY,
+    __module__ = 'xenon_pb2'
+    # @@protoc_insertion_point(class_scope:xenon.Properties.PropertiesEntry)
+    ))
+  ,
+  DESCRIPTOR = _PROPERTIES,
   __module__ = 'xenon_pb2'
-  # @@protoc_insertion_point(class_scope:xenon.Schemes)
+  # @@protoc_insertion_point(class_scope:xenon.Properties)
   ))
-_sym_db.RegisterMessage(Schemes)
+_sym_db.RegisterMessage(Properties)
+_sym_db.RegisterMessage(Properties.PropertiesEntry)
+
+PropertyDescription = _reflection.GeneratedProtocolMessageType('PropertyDescription', (_message.Message,), dict(
+  DESCRIPTOR = _PROPERTYDESCRIPTION,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.PropertyDescription)
+  ))
+_sym_db.RegisterMessage(PropertyDescription)
+
+PropertyDescriptions = _reflection.GeneratedProtocolMessageType('PropertyDescriptions', (_message.Message,), dict(
+  DESCRIPTOR = _PROPERTYDESCRIPTIONS,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.PropertyDescriptions)
+  ))
+_sym_db.RegisterMessage(PropertyDescriptions)
+
+JobAdaptorDescription = _reflection.GeneratedProtocolMessageType('JobAdaptorDescription', (_message.Message,), dict(
+  DESCRIPTOR = _JOBADAPTORDESCRIPTION,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.JobAdaptorDescription)
+  ))
+_sym_db.RegisterMessage(JobAdaptorDescription)
+
+JobAdaptorDescriptions = _reflection.GeneratedProtocolMessageType('JobAdaptorDescriptions', (_message.Message,), dict(
+  DESCRIPTOR = _JOBADAPTORDESCRIPTIONS,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.JobAdaptorDescriptions)
+  ))
+_sym_db.RegisterMessage(JobAdaptorDescriptions)
+
+FileAdaptorDescription = _reflection.GeneratedProtocolMessageType('FileAdaptorDescription', (_message.Message,), dict(
+  DESCRIPTOR = _FILEADAPTORDESCRIPTION,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.FileAdaptorDescription)
+  ))
+_sym_db.RegisterMessage(FileAdaptorDescription)
+
+FileAdaptorDescriptions = _reflection.GeneratedProtocolMessageType('FileAdaptorDescriptions', (_message.Message,), dict(
+  DESCRIPTOR = _FILEADAPTORDESCRIPTIONS,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.FileAdaptorDescriptions)
+  ))
+_sym_db.RegisterMessage(FileAdaptorDescriptions)
+
+AdaptorName = _reflection.GeneratedProtocolMessageType('AdaptorName', (_message.Message,), dict(
+  DESCRIPTOR = _ADAPTORNAME,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.AdaptorName)
+  ))
+_sym_db.RegisterMessage(AdaptorName)
 
 CertificateCredential = _reflection.GeneratedProtocolMessageType('CertificateCredential', (_message.Message,), dict(
 
@@ -1397,6 +2772,76 @@ CopyRequest = _reflection.GeneratedProtocolMessageType('CopyRequest', (_message.
   ))
 _sym_db.RegisterMessage(CopyRequest)
 
+SourceTarget = _reflection.GeneratedProtocolMessageType('SourceTarget', (_message.Message,), dict(
+  DESCRIPTOR = _SOURCETARGET,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.SourceTarget)
+  ))
+_sym_db.RegisterMessage(SourceTarget)
+
+Copy = _reflection.GeneratedProtocolMessageType('Copy', (_message.Message,), dict(
+  DESCRIPTOR = _COPY,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.Copy)
+  ))
+_sym_db.RegisterMessage(Copy)
+
+CopyStatus = _reflection.GeneratedProtocolMessageType('CopyStatus', (_message.Message,), dict(
+  DESCRIPTOR = _COPYSTATUS,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.CopyStatus)
+  ))
+_sym_db.RegisterMessage(CopyStatus)
+
+CopyStatuses = _reflection.GeneratedProtocolMessageType('CopyStatuses', (_message.Message,), dict(
+  DESCRIPTOR = _COPYSTATUSES,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.CopyStatuses)
+  ))
+_sym_db.RegisterMessage(CopyStatuses)
+
+FileAttributes = _reflection.GeneratedProtocolMessageType('FileAttributes', (_message.Message,), dict(
+  DESCRIPTOR = _FILEATTRIBUTES,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.FileAttributes)
+  ))
+_sym_db.RegisterMessage(FileAttributes)
+
+PosixFilePermissionsRequest = _reflection.GeneratedProtocolMessageType('PosixFilePermissionsRequest', (_message.Message,), dict(
+  DESCRIPTOR = _POSIXFILEPERMISSIONSREQUEST,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.PosixFilePermissionsRequest)
+  ))
+_sym_db.RegisterMessage(PosixFilePermissionsRequest)
+
+FileStream = _reflection.GeneratedProtocolMessageType('FileStream', (_message.Message,), dict(
+  DESCRIPTOR = _FILESTREAM,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.FileStream)
+  ))
+_sym_db.RegisterMessage(FileStream)
+
+WriteRequest = _reflection.GeneratedProtocolMessageType('WriteRequest', (_message.Message,), dict(
+  DESCRIPTOR = _WRITEREQUEST,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.WriteRequest)
+  ))
+_sym_db.RegisterMessage(WriteRequest)
+
+DirectoryStream = _reflection.GeneratedProtocolMessageType('DirectoryStream', (_message.Message,), dict(
+  DESCRIPTOR = _DIRECTORYSTREAM,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.DirectoryStream)
+  ))
+_sym_db.RegisterMessage(DirectoryStream)
+
+AttributesDirectoryStream = _reflection.GeneratedProtocolMessageType('AttributesDirectoryStream', (_message.Message,), dict(
+  DESCRIPTOR = _ATTRIBUTESDIRECTORYSTREAM,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.AttributesDirectoryStream)
+  ))
+_sym_db.RegisterMessage(AttributesDirectoryStream)
+
 NewSchedulerRequest = _reflection.GeneratedProtocolMessageType('NewSchedulerRequest', (_message.Message,), dict(
 
   PropertiesEntry = _reflection.GeneratedProtocolMessageType('PropertiesEntry', (_message.Message,), dict(
@@ -1463,12 +2908,33 @@ Job = _reflection.GeneratedProtocolMessageType('Job', (_message.Message,), dict(
   ))
 _sym_db.RegisterMessage(Job)
 
+Jobs = _reflection.GeneratedProtocolMessageType('Jobs', (_message.Message,), dict(
+  DESCRIPTOR = _JOBS,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.Jobs)
+  ))
+_sym_db.RegisterMessage(Jobs)
+
+Queue = _reflection.GeneratedProtocolMessageType('Queue', (_message.Message,), dict(
+  DESCRIPTOR = _QUEUE,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.Queue)
+  ))
+_sym_db.RegisterMessage(Queue)
+
 Queues = _reflection.GeneratedProtocolMessageType('Queues', (_message.Message,), dict(
   DESCRIPTOR = _QUEUES,
   __module__ = 'xenon_pb2'
   # @@protoc_insertion_point(class_scope:xenon.Queues)
   ))
 _sym_db.RegisterMessage(Queues)
+
+SchedulerAndQueues = _reflection.GeneratedProtocolMessageType('SchedulerAndQueues', (_message.Message,), dict(
+  DESCRIPTOR = _SCHEDULERANDQUEUES,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.SchedulerAndQueues)
+  ))
+_sym_db.RegisterMessage(SchedulerAndQueues)
 
 JobStatus = _reflection.GeneratedProtocolMessageType('JobStatus', (_message.Message,), dict(
 
@@ -1485,6 +2951,35 @@ JobStatus = _reflection.GeneratedProtocolMessageType('JobStatus', (_message.Mess
 _sym_db.RegisterMessage(JobStatus)
 _sym_db.RegisterMessage(JobStatus.SchedulerSpecificInformationEntry)
 
+JobStatuses = _reflection.GeneratedProtocolMessageType('JobStatuses', (_message.Message,), dict(
+  DESCRIPTOR = _JOBSTATUSES,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.JobStatuses)
+  ))
+_sym_db.RegisterMessage(JobStatuses)
+
+QueueStatus = _reflection.GeneratedProtocolMessageType('QueueStatus', (_message.Message,), dict(
+
+  SchedulerSpecificInformationEntry = _reflection.GeneratedProtocolMessageType('SchedulerSpecificInformationEntry', (_message.Message,), dict(
+    DESCRIPTOR = _QUEUESTATUS_SCHEDULERSPECIFICINFORMATIONENTRY,
+    __module__ = 'xenon_pb2'
+    # @@protoc_insertion_point(class_scope:xenon.QueueStatus.SchedulerSpecificInformationEntry)
+    ))
+  ,
+  DESCRIPTOR = _QUEUESTATUS,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.QueueStatus)
+  ))
+_sym_db.RegisterMessage(QueueStatus)
+_sym_db.RegisterMessage(QueueStatus.SchedulerSpecificInformationEntry)
+
+QueueStatuses = _reflection.GeneratedProtocolMessageType('QueueStatuses', (_message.Message,), dict(
+  DESCRIPTOR = _QUEUESTATUSES,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.QueueStatuses)
+  ))
+_sym_db.RegisterMessage(QueueStatuses)
+
 JobInputStream = _reflection.GeneratedProtocolMessageType('JobInputStream', (_message.Message,), dict(
   DESCRIPTOR = _JOBINPUTSTREAM,
   __module__ = 'xenon_pb2'
@@ -1499,9 +2994,18 @@ JobOutputStreams = _reflection.GeneratedProtocolMessageType('JobOutputStreams', 
   ))
 _sym_db.RegisterMessage(JobOutputStreams)
 
+Is = _reflection.GeneratedProtocolMessageType('Is', (_message.Message,), dict(
+  DESCRIPTOR = _IS,
+  __module__ = 'xenon_pb2'
+  # @@protoc_insertion_point(class_scope:xenon.Is)
+  ))
+_sym_db.RegisterMessage(Is)
+
 
 DESCRIPTOR.has_options = True
 DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('\n\034nl.esciencecenter.xenon.grpcB\nXenonProto'))
+_PROPERTIES_PROPERTIESENTRY.has_options = True
+_PROPERTIES_PROPERTIESENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
 _CERTIFICATECREDENTIAL_PROPERTIESENTRY.has_options = True
 _CERTIFICATECREDENTIAL_PROPERTIESENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
 _PASSWORDCREDENTIAL_PROPERTIESENTRY.has_options = True
@@ -1516,6 +3020,8 @@ _JOBDESCRIPTION_OPTIONSENTRY.has_options = True
 _JOBDESCRIPTION_OPTIONSENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
 _JOBSTATUS_SCHEDULERSPECIFICINFORMATIONENTRY.has_options = True
 _JOBSTATUS_SCHEDULERSPECIFICINFORMATIONENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
+_QUEUESTATUS_SCHEDULERSPECIFICINFORMATIONENTRY.has_options = True
+_QUEUESTATUS_SCHEDULERSPECIFICINFORMATIONENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
 try:
   # THESE ELEMENTS WILL BE DEPRECATED.
   # Please use the generated *_pb2_grpc.py files instead.
@@ -1526,7 +3032,7 @@ try:
   from grpc.framework.interfaces.face import utilities as face_utilities
 
 
-  class XenonFilesStub(object):
+  class XenonStub(object):
 
     def __init__(self, channel):
       """Constructor.
@@ -1534,10 +3040,70 @@ try:
       Args:
         channel: A grpc.Channel.
       """
-      self.getSchemes = channel.unary_unary(
-          '/xenon.XenonFiles/getSchemes',
+      self.newXenon = channel.unary_unary(
+          '/xenon.Xenon/newXenon',
+          request_serializer=Properties.SerializeToString,
+          response_deserializer=Empty.FromString,
+          )
+      self.getSupportedProperties = channel.unary_unary(
+          '/xenon.Xenon/getSupportedProperties',
           request_serializer=Empty.SerializeToString,
-          response_deserializer=Schemes.FromString,
+          response_deserializer=PropertyDescriptions.FromString,
+          )
+
+
+  class XenonServicer(object):
+
+    def newXenon(self, request, context):
+      """Create a new Xenon instance, WATCH OUT! will destroy existing instance with all its schedulers/filesystems/jobs
+      """
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def getSupportedProperties(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+
+  def add_XenonServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+        'newXenon': grpc.unary_unary_rpc_method_handler(
+            servicer.newXenon,
+            request_deserializer=Properties.FromString,
+            response_serializer=Empty.SerializeToString,
+        ),
+        'getSupportedProperties': grpc.unary_unary_rpc_method_handler(
+            servicer.getSupportedProperties,
+            request_deserializer=Empty.FromString,
+            response_serializer=PropertyDescriptions.SerializeToString,
+        ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+        'xenon.Xenon', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+
+
+  class XenonFilesStub(object):
+    """XenonFiles represents the Files interface Xenon. This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
+    """
+
+    def __init__(self, channel):
+      """Constructor.
+
+      Args:
+        channel: A grpc.Channel.
+      """
+      self.getAdaptorDescriptions = channel.unary_unary(
+          '/xenon.XenonFiles/getAdaptorDescriptions',
+          request_serializer=Empty.SerializeToString,
+          response_deserializer=FileAdaptorDescriptions.FromString,
+          )
+      self.getAdaptorDescription = channel.unary_unary(
+          '/xenon.XenonFiles/getAdaptorDescription',
+          request_serializer=AdaptorName.SerializeToString,
+          response_deserializer=FileAdaptorDescription.FromString,
           )
       self.newFileSystem = channel.unary_unary(
           '/xenon.XenonFiles/newFileSystem',
@@ -1549,9 +3115,44 @@ try:
           request_serializer=Path.SerializeToString,
           response_deserializer=Empty.FromString,
           )
+      self.createDirectory = channel.unary_unary(
+          '/xenon.XenonFiles/createDirectory',
+          request_serializer=Path.SerializeToString,
+          response_deserializer=Empty.FromString,
+          )
+      self.createFile = channel.unary_unary(
+          '/xenon.XenonFiles/createFile',
+          request_serializer=Path.SerializeToString,
+          response_deserializer=Empty.FromString,
+          )
+      self.backgroundCopy = channel.unary_unary(
+          '/xenon.XenonFiles/backgroundCopy',
+          request_serializer=CopyRequest.SerializeToString,
+          response_deserializer=Copy.FromString,
+          )
+      self.cancelCopy = channel.unary_unary(
+          '/xenon.XenonFiles/cancelCopy',
+          request_serializer=Copy.SerializeToString,
+          response_deserializer=CopyStatus.FromString,
+          )
+      self.getCopyStatus = channel.unary_unary(
+          '/xenon.XenonFiles/getCopyStatus',
+          request_serializer=Copy.SerializeToString,
+          response_deserializer=CopyStatus.FromString,
+          )
+      self.listCopyStatuses = channel.unary_unary(
+          '/xenon.XenonFiles/listCopyStatuses',
+          request_serializer=Empty.SerializeToString,
+          response_deserializer=CopyStatuses.FromString,
+          )
       self.copy = channel.unary_unary(
           '/xenon.XenonFiles/copy',
           request_serializer=CopyRequest.SerializeToString,
+          response_deserializer=Empty.FromString,
+          )
+      self.move = channel.unary_unary(
+          '/xenon.XenonFiles/move',
+          request_serializer=SourceTarget.SerializeToString,
           response_deserializer=Empty.FromString,
           )
       self.delete = channel.unary_unary(
@@ -1559,8 +3160,53 @@ try:
           request_serializer=Path.SerializeToString,
           response_deserializer=Empty.FromString,
           )
-      self.closeFileSystem = channel.unary_unary(
-          '/xenon.XenonFiles/closeFileSystem',
+      self.exists = channel.unary_unary(
+          '/xenon.XenonFiles/exists',
+          request_serializer=Path.SerializeToString,
+          response_deserializer=Empty.FromString,
+          )
+      self.read = channel.unary_stream(
+          '/xenon.XenonFiles/read',
+          request_serializer=Path.SerializeToString,
+          response_deserializer=FileStream.FromString,
+          )
+      self.write = channel.stream_unary(
+          '/xenon.XenonFiles/write',
+          request_serializer=WriteRequest.SerializeToString,
+          response_deserializer=Empty.FromString,
+          )
+      self.walkAttributesDirectory = channel.unary_stream(
+          '/xenon.XenonFiles/walkAttributesDirectory',
+          request_serializer=Path.SerializeToString,
+          response_deserializer=AttributesDirectoryStream.FromString,
+          )
+      self.walkDirectory = channel.unary_stream(
+          '/xenon.XenonFiles/walkDirectory',
+          request_serializer=Path.SerializeToString,
+          response_deserializer=DirectoryStream.FromString,
+          )
+      self.getAttributes = channel.unary_unary(
+          '/xenon.XenonFiles/getAttributes',
+          request_serializer=Path.SerializeToString,
+          response_deserializer=FileAttributes.FromString,
+          )
+      self.setPosixFilePermissions = channel.unary_unary(
+          '/xenon.XenonFiles/setPosixFilePermissions',
+          request_serializer=PosixFilePermissionsRequest.SerializeToString,
+          response_deserializer=Empty.FromString,
+          )
+      self.readSymbolicLink = channel.unary_unary(
+          '/xenon.XenonFiles/readSymbolicLink',
+          request_serializer=Path.SerializeToString,
+          response_deserializer=Path.FromString,
+          )
+      self.isOpen = channel.unary_unary(
+          '/xenon.XenonFiles/isOpen',
+          request_serializer=FileSystem.SerializeToString,
+          response_deserializer=Is.FromString,
+          )
+      self.close = channel.unary_unary(
+          '/xenon.XenonFiles/close',
           request_serializer=FileSystem.SerializeToString,
           response_deserializer=Empty.FromString,
           )
@@ -1569,11 +3215,23 @@ try:
           request_serializer=Empty.SerializeToString,
           response_deserializer=FileSystems.FromString,
           )
+      self.localFileSystem = channel.unary_unary(
+          '/xenon.XenonFiles/localFileSystem',
+          request_serializer=Empty.SerializeToString,
+          response_deserializer=FileSystem.FromString,
+          )
 
 
   class XenonFilesServicer(object):
+    """XenonFiles represents the Files interface Xenon. This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
+    """
 
-    def getSchemes(self, request, context):
+    def getAdaptorDescriptions(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def getAdaptorDescription(self, request, context):
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
@@ -1588,9 +3246,51 @@ try:
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
-    def copy(self, request, context):
-      """TODO async copy
+    def createDirectory(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def createFile(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def backgroundCopy(self, request, context):
+      """Asynchronous recursive opy
+      in Xenon it is called copy() without CopyOption.ASYNCHRONOUS
       """
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def cancelCopy(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def getCopyStatus(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def listCopyStatuses(self, request, context):
+      """List currently active copy operations
+      Specific to grpc, not part of Xenon library
+      """
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def copy(self, request, context):
+      """Synchronous recursive opy
+      in Xenon it is called copy() without CopyOption.ASYNCHRONOUS
+      """
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def move(self, request, context):
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
@@ -1600,12 +3300,71 @@ try:
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
-    def closeFileSystem(self, request, context):
+    def exists(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def read(self, request, context):
+      """in Xenon it is called newInputStream()
+      """
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def write(self, request_iterator, context):
+      """in Xenon it is called newOutputStream()
+      """
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def walkAttributesDirectory(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def walkDirectory(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def getAttributes(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def setPosixFilePermissions(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def readSymbolicLink(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def isOpen(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def close(self, request, context):
+      """Closes a filestem, any actions running it with this filestystem will be terminated
+      """
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
     def listFileSystems(self, request, context):
+      """List currently created filesystems
+      Specific to grpc, not part of Xenon library
+      """
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def localFileSystem(self, request, context):
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
@@ -1613,10 +3372,15 @@ try:
 
   def add_XenonFilesServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        'getSchemes': grpc.unary_unary_rpc_method_handler(
-            servicer.getSchemes,
+        'getAdaptorDescriptions': grpc.unary_unary_rpc_method_handler(
+            servicer.getAdaptorDescriptions,
             request_deserializer=Empty.FromString,
-            response_serializer=Schemes.SerializeToString,
+            response_serializer=FileAdaptorDescriptions.SerializeToString,
+        ),
+        'getAdaptorDescription': grpc.unary_unary_rpc_method_handler(
+            servicer.getAdaptorDescription,
+            request_deserializer=AdaptorName.FromString,
+            response_serializer=FileAdaptorDescription.SerializeToString,
         ),
         'newFileSystem': grpc.unary_unary_rpc_method_handler(
             servicer.newFileSystem,
@@ -1628,9 +3392,44 @@ try:
             request_deserializer=Path.FromString,
             response_serializer=Empty.SerializeToString,
         ),
+        'createDirectory': grpc.unary_unary_rpc_method_handler(
+            servicer.createDirectory,
+            request_deserializer=Path.FromString,
+            response_serializer=Empty.SerializeToString,
+        ),
+        'createFile': grpc.unary_unary_rpc_method_handler(
+            servicer.createFile,
+            request_deserializer=Path.FromString,
+            response_serializer=Empty.SerializeToString,
+        ),
+        'backgroundCopy': grpc.unary_unary_rpc_method_handler(
+            servicer.backgroundCopy,
+            request_deserializer=CopyRequest.FromString,
+            response_serializer=Copy.SerializeToString,
+        ),
+        'cancelCopy': grpc.unary_unary_rpc_method_handler(
+            servicer.cancelCopy,
+            request_deserializer=Copy.FromString,
+            response_serializer=CopyStatus.SerializeToString,
+        ),
+        'getCopyStatus': grpc.unary_unary_rpc_method_handler(
+            servicer.getCopyStatus,
+            request_deserializer=Copy.FromString,
+            response_serializer=CopyStatus.SerializeToString,
+        ),
+        'listCopyStatuses': grpc.unary_unary_rpc_method_handler(
+            servicer.listCopyStatuses,
+            request_deserializer=Empty.FromString,
+            response_serializer=CopyStatuses.SerializeToString,
+        ),
         'copy': grpc.unary_unary_rpc_method_handler(
             servicer.copy,
             request_deserializer=CopyRequest.FromString,
+            response_serializer=Empty.SerializeToString,
+        ),
+        'move': grpc.unary_unary_rpc_method_handler(
+            servicer.move,
+            request_deserializer=SourceTarget.FromString,
             response_serializer=Empty.SerializeToString,
         ),
         'delete': grpc.unary_unary_rpc_method_handler(
@@ -1638,8 +3437,53 @@ try:
             request_deserializer=Path.FromString,
             response_serializer=Empty.SerializeToString,
         ),
-        'closeFileSystem': grpc.unary_unary_rpc_method_handler(
-            servicer.closeFileSystem,
+        'exists': grpc.unary_unary_rpc_method_handler(
+            servicer.exists,
+            request_deserializer=Path.FromString,
+            response_serializer=Empty.SerializeToString,
+        ),
+        'read': grpc.unary_stream_rpc_method_handler(
+            servicer.read,
+            request_deserializer=Path.FromString,
+            response_serializer=FileStream.SerializeToString,
+        ),
+        'write': grpc.stream_unary_rpc_method_handler(
+            servicer.write,
+            request_deserializer=WriteRequest.FromString,
+            response_serializer=Empty.SerializeToString,
+        ),
+        'walkAttributesDirectory': grpc.unary_stream_rpc_method_handler(
+            servicer.walkAttributesDirectory,
+            request_deserializer=Path.FromString,
+            response_serializer=AttributesDirectoryStream.SerializeToString,
+        ),
+        'walkDirectory': grpc.unary_stream_rpc_method_handler(
+            servicer.walkDirectory,
+            request_deserializer=Path.FromString,
+            response_serializer=DirectoryStream.SerializeToString,
+        ),
+        'getAttributes': grpc.unary_unary_rpc_method_handler(
+            servicer.getAttributes,
+            request_deserializer=Path.FromString,
+            response_serializer=FileAttributes.SerializeToString,
+        ),
+        'setPosixFilePermissions': grpc.unary_unary_rpc_method_handler(
+            servicer.setPosixFilePermissions,
+            request_deserializer=PosixFilePermissionsRequest.FromString,
+            response_serializer=Empty.SerializeToString,
+        ),
+        'readSymbolicLink': grpc.unary_unary_rpc_method_handler(
+            servicer.readSymbolicLink,
+            request_deserializer=Path.FromString,
+            response_serializer=Path.SerializeToString,
+        ),
+        'isOpen': grpc.unary_unary_rpc_method_handler(
+            servicer.isOpen,
+            request_deserializer=FileSystem.FromString,
+            response_serializer=Is.SerializeToString,
+        ),
+        'close': grpc.unary_unary_rpc_method_handler(
+            servicer.close,
             request_deserializer=FileSystem.FromString,
             response_serializer=Empty.SerializeToString,
         ),
@@ -1648,6 +3492,11 @@ try:
             request_deserializer=Empty.FromString,
             response_serializer=FileSystems.SerializeToString,
         ),
+        'localFileSystem': grpc.unary_unary_rpc_method_handler(
+            servicer.localFileSystem,
+            request_deserializer=Empty.FromString,
+            response_serializer=FileSystem.SerializeToString,
+        ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
         'xenon.XenonFiles', rpc_method_handlers)
@@ -1655,6 +3504,15 @@ try:
 
 
   class XenonJobsStub(object):
+    """Xenon files methods not implemented in grpc
+    - cancelCopy, grpc has async client, so do not need to offer Xenon version
+    - getCopyStatus, see cancelCopy
+    - newAttributesDirectoryStream with filter, filter is a lambda function which can not be used in rpc
+    - newDirectoryStream with filter, filter is a lambda function which can not be used in rpc
+    - newPath, a Xenon Path is contructed by FileSystem + RelativePath, in grpc the message Path has FileSystem + RelativePath, making the Xenon Path hidden from the grpc API
+
+    The Jobs API of Xenon. This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about schedulers and jobs.
+    """
 
     def __init__(self, channel):
       """Constructor.
@@ -1662,10 +3520,15 @@ try:
       Args:
         channel: A grpc.Channel.
       """
-      self.getSchemes = channel.unary_unary(
-          '/xenon.XenonJobs/getSchemes',
+      self.getAdaptorDescriptions = channel.unary_unary(
+          '/xenon.XenonJobs/getAdaptorDescriptions',
           request_serializer=Empty.SerializeToString,
-          response_deserializer=Schemes.FromString,
+          response_deserializer=JobAdaptorDescriptions.FromString,
+          )
+      self.getAdaptorDescription = channel.unary_unary(
+          '/xenon.XenonJobs/getAdaptorDescription',
+          request_serializer=AdaptorName.SerializeToString,
+          response_deserializer=JobAdaptorDescription.FromString,
           )
       self.newScheduler = channel.unary_unary(
           '/xenon.XenonJobs/newScheduler',
@@ -1679,13 +3542,38 @@ try:
           )
       self.getQueues = channel.unary_unary(
           '/xenon.XenonJobs/getQueues',
-          request_serializer=Empty.SerializeToString,
+          request_serializer=Scheduler.SerializeToString,
           response_deserializer=Queues.FromString,
+          )
+      self.getDefaultQueueName = channel.unary_unary(
+          '/xenon.XenonJobs/getDefaultQueueName',
+          request_serializer=Scheduler.SerializeToString,
+          response_deserializer=Queue.FromString,
+          )
+      self.getJobs = channel.unary_unary(
+          '/xenon.XenonJobs/getJobs',
+          request_serializer=SchedulerAndQueues.SerializeToString,
+          response_deserializer=Jobs.FromString,
           )
       self.getJobStatus = channel.unary_unary(
           '/xenon.XenonJobs/getJobStatus',
           request_serializer=Job.SerializeToString,
           response_deserializer=JobStatus.FromString,
+          )
+      self.getJobStatuses = channel.unary_unary(
+          '/xenon.XenonJobs/getJobStatuses',
+          request_serializer=Jobs.SerializeToString,
+          response_deserializer=JobStatuses.FromString,
+          )
+      self.getQueueStatus = channel.unary_unary(
+          '/xenon.XenonJobs/getQueueStatus',
+          request_serializer=SchedulerAndQueues.SerializeToString,
+          response_deserializer=QueueStatus.FromString,
+          )
+      self.getQueueStatuses = channel.unary_unary(
+          '/xenon.XenonJobs/getQueueStatuses',
+          request_serializer=SchedulerAndQueues.SerializeToString,
+          response_deserializer=QueueStatuses.FromString,
           )
       self.waitUntilDone = channel.unary_unary(
           '/xenon.XenonJobs/waitUntilDone',
@@ -1702,6 +3590,11 @@ try:
           request_serializer=JobInputStream.SerializeToString,
           response_deserializer=JobOutputStreams.FromString,
           )
+      self.isOpen = channel.unary_unary(
+          '/xenon.XenonJobs/isOpen',
+          request_serializer=Scheduler.SerializeToString,
+          response_deserializer=Is.FromString,
+          )
       self.cancelJob = channel.unary_unary(
           '/xenon.XenonJobs/cancelJob',
           request_serializer=Job.SerializeToString,
@@ -1712,8 +3605,8 @@ try:
           request_serializer=Job.SerializeToString,
           response_deserializer=Empty.FromString,
           )
-      self.closeScheduler = channel.unary_unary(
-          '/xenon.XenonJobs/closeScheduler',
+      self.close = channel.unary_unary(
+          '/xenon.XenonJobs/close',
           request_serializer=Scheduler.SerializeToString,
           response_deserializer=Empty.FromString,
           )
@@ -1722,11 +3615,35 @@ try:
           request_serializer=Empty.SerializeToString,
           response_deserializer=Schedulers.FromString,
           )
+      self.listJobs = channel.unary_unary(
+          '/xenon.XenonJobs/listJobs',
+          request_serializer=Empty.SerializeToString,
+          response_deserializer=Jobs.FromString,
+          )
+      self.localScheduler = channel.unary_unary(
+          '/xenon.XenonJobs/localScheduler',
+          request_serializer=Empty.SerializeToString,
+          response_deserializer=Scheduler.FromString,
+          )
 
 
   class XenonJobsServicer(object):
+    """Xenon files methods not implemented in grpc
+    - cancelCopy, grpc has async client, so do not need to offer Xenon version
+    - getCopyStatus, see cancelCopy
+    - newAttributesDirectoryStream with filter, filter is a lambda function which can not be used in rpc
+    - newDirectoryStream with filter, filter is a lambda function which can not be used in rpc
+    - newPath, a Xenon Path is contructed by FileSystem + RelativePath, in grpc the message Path has FileSystem + RelativePath, making the Xenon Path hidden from the grpc API
 
-    def getSchemes(self, request, context):
+    The Jobs API of Xenon. This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about schedulers and jobs.
+    """
+
+    def getAdaptorDescriptions(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def getAdaptorDescription(self, request, context):
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
@@ -1746,7 +3663,32 @@ try:
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
+    def getDefaultQueueName(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def getJobs(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
     def getJobStatus(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def getJobStatuses(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def getQueueStatus(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def getQueueStatuses(self, request, context):
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
@@ -1766,22 +3708,43 @@ try:
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
+    def isOpen(self, request, context):
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
     def cancelJob(self, request, context):
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
     def deleteJob(self, request, context):
+      """Specific to grpc, not part of Xenon library
+      """
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
-    def closeScheduler(self, request, context):
+    def close(self, request, context):
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
     def listSchedulers(self, request, context):
+      """Specific to grpc, not part of Xenon library
+      """
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def listJobs(self, request, context):
+      """Specific to grpc, not part of Xenon library
+      """
+      context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+      context.set_details('Method not implemented!')
+      raise NotImplementedError('Method not implemented!')
+
+    def localScheduler(self, request, context):
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
@@ -1789,10 +3752,15 @@ try:
 
   def add_XenonJobsServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        'getSchemes': grpc.unary_unary_rpc_method_handler(
-            servicer.getSchemes,
+        'getAdaptorDescriptions': grpc.unary_unary_rpc_method_handler(
+            servicer.getAdaptorDescriptions,
             request_deserializer=Empty.FromString,
-            response_serializer=Schemes.SerializeToString,
+            response_serializer=JobAdaptorDescriptions.SerializeToString,
+        ),
+        'getAdaptorDescription': grpc.unary_unary_rpc_method_handler(
+            servicer.getAdaptorDescription,
+            request_deserializer=AdaptorName.FromString,
+            response_serializer=JobAdaptorDescription.SerializeToString,
         ),
         'newScheduler': grpc.unary_unary_rpc_method_handler(
             servicer.newScheduler,
@@ -1806,13 +3774,38 @@ try:
         ),
         'getQueues': grpc.unary_unary_rpc_method_handler(
             servicer.getQueues,
-            request_deserializer=Empty.FromString,
+            request_deserializer=Scheduler.FromString,
             response_serializer=Queues.SerializeToString,
+        ),
+        'getDefaultQueueName': grpc.unary_unary_rpc_method_handler(
+            servicer.getDefaultQueueName,
+            request_deserializer=Scheduler.FromString,
+            response_serializer=Queue.SerializeToString,
+        ),
+        'getJobs': grpc.unary_unary_rpc_method_handler(
+            servicer.getJobs,
+            request_deserializer=SchedulerAndQueues.FromString,
+            response_serializer=Jobs.SerializeToString,
         ),
         'getJobStatus': grpc.unary_unary_rpc_method_handler(
             servicer.getJobStatus,
             request_deserializer=Job.FromString,
             response_serializer=JobStatus.SerializeToString,
+        ),
+        'getJobStatuses': grpc.unary_unary_rpc_method_handler(
+            servicer.getJobStatuses,
+            request_deserializer=Jobs.FromString,
+            response_serializer=JobStatuses.SerializeToString,
+        ),
+        'getQueueStatus': grpc.unary_unary_rpc_method_handler(
+            servicer.getQueueStatus,
+            request_deserializer=SchedulerAndQueues.FromString,
+            response_serializer=QueueStatus.SerializeToString,
+        ),
+        'getQueueStatuses': grpc.unary_unary_rpc_method_handler(
+            servicer.getQueueStatuses,
+            request_deserializer=SchedulerAndQueues.FromString,
+            response_serializer=QueueStatuses.SerializeToString,
         ),
         'waitUntilDone': grpc.unary_unary_rpc_method_handler(
             servicer.waitUntilDone,
@@ -1829,6 +3822,11 @@ try:
             request_deserializer=JobInputStream.FromString,
             response_serializer=JobOutputStreams.SerializeToString,
         ),
+        'isOpen': grpc.unary_unary_rpc_method_handler(
+            servicer.isOpen,
+            request_deserializer=Scheduler.FromString,
+            response_serializer=Is.SerializeToString,
+        ),
         'cancelJob': grpc.unary_unary_rpc_method_handler(
             servicer.cancelJob,
             request_deserializer=Job.FromString,
@@ -1839,8 +3837,8 @@ try:
             request_deserializer=Job.FromString,
             response_serializer=Empty.SerializeToString,
         ),
-        'closeScheduler': grpc.unary_unary_rpc_method_handler(
-            servicer.closeScheduler,
+        'close': grpc.unary_unary_rpc_method_handler(
+            servicer.close,
             request_deserializer=Scheduler.FromString,
             response_serializer=Empty.SerializeToString,
         ),
@@ -1849,10 +3847,94 @@ try:
             request_deserializer=Empty.FromString,
             response_serializer=Schedulers.SerializeToString,
         ),
+        'listJobs': grpc.unary_unary_rpc_method_handler(
+            servicer.listJobs,
+            request_deserializer=Empty.FromString,
+            response_serializer=Jobs.SerializeToString,
+        ),
+        'localScheduler': grpc.unary_unary_rpc_method_handler(
+            servicer.localScheduler,
+            request_deserializer=Empty.FromString,
+            response_serializer=Scheduler.SerializeToString,
+        ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
         'xenon.XenonJobs', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
+
+
+  class BetaXenonServicer(object):
+    """The Beta API is deprecated for 0.15.0 and later.
+
+    It is recommended to use the GA API (classes and functions in this
+    file not marked beta) for all further purposes. This class was generated
+    only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
+    def newXenon(self, request, context):
+      """Create a new Xenon instance, WATCH OUT! will destroy existing instance with all its schedulers/filesystems/jobs
+      """
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def getSupportedProperties(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+
+
+  class BetaXenonStub(object):
+    """The Beta API is deprecated for 0.15.0 and later.
+
+    It is recommended to use the GA API (classes and functions in this
+    file not marked beta) for all further purposes. This class was generated
+    only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
+    def newXenon(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      """Create a new Xenon instance, WATCH OUT! will destroy existing instance with all its schedulers/filesystems/jobs
+      """
+      raise NotImplementedError()
+    newXenon.future = None
+    def getSupportedProperties(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    getSupportedProperties.future = None
+
+
+  def beta_create_Xenon_server(servicer, pool=None, pool_size=None, default_timeout=None, maximum_timeout=None):
+    """The Beta API is deprecated for 0.15.0 and later.
+
+    It is recommended to use the GA API (classes and functions in this
+    file not marked beta) for all further purposes. This function was
+    generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
+    request_deserializers = {
+      ('xenon.Xenon', 'getSupportedProperties'): Empty.FromString,
+      ('xenon.Xenon', 'newXenon'): Properties.FromString,
+    }
+    response_serializers = {
+      ('xenon.Xenon', 'getSupportedProperties'): PropertyDescriptions.SerializeToString,
+      ('xenon.Xenon', 'newXenon'): Empty.SerializeToString,
+    }
+    method_implementations = {
+      ('xenon.Xenon', 'getSupportedProperties'): face_utilities.unary_unary_inline(servicer.getSupportedProperties),
+      ('xenon.Xenon', 'newXenon'): face_utilities.unary_unary_inline(servicer.newXenon),
+    }
+    server_options = beta_implementations.server_options(request_deserializers=request_deserializers, response_serializers=response_serializers, thread_pool=pool, thread_pool_size=pool_size, default_timeout=default_timeout, maximum_timeout=maximum_timeout)
+    return beta_implementations.server(method_implementations, options=server_options)
+
+
+  def beta_create_Xenon_stub(channel, host=None, metadata_transformer=None, pool=None, pool_size=None):
+    """The Beta API is deprecated for 0.15.0 and later.
+
+    It is recommended to use the GA API (classes and functions in this
+    file not marked beta) for all further purposes. This function was
+    generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
+    request_serializers = {
+      ('xenon.Xenon', 'getSupportedProperties'): Empty.SerializeToString,
+      ('xenon.Xenon', 'newXenon'): Properties.SerializeToString,
+    }
+    response_deserializers = {
+      ('xenon.Xenon', 'getSupportedProperties'): PropertyDescriptions.FromString,
+      ('xenon.Xenon', 'newXenon'): Empty.FromString,
+    }
+    cardinalities = {
+      'getSupportedProperties': cardinality.Cardinality.UNARY_UNARY,
+      'newXenon': cardinality.Cardinality.UNARY_UNARY,
+    }
+    stub_options = beta_implementations.stub_options(host=host, metadata_transformer=metadata_transformer, request_serializers=request_serializers, response_deserializers=response_deserializers, thread_pool=pool, thread_pool_size=pool_size)
+    return beta_implementations.dynamic_stub(channel, 'xenon.Xenon', cardinalities, options=stub_options)
 
 
   class BetaXenonFilesServicer(object):
@@ -1861,21 +3943,75 @@ try:
     It is recommended to use the GA API (classes and functions in this
     file not marked beta) for all further purposes. This class was generated
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
-    def getSchemes(self, request, context):
+    """XenonFiles represents the Files interface Xenon. This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
+    """
+    def getAdaptorDescriptions(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def getAdaptorDescription(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def newFileSystem(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def createDirectories(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
-    def copy(self, request, context):
-      """TODO async copy
+    def createDirectory(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def createFile(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def backgroundCopy(self, request, context):
+      """Asynchronous recursive opy
+      in Xenon it is called copy() without CopyOption.ASYNCHRONOUS
       """
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def cancelCopy(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def getCopyStatus(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def listCopyStatuses(self, request, context):
+      """List currently active copy operations
+      Specific to grpc, not part of Xenon library
+      """
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def copy(self, request, context):
+      """Synchronous recursive opy
+      in Xenon it is called copy() without CopyOption.ASYNCHRONOUS
+      """
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def move(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def delete(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
-    def closeFileSystem(self, request, context):
+    def exists(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def read(self, request, context):
+      """in Xenon it is called newInputStream()
+      """
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def write(self, request_iterator, context):
+      """in Xenon it is called newOutputStream()
+      """
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def walkAttributesDirectory(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def walkDirectory(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def getAttributes(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def setPosixFilePermissions(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def readSymbolicLink(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def isOpen(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def close(self, request, context):
+      """Closes a filestem, any actions running it with this filestystem will be terminated
+      """
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def listFileSystems(self, request, context):
+      """List currently created filesystems
+      Specific to grpc, not part of Xenon library
+      """
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def localFileSystem(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
 
 
@@ -1885,29 +4021,98 @@ try:
     It is recommended to use the GA API (classes and functions in this
     file not marked beta) for all further purposes. This class was generated
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
-    def getSchemes(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+    """XenonFiles represents the Files interface Xenon. This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
+    """
+    def getAdaptorDescriptions(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
-    getSchemes.future = None
+    getAdaptorDescriptions.future = None
+    def getAdaptorDescription(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    getAdaptorDescription.future = None
     def newFileSystem(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     newFileSystem.future = None
     def createDirectories(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     createDirectories.future = None
+    def createDirectory(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    createDirectory.future = None
+    def createFile(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    createFile.future = None
+    def backgroundCopy(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      """Asynchronous recursive opy
+      in Xenon it is called copy() without CopyOption.ASYNCHRONOUS
+      """
+      raise NotImplementedError()
+    backgroundCopy.future = None
+    def cancelCopy(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    cancelCopy.future = None
+    def getCopyStatus(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    getCopyStatus.future = None
+    def listCopyStatuses(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      """List currently active copy operations
+      Specific to grpc, not part of Xenon library
+      """
+      raise NotImplementedError()
+    listCopyStatuses.future = None
     def copy(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
-      """TODO async copy
+      """Synchronous recursive opy
+      in Xenon it is called copy() without CopyOption.ASYNCHRONOUS
       """
       raise NotImplementedError()
     copy.future = None
+    def move(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    move.future = None
     def delete(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     delete.future = None
-    def closeFileSystem(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+    def exists(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
-    closeFileSystem.future = None
+    exists.future = None
+    def read(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      """in Xenon it is called newInputStream()
+      """
+      raise NotImplementedError()
+    def write(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
+      """in Xenon it is called newOutputStream()
+      """
+      raise NotImplementedError()
+    write.future = None
+    def walkAttributesDirectory(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    def walkDirectory(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    def getAttributes(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    getAttributes.future = None
+    def setPosixFilePermissions(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    setPosixFilePermissions.future = None
+    def readSymbolicLink(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    readSymbolicLink.future = None
+    def isOpen(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    isOpen.future = None
+    def close(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      """Closes a filestem, any actions running it with this filestystem will be terminated
+      """
+      raise NotImplementedError()
+    close.future = None
     def listFileSystems(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      """List currently created filesystems
+      Specific to grpc, not part of Xenon library
+      """
       raise NotImplementedError()
     listFileSystems.future = None
+    def localFileSystem(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    localFileSystem.future = None
 
 
   def beta_create_XenonFiles_server(servicer, pool=None, pool_size=None, default_timeout=None, maximum_timeout=None):
@@ -1917,31 +4122,85 @@ try:
     file not marked beta) for all further purposes. This function was
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_deserializers = {
-      ('xenon.XenonFiles', 'closeFileSystem'): FileSystem.FromString,
+      ('xenon.XenonFiles', 'backgroundCopy'): CopyRequest.FromString,
+      ('xenon.XenonFiles', 'cancelCopy'): Copy.FromString,
+      ('xenon.XenonFiles', 'close'): FileSystem.FromString,
       ('xenon.XenonFiles', 'copy'): CopyRequest.FromString,
       ('xenon.XenonFiles', 'createDirectories'): Path.FromString,
+      ('xenon.XenonFiles', 'createDirectory'): Path.FromString,
+      ('xenon.XenonFiles', 'createFile'): Path.FromString,
       ('xenon.XenonFiles', 'delete'): Path.FromString,
-      ('xenon.XenonFiles', 'getSchemes'): Empty.FromString,
+      ('xenon.XenonFiles', 'exists'): Path.FromString,
+      ('xenon.XenonFiles', 'getAdaptorDescription'): AdaptorName.FromString,
+      ('xenon.XenonFiles', 'getAdaptorDescriptions'): Empty.FromString,
+      ('xenon.XenonFiles', 'getAttributes'): Path.FromString,
+      ('xenon.XenonFiles', 'getCopyStatus'): Copy.FromString,
+      ('xenon.XenonFiles', 'isOpen'): FileSystem.FromString,
+      ('xenon.XenonFiles', 'listCopyStatuses'): Empty.FromString,
       ('xenon.XenonFiles', 'listFileSystems'): Empty.FromString,
+      ('xenon.XenonFiles', 'localFileSystem'): Empty.FromString,
+      ('xenon.XenonFiles', 'move'): SourceTarget.FromString,
       ('xenon.XenonFiles', 'newFileSystem'): NewFileSystemRequest.FromString,
+      ('xenon.XenonFiles', 'read'): Path.FromString,
+      ('xenon.XenonFiles', 'readSymbolicLink'): Path.FromString,
+      ('xenon.XenonFiles', 'setPosixFilePermissions'): PosixFilePermissionsRequest.FromString,
+      ('xenon.XenonFiles', 'walkAttributesDirectory'): Path.FromString,
+      ('xenon.XenonFiles', 'walkDirectory'): Path.FromString,
+      ('xenon.XenonFiles', 'write'): WriteRequest.FromString,
     }
     response_serializers = {
-      ('xenon.XenonFiles', 'closeFileSystem'): Empty.SerializeToString,
+      ('xenon.XenonFiles', 'backgroundCopy'): Copy.SerializeToString,
+      ('xenon.XenonFiles', 'cancelCopy'): CopyStatus.SerializeToString,
+      ('xenon.XenonFiles', 'close'): Empty.SerializeToString,
       ('xenon.XenonFiles', 'copy'): Empty.SerializeToString,
       ('xenon.XenonFiles', 'createDirectories'): Empty.SerializeToString,
+      ('xenon.XenonFiles', 'createDirectory'): Empty.SerializeToString,
+      ('xenon.XenonFiles', 'createFile'): Empty.SerializeToString,
       ('xenon.XenonFiles', 'delete'): Empty.SerializeToString,
-      ('xenon.XenonFiles', 'getSchemes'): Schemes.SerializeToString,
+      ('xenon.XenonFiles', 'exists'): Empty.SerializeToString,
+      ('xenon.XenonFiles', 'getAdaptorDescription'): FileAdaptorDescription.SerializeToString,
+      ('xenon.XenonFiles', 'getAdaptorDescriptions'): FileAdaptorDescriptions.SerializeToString,
+      ('xenon.XenonFiles', 'getAttributes'): FileAttributes.SerializeToString,
+      ('xenon.XenonFiles', 'getCopyStatus'): CopyStatus.SerializeToString,
+      ('xenon.XenonFiles', 'isOpen'): Is.SerializeToString,
+      ('xenon.XenonFiles', 'listCopyStatuses'): CopyStatuses.SerializeToString,
       ('xenon.XenonFiles', 'listFileSystems'): FileSystems.SerializeToString,
+      ('xenon.XenonFiles', 'localFileSystem'): FileSystem.SerializeToString,
+      ('xenon.XenonFiles', 'move'): Empty.SerializeToString,
       ('xenon.XenonFiles', 'newFileSystem'): FileSystem.SerializeToString,
+      ('xenon.XenonFiles', 'read'): FileStream.SerializeToString,
+      ('xenon.XenonFiles', 'readSymbolicLink'): Path.SerializeToString,
+      ('xenon.XenonFiles', 'setPosixFilePermissions'): Empty.SerializeToString,
+      ('xenon.XenonFiles', 'walkAttributesDirectory'): AttributesDirectoryStream.SerializeToString,
+      ('xenon.XenonFiles', 'walkDirectory'): DirectoryStream.SerializeToString,
+      ('xenon.XenonFiles', 'write'): Empty.SerializeToString,
     }
     method_implementations = {
-      ('xenon.XenonFiles', 'closeFileSystem'): face_utilities.unary_unary_inline(servicer.closeFileSystem),
+      ('xenon.XenonFiles', 'backgroundCopy'): face_utilities.unary_unary_inline(servicer.backgroundCopy),
+      ('xenon.XenonFiles', 'cancelCopy'): face_utilities.unary_unary_inline(servicer.cancelCopy),
+      ('xenon.XenonFiles', 'close'): face_utilities.unary_unary_inline(servicer.close),
       ('xenon.XenonFiles', 'copy'): face_utilities.unary_unary_inline(servicer.copy),
       ('xenon.XenonFiles', 'createDirectories'): face_utilities.unary_unary_inline(servicer.createDirectories),
+      ('xenon.XenonFiles', 'createDirectory'): face_utilities.unary_unary_inline(servicer.createDirectory),
+      ('xenon.XenonFiles', 'createFile'): face_utilities.unary_unary_inline(servicer.createFile),
       ('xenon.XenonFiles', 'delete'): face_utilities.unary_unary_inline(servicer.delete),
-      ('xenon.XenonFiles', 'getSchemes'): face_utilities.unary_unary_inline(servicer.getSchemes),
+      ('xenon.XenonFiles', 'exists'): face_utilities.unary_unary_inline(servicer.exists),
+      ('xenon.XenonFiles', 'getAdaptorDescription'): face_utilities.unary_unary_inline(servicer.getAdaptorDescription),
+      ('xenon.XenonFiles', 'getAdaptorDescriptions'): face_utilities.unary_unary_inline(servicer.getAdaptorDescriptions),
+      ('xenon.XenonFiles', 'getAttributes'): face_utilities.unary_unary_inline(servicer.getAttributes),
+      ('xenon.XenonFiles', 'getCopyStatus'): face_utilities.unary_unary_inline(servicer.getCopyStatus),
+      ('xenon.XenonFiles', 'isOpen'): face_utilities.unary_unary_inline(servicer.isOpen),
+      ('xenon.XenonFiles', 'listCopyStatuses'): face_utilities.unary_unary_inline(servicer.listCopyStatuses),
       ('xenon.XenonFiles', 'listFileSystems'): face_utilities.unary_unary_inline(servicer.listFileSystems),
+      ('xenon.XenonFiles', 'localFileSystem'): face_utilities.unary_unary_inline(servicer.localFileSystem),
+      ('xenon.XenonFiles', 'move'): face_utilities.unary_unary_inline(servicer.move),
       ('xenon.XenonFiles', 'newFileSystem'): face_utilities.unary_unary_inline(servicer.newFileSystem),
+      ('xenon.XenonFiles', 'read'): face_utilities.unary_stream_inline(servicer.read),
+      ('xenon.XenonFiles', 'readSymbolicLink'): face_utilities.unary_unary_inline(servicer.readSymbolicLink),
+      ('xenon.XenonFiles', 'setPosixFilePermissions'): face_utilities.unary_unary_inline(servicer.setPosixFilePermissions),
+      ('xenon.XenonFiles', 'walkAttributesDirectory'): face_utilities.unary_stream_inline(servicer.walkAttributesDirectory),
+      ('xenon.XenonFiles', 'walkDirectory'): face_utilities.unary_stream_inline(servicer.walkDirectory),
+      ('xenon.XenonFiles', 'write'): face_utilities.stream_unary_inline(servicer.write),
     }
     server_options = beta_implementations.server_options(request_deserializers=request_deserializers, response_serializers=response_serializers, thread_pool=pool, thread_pool_size=pool_size, default_timeout=default_timeout, maximum_timeout=maximum_timeout)
     return beta_implementations.server(method_implementations, options=server_options)
@@ -1954,31 +4213,85 @@ try:
     file not marked beta) for all further purposes. This function was
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_serializers = {
-      ('xenon.XenonFiles', 'closeFileSystem'): FileSystem.SerializeToString,
+      ('xenon.XenonFiles', 'backgroundCopy'): CopyRequest.SerializeToString,
+      ('xenon.XenonFiles', 'cancelCopy'): Copy.SerializeToString,
+      ('xenon.XenonFiles', 'close'): FileSystem.SerializeToString,
       ('xenon.XenonFiles', 'copy'): CopyRequest.SerializeToString,
       ('xenon.XenonFiles', 'createDirectories'): Path.SerializeToString,
+      ('xenon.XenonFiles', 'createDirectory'): Path.SerializeToString,
+      ('xenon.XenonFiles', 'createFile'): Path.SerializeToString,
       ('xenon.XenonFiles', 'delete'): Path.SerializeToString,
-      ('xenon.XenonFiles', 'getSchemes'): Empty.SerializeToString,
+      ('xenon.XenonFiles', 'exists'): Path.SerializeToString,
+      ('xenon.XenonFiles', 'getAdaptorDescription'): AdaptorName.SerializeToString,
+      ('xenon.XenonFiles', 'getAdaptorDescriptions'): Empty.SerializeToString,
+      ('xenon.XenonFiles', 'getAttributes'): Path.SerializeToString,
+      ('xenon.XenonFiles', 'getCopyStatus'): Copy.SerializeToString,
+      ('xenon.XenonFiles', 'isOpen'): FileSystem.SerializeToString,
+      ('xenon.XenonFiles', 'listCopyStatuses'): Empty.SerializeToString,
       ('xenon.XenonFiles', 'listFileSystems'): Empty.SerializeToString,
+      ('xenon.XenonFiles', 'localFileSystem'): Empty.SerializeToString,
+      ('xenon.XenonFiles', 'move'): SourceTarget.SerializeToString,
       ('xenon.XenonFiles', 'newFileSystem'): NewFileSystemRequest.SerializeToString,
+      ('xenon.XenonFiles', 'read'): Path.SerializeToString,
+      ('xenon.XenonFiles', 'readSymbolicLink'): Path.SerializeToString,
+      ('xenon.XenonFiles', 'setPosixFilePermissions'): PosixFilePermissionsRequest.SerializeToString,
+      ('xenon.XenonFiles', 'walkAttributesDirectory'): Path.SerializeToString,
+      ('xenon.XenonFiles', 'walkDirectory'): Path.SerializeToString,
+      ('xenon.XenonFiles', 'write'): WriteRequest.SerializeToString,
     }
     response_deserializers = {
-      ('xenon.XenonFiles', 'closeFileSystem'): Empty.FromString,
+      ('xenon.XenonFiles', 'backgroundCopy'): Copy.FromString,
+      ('xenon.XenonFiles', 'cancelCopy'): CopyStatus.FromString,
+      ('xenon.XenonFiles', 'close'): Empty.FromString,
       ('xenon.XenonFiles', 'copy'): Empty.FromString,
       ('xenon.XenonFiles', 'createDirectories'): Empty.FromString,
+      ('xenon.XenonFiles', 'createDirectory'): Empty.FromString,
+      ('xenon.XenonFiles', 'createFile'): Empty.FromString,
       ('xenon.XenonFiles', 'delete'): Empty.FromString,
-      ('xenon.XenonFiles', 'getSchemes'): Schemes.FromString,
+      ('xenon.XenonFiles', 'exists'): Empty.FromString,
+      ('xenon.XenonFiles', 'getAdaptorDescription'): FileAdaptorDescription.FromString,
+      ('xenon.XenonFiles', 'getAdaptorDescriptions'): FileAdaptorDescriptions.FromString,
+      ('xenon.XenonFiles', 'getAttributes'): FileAttributes.FromString,
+      ('xenon.XenonFiles', 'getCopyStatus'): CopyStatus.FromString,
+      ('xenon.XenonFiles', 'isOpen'): Is.FromString,
+      ('xenon.XenonFiles', 'listCopyStatuses'): CopyStatuses.FromString,
       ('xenon.XenonFiles', 'listFileSystems'): FileSystems.FromString,
+      ('xenon.XenonFiles', 'localFileSystem'): FileSystem.FromString,
+      ('xenon.XenonFiles', 'move'): Empty.FromString,
       ('xenon.XenonFiles', 'newFileSystem'): FileSystem.FromString,
+      ('xenon.XenonFiles', 'read'): FileStream.FromString,
+      ('xenon.XenonFiles', 'readSymbolicLink'): Path.FromString,
+      ('xenon.XenonFiles', 'setPosixFilePermissions'): Empty.FromString,
+      ('xenon.XenonFiles', 'walkAttributesDirectory'): AttributesDirectoryStream.FromString,
+      ('xenon.XenonFiles', 'walkDirectory'): DirectoryStream.FromString,
+      ('xenon.XenonFiles', 'write'): Empty.FromString,
     }
     cardinalities = {
-      'closeFileSystem': cardinality.Cardinality.UNARY_UNARY,
+      'backgroundCopy': cardinality.Cardinality.UNARY_UNARY,
+      'cancelCopy': cardinality.Cardinality.UNARY_UNARY,
+      'close': cardinality.Cardinality.UNARY_UNARY,
       'copy': cardinality.Cardinality.UNARY_UNARY,
       'createDirectories': cardinality.Cardinality.UNARY_UNARY,
+      'createDirectory': cardinality.Cardinality.UNARY_UNARY,
+      'createFile': cardinality.Cardinality.UNARY_UNARY,
       'delete': cardinality.Cardinality.UNARY_UNARY,
-      'getSchemes': cardinality.Cardinality.UNARY_UNARY,
+      'exists': cardinality.Cardinality.UNARY_UNARY,
+      'getAdaptorDescription': cardinality.Cardinality.UNARY_UNARY,
+      'getAdaptorDescriptions': cardinality.Cardinality.UNARY_UNARY,
+      'getAttributes': cardinality.Cardinality.UNARY_UNARY,
+      'getCopyStatus': cardinality.Cardinality.UNARY_UNARY,
+      'isOpen': cardinality.Cardinality.UNARY_UNARY,
+      'listCopyStatuses': cardinality.Cardinality.UNARY_UNARY,
       'listFileSystems': cardinality.Cardinality.UNARY_UNARY,
+      'localFileSystem': cardinality.Cardinality.UNARY_UNARY,
+      'move': cardinality.Cardinality.UNARY_UNARY,
       'newFileSystem': cardinality.Cardinality.UNARY_UNARY,
+      'read': cardinality.Cardinality.UNARY_STREAM,
+      'readSymbolicLink': cardinality.Cardinality.UNARY_UNARY,
+      'setPosixFilePermissions': cardinality.Cardinality.UNARY_UNARY,
+      'walkAttributesDirectory': cardinality.Cardinality.UNARY_STREAM,
+      'walkDirectory': cardinality.Cardinality.UNARY_STREAM,
+      'write': cardinality.Cardinality.STREAM_UNARY,
     }
     stub_options = beta_implementations.stub_options(host=host, metadata_transformer=metadata_transformer, request_serializers=request_serializers, response_deserializers=response_deserializers, thread_pool=pool, thread_pool_size=pool_size)
     return beta_implementations.dynamic_stub(channel, 'xenon.XenonFiles', cardinalities, options=stub_options)
@@ -1990,7 +4303,18 @@ try:
     It is recommended to use the GA API (classes and functions in this
     file not marked beta) for all further purposes. This class was generated
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
-    def getSchemes(self, request, context):
+    """Xenon files methods not implemented in grpc
+    - cancelCopy, grpc has async client, so do not need to offer Xenon version
+    - getCopyStatus, see cancelCopy
+    - newAttributesDirectoryStream with filter, filter is a lambda function which can not be used in rpc
+    - newDirectoryStream with filter, filter is a lambda function which can not be used in rpc
+    - newPath, a Xenon Path is contructed by FileSystem + RelativePath, in grpc the message Path has FileSystem + RelativePath, making the Xenon Path hidden from the grpc API
+
+    The Jobs API of Xenon. This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about schedulers and jobs.
+    """
+    def getAdaptorDescriptions(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def getAdaptorDescription(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def newScheduler(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
@@ -1998,7 +4322,17 @@ try:
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def getQueues(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def getDefaultQueueName(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def getJobs(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def getJobStatus(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def getJobStatuses(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def getQueueStatus(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def getQueueStatuses(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def waitUntilDone(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
@@ -2006,13 +4340,25 @@ try:
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def getStreams(self, request_iterator, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def isOpen(self, request, context):
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def cancelJob(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def deleteJob(self, request, context):
+      """Specific to grpc, not part of Xenon library
+      """
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
-    def closeScheduler(self, request, context):
+    def close(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def listSchedulers(self, request, context):
+      """Specific to grpc, not part of Xenon library
+      """
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def listJobs(self, request, context):
+      """Specific to grpc, not part of Xenon library
+      """
+      context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
+    def localScheduler(self, request, context):
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
 
 
@@ -2022,9 +4368,21 @@ try:
     It is recommended to use the GA API (classes and functions in this
     file not marked beta) for all further purposes. This class was generated
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
-    def getSchemes(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+    """Xenon files methods not implemented in grpc
+    - cancelCopy, grpc has async client, so do not need to offer Xenon version
+    - getCopyStatus, see cancelCopy
+    - newAttributesDirectoryStream with filter, filter is a lambda function which can not be used in rpc
+    - newDirectoryStream with filter, filter is a lambda function which can not be used in rpc
+    - newPath, a Xenon Path is contructed by FileSystem + RelativePath, in grpc the message Path has FileSystem + RelativePath, making the Xenon Path hidden from the grpc API
+
+    The Jobs API of Xenon. This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about schedulers and jobs.
+    """
+    def getAdaptorDescriptions(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
-    getSchemes.future = None
+    getAdaptorDescriptions.future = None
+    def getAdaptorDescription(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    getAdaptorDescription.future = None
     def newScheduler(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     newScheduler.future = None
@@ -2034,9 +4392,24 @@ try:
     def getQueues(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     getQueues.future = None
+    def getDefaultQueueName(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    getDefaultQueueName.future = None
+    def getJobs(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    getJobs.future = None
     def getJobStatus(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     getJobStatus.future = None
+    def getJobStatuses(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    getJobStatuses.future = None
+    def getQueueStatus(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    getQueueStatus.future = None
+    def getQueueStatuses(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    getQueueStatuses.future = None
     def waitUntilDone(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     waitUntilDone.future = None
@@ -2045,18 +4418,33 @@ try:
     waitUntilRunning.future = None
     def getStreams(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
+    def isOpen(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    isOpen.future = None
     def cancelJob(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
     cancelJob.future = None
     def deleteJob(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      """Specific to grpc, not part of Xenon library
+      """
       raise NotImplementedError()
     deleteJob.future = None
-    def closeScheduler(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+    def close(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
       raise NotImplementedError()
-    closeScheduler.future = None
+    close.future = None
     def listSchedulers(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      """Specific to grpc, not part of Xenon library
+      """
       raise NotImplementedError()
     listSchedulers.future = None
+    def listJobs(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      """Specific to grpc, not part of Xenon library
+      """
+      raise NotImplementedError()
+    listJobs.future = None
+    def localScheduler(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
+      raise NotImplementedError()
+    localScheduler.future = None
 
 
   def beta_create_XenonJobs_server(servicer, pool=None, pool_size=None, default_timeout=None, maximum_timeout=None):
@@ -2067,13 +4455,22 @@ try:
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_deserializers = {
       ('xenon.XenonJobs', 'cancelJob'): Job.FromString,
-      ('xenon.XenonJobs', 'closeScheduler'): Scheduler.FromString,
+      ('xenon.XenonJobs', 'close'): Scheduler.FromString,
       ('xenon.XenonJobs', 'deleteJob'): Job.FromString,
+      ('xenon.XenonJobs', 'getAdaptorDescription'): AdaptorName.FromString,
+      ('xenon.XenonJobs', 'getAdaptorDescriptions'): Empty.FromString,
+      ('xenon.XenonJobs', 'getDefaultQueueName'): Scheduler.FromString,
       ('xenon.XenonJobs', 'getJobStatus'): Job.FromString,
-      ('xenon.XenonJobs', 'getQueues'): Empty.FromString,
-      ('xenon.XenonJobs', 'getSchemes'): Empty.FromString,
+      ('xenon.XenonJobs', 'getJobStatuses'): Jobs.FromString,
+      ('xenon.XenonJobs', 'getJobs'): SchedulerAndQueues.FromString,
+      ('xenon.XenonJobs', 'getQueueStatus'): SchedulerAndQueues.FromString,
+      ('xenon.XenonJobs', 'getQueueStatuses'): SchedulerAndQueues.FromString,
+      ('xenon.XenonJobs', 'getQueues'): Scheduler.FromString,
       ('xenon.XenonJobs', 'getStreams'): JobInputStream.FromString,
+      ('xenon.XenonJobs', 'isOpen'): Scheduler.FromString,
+      ('xenon.XenonJobs', 'listJobs'): Empty.FromString,
       ('xenon.XenonJobs', 'listSchedulers'): Empty.FromString,
+      ('xenon.XenonJobs', 'localScheduler'): Empty.FromString,
       ('xenon.XenonJobs', 'newScheduler'): NewSchedulerRequest.FromString,
       ('xenon.XenonJobs', 'submitJob'): SubmitJobRequest.FromString,
       ('xenon.XenonJobs', 'waitUntilDone'): Job.FromString,
@@ -2081,13 +4478,22 @@ try:
     }
     response_serializers = {
       ('xenon.XenonJobs', 'cancelJob'): JobStatus.SerializeToString,
-      ('xenon.XenonJobs', 'closeScheduler'): Empty.SerializeToString,
+      ('xenon.XenonJobs', 'close'): Empty.SerializeToString,
       ('xenon.XenonJobs', 'deleteJob'): Empty.SerializeToString,
+      ('xenon.XenonJobs', 'getAdaptorDescription'): JobAdaptorDescription.SerializeToString,
+      ('xenon.XenonJobs', 'getAdaptorDescriptions'): JobAdaptorDescriptions.SerializeToString,
+      ('xenon.XenonJobs', 'getDefaultQueueName'): Queue.SerializeToString,
       ('xenon.XenonJobs', 'getJobStatus'): JobStatus.SerializeToString,
+      ('xenon.XenonJobs', 'getJobStatuses'): JobStatuses.SerializeToString,
+      ('xenon.XenonJobs', 'getJobs'): Jobs.SerializeToString,
+      ('xenon.XenonJobs', 'getQueueStatus'): QueueStatus.SerializeToString,
+      ('xenon.XenonJobs', 'getQueueStatuses'): QueueStatuses.SerializeToString,
       ('xenon.XenonJobs', 'getQueues'): Queues.SerializeToString,
-      ('xenon.XenonJobs', 'getSchemes'): Schemes.SerializeToString,
       ('xenon.XenonJobs', 'getStreams'): JobOutputStreams.SerializeToString,
+      ('xenon.XenonJobs', 'isOpen'): Is.SerializeToString,
+      ('xenon.XenonJobs', 'listJobs'): Jobs.SerializeToString,
       ('xenon.XenonJobs', 'listSchedulers'): Schedulers.SerializeToString,
+      ('xenon.XenonJobs', 'localScheduler'): Scheduler.SerializeToString,
       ('xenon.XenonJobs', 'newScheduler'): Scheduler.SerializeToString,
       ('xenon.XenonJobs', 'submitJob'): Job.SerializeToString,
       ('xenon.XenonJobs', 'waitUntilDone'): JobStatus.SerializeToString,
@@ -2095,13 +4501,22 @@ try:
     }
     method_implementations = {
       ('xenon.XenonJobs', 'cancelJob'): face_utilities.unary_unary_inline(servicer.cancelJob),
-      ('xenon.XenonJobs', 'closeScheduler'): face_utilities.unary_unary_inline(servicer.closeScheduler),
+      ('xenon.XenonJobs', 'close'): face_utilities.unary_unary_inline(servicer.close),
       ('xenon.XenonJobs', 'deleteJob'): face_utilities.unary_unary_inline(servicer.deleteJob),
+      ('xenon.XenonJobs', 'getAdaptorDescription'): face_utilities.unary_unary_inline(servicer.getAdaptorDescription),
+      ('xenon.XenonJobs', 'getAdaptorDescriptions'): face_utilities.unary_unary_inline(servicer.getAdaptorDescriptions),
+      ('xenon.XenonJobs', 'getDefaultQueueName'): face_utilities.unary_unary_inline(servicer.getDefaultQueueName),
       ('xenon.XenonJobs', 'getJobStatus'): face_utilities.unary_unary_inline(servicer.getJobStatus),
+      ('xenon.XenonJobs', 'getJobStatuses'): face_utilities.unary_unary_inline(servicer.getJobStatuses),
+      ('xenon.XenonJobs', 'getJobs'): face_utilities.unary_unary_inline(servicer.getJobs),
+      ('xenon.XenonJobs', 'getQueueStatus'): face_utilities.unary_unary_inline(servicer.getQueueStatus),
+      ('xenon.XenonJobs', 'getQueueStatuses'): face_utilities.unary_unary_inline(servicer.getQueueStatuses),
       ('xenon.XenonJobs', 'getQueues'): face_utilities.unary_unary_inline(servicer.getQueues),
-      ('xenon.XenonJobs', 'getSchemes'): face_utilities.unary_unary_inline(servicer.getSchemes),
       ('xenon.XenonJobs', 'getStreams'): face_utilities.stream_stream_inline(servicer.getStreams),
+      ('xenon.XenonJobs', 'isOpen'): face_utilities.unary_unary_inline(servicer.isOpen),
+      ('xenon.XenonJobs', 'listJobs'): face_utilities.unary_unary_inline(servicer.listJobs),
       ('xenon.XenonJobs', 'listSchedulers'): face_utilities.unary_unary_inline(servicer.listSchedulers),
+      ('xenon.XenonJobs', 'localScheduler'): face_utilities.unary_unary_inline(servicer.localScheduler),
       ('xenon.XenonJobs', 'newScheduler'): face_utilities.unary_unary_inline(servicer.newScheduler),
       ('xenon.XenonJobs', 'submitJob'): face_utilities.unary_unary_inline(servicer.submitJob),
       ('xenon.XenonJobs', 'waitUntilDone'): face_utilities.unary_unary_inline(servicer.waitUntilDone),
@@ -2119,13 +4534,22 @@ try:
     generated only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0"""
     request_serializers = {
       ('xenon.XenonJobs', 'cancelJob'): Job.SerializeToString,
-      ('xenon.XenonJobs', 'closeScheduler'): Scheduler.SerializeToString,
+      ('xenon.XenonJobs', 'close'): Scheduler.SerializeToString,
       ('xenon.XenonJobs', 'deleteJob'): Job.SerializeToString,
+      ('xenon.XenonJobs', 'getAdaptorDescription'): AdaptorName.SerializeToString,
+      ('xenon.XenonJobs', 'getAdaptorDescriptions'): Empty.SerializeToString,
+      ('xenon.XenonJobs', 'getDefaultQueueName'): Scheduler.SerializeToString,
       ('xenon.XenonJobs', 'getJobStatus'): Job.SerializeToString,
-      ('xenon.XenonJobs', 'getQueues'): Empty.SerializeToString,
-      ('xenon.XenonJobs', 'getSchemes'): Empty.SerializeToString,
+      ('xenon.XenonJobs', 'getJobStatuses'): Jobs.SerializeToString,
+      ('xenon.XenonJobs', 'getJobs'): SchedulerAndQueues.SerializeToString,
+      ('xenon.XenonJobs', 'getQueueStatus'): SchedulerAndQueues.SerializeToString,
+      ('xenon.XenonJobs', 'getQueueStatuses'): SchedulerAndQueues.SerializeToString,
+      ('xenon.XenonJobs', 'getQueues'): Scheduler.SerializeToString,
       ('xenon.XenonJobs', 'getStreams'): JobInputStream.SerializeToString,
+      ('xenon.XenonJobs', 'isOpen'): Scheduler.SerializeToString,
+      ('xenon.XenonJobs', 'listJobs'): Empty.SerializeToString,
       ('xenon.XenonJobs', 'listSchedulers'): Empty.SerializeToString,
+      ('xenon.XenonJobs', 'localScheduler'): Empty.SerializeToString,
       ('xenon.XenonJobs', 'newScheduler'): NewSchedulerRequest.SerializeToString,
       ('xenon.XenonJobs', 'submitJob'): SubmitJobRequest.SerializeToString,
       ('xenon.XenonJobs', 'waitUntilDone'): Job.SerializeToString,
@@ -2133,13 +4557,22 @@ try:
     }
     response_deserializers = {
       ('xenon.XenonJobs', 'cancelJob'): JobStatus.FromString,
-      ('xenon.XenonJobs', 'closeScheduler'): Empty.FromString,
+      ('xenon.XenonJobs', 'close'): Empty.FromString,
       ('xenon.XenonJobs', 'deleteJob'): Empty.FromString,
+      ('xenon.XenonJobs', 'getAdaptorDescription'): JobAdaptorDescription.FromString,
+      ('xenon.XenonJobs', 'getAdaptorDescriptions'): JobAdaptorDescriptions.FromString,
+      ('xenon.XenonJobs', 'getDefaultQueueName'): Queue.FromString,
       ('xenon.XenonJobs', 'getJobStatus'): JobStatus.FromString,
+      ('xenon.XenonJobs', 'getJobStatuses'): JobStatuses.FromString,
+      ('xenon.XenonJobs', 'getJobs'): Jobs.FromString,
+      ('xenon.XenonJobs', 'getQueueStatus'): QueueStatus.FromString,
+      ('xenon.XenonJobs', 'getQueueStatuses'): QueueStatuses.FromString,
       ('xenon.XenonJobs', 'getQueues'): Queues.FromString,
-      ('xenon.XenonJobs', 'getSchemes'): Schemes.FromString,
       ('xenon.XenonJobs', 'getStreams'): JobOutputStreams.FromString,
+      ('xenon.XenonJobs', 'isOpen'): Is.FromString,
+      ('xenon.XenonJobs', 'listJobs'): Jobs.FromString,
       ('xenon.XenonJobs', 'listSchedulers'): Schedulers.FromString,
+      ('xenon.XenonJobs', 'localScheduler'): Scheduler.FromString,
       ('xenon.XenonJobs', 'newScheduler'): Scheduler.FromString,
       ('xenon.XenonJobs', 'submitJob'): Job.FromString,
       ('xenon.XenonJobs', 'waitUntilDone'): JobStatus.FromString,
@@ -2147,13 +4580,22 @@ try:
     }
     cardinalities = {
       'cancelJob': cardinality.Cardinality.UNARY_UNARY,
-      'closeScheduler': cardinality.Cardinality.UNARY_UNARY,
+      'close': cardinality.Cardinality.UNARY_UNARY,
       'deleteJob': cardinality.Cardinality.UNARY_UNARY,
+      'getAdaptorDescription': cardinality.Cardinality.UNARY_UNARY,
+      'getAdaptorDescriptions': cardinality.Cardinality.UNARY_UNARY,
+      'getDefaultQueueName': cardinality.Cardinality.UNARY_UNARY,
       'getJobStatus': cardinality.Cardinality.UNARY_UNARY,
+      'getJobStatuses': cardinality.Cardinality.UNARY_UNARY,
+      'getJobs': cardinality.Cardinality.UNARY_UNARY,
+      'getQueueStatus': cardinality.Cardinality.UNARY_UNARY,
+      'getQueueStatuses': cardinality.Cardinality.UNARY_UNARY,
       'getQueues': cardinality.Cardinality.UNARY_UNARY,
-      'getSchemes': cardinality.Cardinality.UNARY_UNARY,
       'getStreams': cardinality.Cardinality.STREAM_STREAM,
+      'isOpen': cardinality.Cardinality.UNARY_UNARY,
+      'listJobs': cardinality.Cardinality.UNARY_UNARY,
       'listSchedulers': cardinality.Cardinality.UNARY_UNARY,
+      'localScheduler': cardinality.Cardinality.UNARY_UNARY,
       'newScheduler': cardinality.Cardinality.UNARY_UNARY,
       'submitJob': cardinality.Cardinality.UNARY_UNARY,
       'waitUntilDone': cardinality.Cardinality.UNARY_UNARY,

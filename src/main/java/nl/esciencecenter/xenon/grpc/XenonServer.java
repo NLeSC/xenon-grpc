@@ -27,6 +27,7 @@ public class XenonServer {
     private void start() throws IOException {
         int port = 50051;
         server = ServerBuilder.forPort(port)
+                .addService(new XenonImpl())
                 .addService(new XenonJobsImpl())
                 .addService(new XenonFilesImpl())
                 .build()
