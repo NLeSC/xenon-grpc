@@ -20,7 +20,7 @@ import io.grpc.stub.StreamObserver;
 
 public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
     private final XenonSingleton singleton;
-    private final Map<String, SchedulerContainer> schedulers = new ConcurrentHashMap();
+    private final Map<String, SchedulerContainer> schedulers = new ConcurrentHashMap<>();
 
     public JobsService(XenonSingleton singleton) {
         super();
@@ -35,6 +35,7 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
             System.err.print("Location empty = ");
             System.err.println(request.getLocation().isEmpty());
 
+            // TODO remove this experiment
             if (!"local".equals(request.getAdaptor()) && request.getLocation().isEmpty()) {
                 throw new XenonException(request.getAdaptor(), "Location can not be empty");
             }
@@ -42,8 +43,9 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
             Scheduler scheduler = xenon.jobs().newScheduler(
                     request.getAdaptor(),
                     request.getLocation(),
+                    // TODO implement credentials
                     null,
-                    null
+                    request.getPropertiesMap()
             );
 
             // TODO use more unique id, maybe use new label/alias field from request or a uuid

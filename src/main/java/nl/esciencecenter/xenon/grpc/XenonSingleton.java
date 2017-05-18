@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 public class XenonSingleton {
     Logger logger = LoggerFactory.getLogger(XenonSingleton.class);
     private Xenon instance = null;
-    private Map<String,String> properties = new HashMap();
+    private Map<String,String> properties = new HashMap<>();
 
     public Xenon getInstance() {
         if (instance == null) {
