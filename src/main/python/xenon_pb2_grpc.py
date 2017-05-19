@@ -146,7 +146,7 @@ class XenonFilesStub(object):
     self.exists = channel.unary_unary(
         '/xenon.XenonFiles/exists',
         request_serializer=xenon__pb2.Path.SerializeToString,
-        response_deserializer=xenon__pb2.Empty.FromString,
+        response_deserializer=xenon__pb2.Is.FromString,
         )
     self.read = channel.unary_stream(
         '/xenon.XenonFiles/read',
@@ -424,7 +424,7 @@ def add_XenonFilesServicer_to_server(servicer, server):
       'exists': grpc.unary_unary_rpc_method_handler(
           servicer.exists,
           request_deserializer=xenon__pb2.Path.FromString,
-          response_serializer=xenon__pb2.Empty.SerializeToString,
+          response_serializer=xenon__pb2.Is.SerializeToString,
       ),
       'read': grpc.unary_stream_rpc_method_handler(
           servicer.read,

@@ -359,7 +359,7 @@ service XenonFiles {
     rpc copy(CopyRequest) returns (Empty) {}
     rpc move(SourceTarget) returns (Empty) {}
     rpc delete(Path) returns (Empty) {}
-    rpc exists(Path) returns (Empty) {}
+    rpc exists(Path) returns (Is) {}
     // in Xenon it is called newInputStream()
     rpc read(Path) returns (stream FileStream) {}
     // in Xenon it is called newOutputStream()
