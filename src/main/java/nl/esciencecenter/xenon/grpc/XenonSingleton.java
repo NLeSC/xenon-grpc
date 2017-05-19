@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class XenonSingleton {
-    Logger logger = LoggerFactory.getLogger(XenonSingleton.class);
+    private Logger logger = LoggerFactory.getLogger(XenonSingleton.class);
     private Xenon instance = null;
     private Map<String,String> properties = new HashMap<>();
 
@@ -28,7 +28,7 @@ public class XenonSingleton {
         return instance;
     }
 
-    public void setProperties(Map<String, String> properties) {
+    void setProperties(Map<String, String> properties) {
         this.properties = properties;
         // TODO complain when instance already exists with different properties
     }

@@ -74,5 +74,13 @@ def run_adaptordescriptions():
     response = stub.getAdaptorDescriptions(xenon_pb2.Empty())
     print(response)
 
+def run_exists(path):
+    channel = grpc.insecure_channel('localhost:50051')
+    files = xenon_pb2_grpc.XenonFilesStub(channel)
+    localfs = files.newFileSystem(xenon_pb2.NewFileSystemRequest(adaptor='file'))
+    response = files.exists(xenon_pb2.Path(filesystem=localfs, path=path))
+    print(response)
+
+
 if __name__ == '__main__':
     run_adaptors()

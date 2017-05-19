@@ -1,22 +1,25 @@
 package nl.esciencecenter.xenon.grpc.jobs;
 
+import io.grpc.Status;
+import io.grpc.StatusException;
+import io.grpc.stub.StreamObserver;
+import nl.esciencecenter.xenon.AdaptorStatus;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.grpc.Parsers;
+import nl.esciencecenter.xenon.grpc.XenonJobsGrpc;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+import nl.esciencecenter.xenon.grpc.XenonSingleton;
+import nl.esciencecenter.xenon.jobs.Jobs;
+import nl.esciencecenter.xenon.jobs.Scheduler;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
-import nl.esciencecenter.xenon.AdaptorStatus;
-import nl.esciencecenter.xenon.Xenon;
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.grpc.XenonJobsGrpc;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.grpc.XenonSingleton;
-import nl.esciencecenter.xenon.jobs.Scheduler;
-
-import io.grpc.Status;
-import io.grpc.stub.StreamObserver;
 
 public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
     private final XenonSingleton singleton;
@@ -29,22 +32,13 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
 
     @Override
     public void newScheduler(XenonProto.NewSchedulerRequest request, StreamObserver<XenonProto.Scheduler> responseObserver) {
+        Jobs jobs = singleton.getInstance().jobs();
         try {
-            Xenon xenon = singleton.getInstance();
-
-            System.err.print("Location empty = ");
-            System.err.println(request.getLocation().isEmpty());
-
-            // TODO remove this experiment
-            if (!"local".equals(request.getAdaptor()) && request.getLocation().isEmpty()) {
-                throw new XenonException(request.getAdaptor(), "Location can not be empty");
-            }
-
-            Scheduler scheduler = xenon.jobs().newScheduler(
+            Credential credential = Parsers.parseCredential(singleton.getInstance(), request.getPassword(), request.getCertificate());
+            Scheduler scheduler = jobs.newScheduler(
                     request.getAdaptor(),
                     request.getLocation(),
-                    // TODO implement credentials
-                    null,
+                    credential,
                     request.getPropertiesMap()
             );
 
@@ -60,6 +54,8 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
             responseObserver.onCompleted();
         } catch (XenonException e) {
             responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).asException());
+        } catch (StatusException e) {
+            responseObserver.onError(e);
         }
     }
 

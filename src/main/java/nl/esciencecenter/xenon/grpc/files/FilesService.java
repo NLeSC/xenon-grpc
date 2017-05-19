@@ -1,14 +1,15 @@
 package nl.esciencecenter.xenon.grpc.files;
 
-import com.google.protobuf.Descriptors;
 import io.grpc.Status;
+import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
-import nl.esciencecenter.xenon.*;
-import nl.esciencecenter.xenon.credentials.CertificateNotFoundException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
+import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.files.RelativePath;
+import nl.esciencecenter.xenon.grpc.Parsers;
 import nl.esciencecenter.xenon.grpc.XenonFilesGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.grpc.XenonSingleton;
@@ -28,41 +29,30 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
     @Override
     public void newFileSystem(XenonProto.NewFileSystemRequest request, StreamObserver<XenonProto.FileSystem> responseObserver) {
         Files files = singleton.getInstance().files();
-        Credentials creds = singleton.getInstance().credentials();
 
-        XenonProto.CertificateCredential certificate = request.getCertificate();
-        XenonProto.PasswordCredential password = request.getPassword();
         try {
-            Credential credential;
-            // TODO should password/passphrase be masked?
-            XenonProto.NewFileSystemRequest.Builder maskedRequest = request.toBuilder();
-            if (certificate != null) {
-                // TODO use simpler constructor when Xenon 2.0 is released
-                credential = creds.newCertificateCredential(null, certificate.getCertfile(), null, certificate.getPassphrase().toCharArray(), null);
-                maskedRequest = maskedRequest.setCertificate(certificate.toBuilder().setPassphrase("******"));
-            } else if (password != null) {
-                // TODO use simpler constructor when Xenon 2.0 is released
-                credential = creds.newPasswordCredential(null, password.getUsername(), password.getPassword().toCharArray(), null);
-                maskedRequest = maskedRequest.setPassword(password.toBuilder().setPassword("******"));
-            } else {
-                // TODO remove when Xenon 2.0 is released
-                credential = creds.getDefaultCredential(null);
-            }
-            FileSystem fileSystem = files.newFileSystem(request.getAdaptor(), request.getAdaptor(), credential, request.getPropertiesMap());
+            Credential credential = Parsers.parseCredential(singleton.getInstance(), request.getPassword(), request.getCertificate());
+            FileSystem fileSystem = files.newFileSystem(
+                    request.getAdaptor(),
+                    request.getLocation(),
+                    credential,
+                    request.getPropertiesMap()
+            );
+
             // TODO use more unique id, maybe use new label/alias field from request or a uuid
             String id = fileSystem.getAdaptorName() + ":" + fileSystem.getLocation();
             fileSystems.put(id, new FileSystemContainer(request, fileSystem));
 
-            responseObserver.onNext(XenonProto.FileSystem.newBuilder()
-                .setId(id)
-                .setRequest(maskedRequest)
-                .build()
-            );
+            XenonProto.FileSystem value = XenonProto.FileSystem.newBuilder()
+                    .setId(id)
+                    .setRequest(request)
+                    .build();
+            responseObserver.onNext(value);
             responseObserver.onCompleted();
-        } catch (CertificateNotFoundException | InvalidLocationException | InvalidSchemeException | InvalidCredentialException | InvalidPropertyException | UnknownPropertyException e) {
-            responseObserver.onError(Status.INVALID_ARGUMENT.withDescription(e.getMessage()).asException());
         } catch (XenonException e) {
             responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).asException());
+        } catch (StatusException e) {
+            responseObserver.onError(e);
         }
     }
 
@@ -83,18 +73,46 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
 
     @Override
     public void close(XenonProto.FileSystem request, StreamObserver<XenonProto.Empty> responseObserver) {
-        String id = request.getId();
-        if (fileSystems.containsKey(id)) {
-            responseObserver.onError(Status.NOT_FOUND.asException());
-        }
-        FileSystem filesystem = fileSystems.get(id).getFileSystem();
         try {
+            FileSystem filesystem = getFileSystem(request);
             singleton.getInstance().files().close(filesystem);
-            fileSystems.remove(id);
+            fileSystems.remove(request.getId());
         } catch (XenonException e) {
             responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).asException());
+        } catch (StatusException e) {
+            responseObserver.onError(e);
         }
         responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void exists(XenonProto.Path request, StreamObserver<XenonProto.Is> responseObserver) {
+        Files files = singleton.getInstance().files();
+        try {
+            Path path = getPath(request);
+            boolean value = files.exists(path);
+            responseObserver.onNext(XenonProto.Is.newBuilder().setIs(value).build());
+            responseObserver.onCompleted();
+        } catch (XenonException e) {
+            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).asException());
+        } catch (StatusException e) {
+            responseObserver.onError(e);
+        }
+    }
+
+    private Path getPath(XenonProto.Path request) throws XenonException, StatusException {
+        Files files = singleton.getInstance().files();
+        XenonProto.FileSystem fileSystemRequest = request.getFilesystem();
+        FileSystem filesystem = getFileSystem(fileSystemRequest);
+        return files.newPath(filesystem, new RelativePath(request.getPath()));
+    }
+
+    private FileSystem getFileSystem(XenonProto.FileSystem fileSystemRequest) throws StatusException {
+        String id = fileSystemRequest.getId();
+        if (!fileSystems.containsKey(id)) {
+            throw Status.NOT_FOUND.augmentDescription(id).asException();
+        }
+        return fileSystems.get(id).getFileSystem();
     }
 }

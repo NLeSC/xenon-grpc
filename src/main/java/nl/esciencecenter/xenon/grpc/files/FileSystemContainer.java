@@ -7,12 +7,12 @@ public class FileSystemContainer {
     private final XenonProto.NewFileSystemRequest request;
     private final FileSystem fileSystem;
 
-    public FileSystemContainer(XenonProto.NewFileSystemRequest request, FileSystem fileSystem) {
+    FileSystemContainer(XenonProto.NewFileSystemRequest request, FileSystem fileSystem) {
         this.request = request;
         this.fileSystem = fileSystem;
     }
 
-    public FileSystem getFileSystem() {
+    FileSystem getFileSystem() {
         return fileSystem;
     }
 

@@ -7,7 +7,7 @@ public class SchedulerContainer {
     private final Scheduler scheduler;
     private final XenonProto.NewSchedulerRequest request;
 
-    public SchedulerContainer(XenonProto.NewSchedulerRequest request, Scheduler scheduler) {
+    SchedulerContainer(XenonProto.NewSchedulerRequest request, Scheduler scheduler) {
         this.request = request;
         this.scheduler = scheduler;
     }
@@ -16,8 +16,7 @@ public class SchedulerContainer {
         return request;
     }
 
-    public Scheduler getScheduler() {
+    Scheduler getScheduler() {
         return scheduler;
     }
-
 }

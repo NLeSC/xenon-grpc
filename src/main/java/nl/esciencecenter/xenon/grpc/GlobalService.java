@@ -5,7 +5,7 @@ import io.grpc.stub.StreamObserver;
 public class GlobalService extends XenonGlobalGrpc.XenonGlobalImplBase {
     private final XenonSingleton singleton;
 
-    public GlobalService(XenonSingleton singleton) {
+    GlobalService(XenonSingleton singleton) {
         super();
         this.singleton = singleton;
     }
