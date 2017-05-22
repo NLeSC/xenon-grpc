@@ -35,7 +35,6 @@ import nl.esciencecenter.xenon.grpc.Parsers;
 import nl.esciencecenter.xenon.grpc.XenonFilesGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.grpc.XenonSingleton;
-import nl.esciencecenter.xenon.util.FileVisitResult;
 import nl.esciencecenter.xenon.util.FileVisitor;
 import nl.esciencecenter.xenon.util.Utils;
 
@@ -513,31 +512,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
         Files files = singleton.getInstance().files();
         try {
             Path start = getPath(request.getStart());
-            FileVisitor visitor = new FileVisitor() {
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, XenonException exception, Files files) throws XenonException {
-                    // TODO implement
-                    return null;
-                }
-
-                @Override
-                public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files) throws XenonException {
-                    // TODO implement
-                    return null;
-                }
-
-                @Override
-                public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws XenonException {
-                    // TODO implement
-                    return null;
-                }
-
-                @Override
-                public FileVisitResult visitFileFailed(Path file, XenonException exception, Files files) throws XenonException {
-                    // TODO implement
-                    return null;
-                }
-            };
+            FileVisitor visitor = new FileRegexpVisitor(request.getStart().getFilesystem(), responseObserver, !request.getWithoutAttributes(), request.getFilenameRegexp());
             Utils.walkFileTree(files, start, request.getFollowLinks(), request.getMaxDepth(), visitor);
             responseObserver.onCompleted();
         } catch (XenonException e) {

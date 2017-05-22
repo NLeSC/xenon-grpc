@@ -142,15 +142,16 @@ message CopyStatuses {
 }
 
 enum PosixFilePermission {
-    OWNER_READ = 0;
-    OWNER_WRITE = 1;
-    OWNER_EXECUTE = 2;
-    GROUP_READ = 3;
-    GROUP_WRITE = 4;
-    GROUP_EXECUTE = 5;
-    OTHERS_READ = 6;
-    OTHERS_WRITE = 7;
-    OTHERS_EXECUTE = 8;
+    NONE = 0;
+    OWNER_READ = 1;
+    OWNER_WRITE = 2;
+    OWNER_EXECUTE = 3;
+    GROUP_READ = 4;
+    GROUP_WRITE = 5;
+    GROUP_EXECUTE = 6;
+    OTHERS_READ = 7;
+    OTHERS_WRITE = 8;
+    OTHERS_EXECUTE = 9;
 }
 
 message FileAttributes {
@@ -197,10 +198,12 @@ message WriteRequest {
 message WalkFileTreeRequest {
     // Start directory
     Path start = 1;
-    // When true attributes will be returned
-    bool attributes = 2;
-    // When 1 only files/directories/symlinks in start path will be returned. If not set will recurse as deep as it can.
+    // When false attributes will be returned
+    bool withoutAttributes = 2;
+    // When 1 only files/directories/symlinks in start path will be returned.
+    // If not set or 0 will recurse as deep as it can.
     uint32 maxDepth = 3;
+    // When true then will follow symbolic links
     bool followLinks = 4;
     // Only files matching regexp will be returned. For example '\.txt$' will only return *.txt files.
     string filenameRegexp = 5;

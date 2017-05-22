@@ -100,7 +100,7 @@ class Writers {
         return fileSystem.getAdaptorName() + ":" + fileSystem.getLocation();
     }
 
-    static XenonProto.FileSystem writeFileSystem(FileSystem fs) {
+    private static XenonProto.FileSystem writeFileSystem(FileSystem fs) {
         XenonProto.NewFileSystemRequest request = XenonProto.NewFileSystemRequest.newBuilder()
             .setAdaptor(fs.getAdaptorName())
             .setLocation(fs.getLocation())
