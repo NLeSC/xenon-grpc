@@ -1,10 +1,17 @@
 package nl.esciencecenter.xenon.grpc.files;
 
+import static nl.esciencecenter.xenon.grpc.Parsers.parseOpenOption;
+import static nl.esciencecenter.xenon.grpc.files.Writers.writeWritePermissions;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
@@ -19,8 +26,12 @@ import nl.esciencecenter.xenon.util.Utils;
 import io.grpc.Status;
 import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
+    private static final int BUFFER_SIZE = 8192;
+    private static final Logger LOGGER = LoggerFactory.getLogger(FilesService.class);
     private final XenonSingleton singleton;
     private Map<String, FileSystemContainer> fileSystems = new ConcurrentHashMap<>();
 
@@ -182,6 +193,96 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
             responseObserver.onError(e);
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        }
+    }
+
+    @Override
+    public void read(XenonProto.Path request, StreamObserver<XenonProto.FileStream> responseObserver) {
+        Files files = singleton.getInstance().files();
+        InputStream pipe = null;
+        try {
+            Path path = getPath(request);
+            pipe = files.newInputStream(path);
+            // Read file in chunks and pass on as stream of byte arrays
+            byte[] buffer = new byte[BUFFER_SIZE];
+            while (pipe.read(buffer) != -1) {
+                responseObserver.onNext(XenonProto.FileStream.parseFrom(buffer));
+            }
+            responseObserver.onCompleted();
+        } catch (StatusException e) {
+            responseObserver.onError(e);
+        } catch (XenonException | IOException e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        } finally {
+            try {
+                if (pipe != null) {
+                    pipe.close();
+                }
+            } catch (IOException e) {
+                responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+            }
+        }
+    }
+
+    @Override
+    public StreamObserver<XenonProto.WriteRequest> write(StreamObserver<XenonProto.Empty> responseObserver) {
+        return new StreamObserver<XenonProto.WriteRequest>() {
+            private OutputStream pipe;
+
+            @Override
+            public void onNext(XenonProto.WriteRequest value) {
+                try {
+                    // open pip to write to on first incoming chunk
+                    if (pipe == null) {
+                        Files files = singleton.getInstance().files();
+                        Path path = getPath(value.getPath());
+                        pipe = files.newOutputStream(path, parseOpenOption(value.getOptionsValueList()));
+                    }
+                    pipe.write(value.getBuffer().toByteArray());
+                } catch (XenonException | IOException e) {
+                    responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+                } catch (StatusException e) {
+                    responseObserver.onError(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                if (pipe != null) {
+                    try {
+                        pipe.close();
+                    } catch (IOException e) {
+                        LOGGER.warn("Error from client", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onCompleted() {
+                if (pipe != null) {
+                    try {
+                        pipe.close();
+                    } catch (IOException e) {
+                        LOGGER.warn("Error from client", e);
+                    }
+                }
+                responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+                responseObserver.onCompleted();
+            }
+        };
+    }
+
+    @Override
+    public void getAttributes(XenonProto.Path request, StreamObserver<XenonProto.FileAttributes> responseObserver) {
+        Files files = singleton.getInstance().files();
+        try {
+            Path path = getPath(request);
+            FileAttributes attributes = files.getAttributes(path);
+            responseObserver.onNext(writeWritePermissions(attributes));
+        } catch (XenonException e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (StatusException e) {
+            responseObserver.onError(e);
         }
     }
 

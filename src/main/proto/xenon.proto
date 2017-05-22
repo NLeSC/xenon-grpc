@@ -184,14 +184,13 @@ message WriteRequest {
     Path path = 1;
     bytes buffer = 2;
     enum OpenOption {
-        READ = 0;
-        WRITE = 1;
-        APPEND = 2;
-        CREATE = 3;
-        OPEN = 4;
-        OPEN_OR_CREATE = 5;
-        TRUNCATE = 7;
+        CREATE = 0;
+        OPEN = 1;
+        OPEN_OR_CREATE = 2;
+        APPEND = 3;
+        TRUNCATE = 4;
     }
+    // Xenon.OpenOption.WRITE is always passed
     repeated OpenOption options = 3;
 }
 
