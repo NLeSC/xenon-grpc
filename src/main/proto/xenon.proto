@@ -345,18 +345,21 @@ service XenonFiles {
     rpc createDirectories(Path) returns (Empty) {}
     rpc createDirectory(Path) returns (Empty) {}
     rpc createFile(Path) returns (Empty) {}
-    // Asynchronous recursive opy
+    // Asynchronous recursive copy of files.
     // in Xenon it is called copy() with CopyOption.ASYNCHRONOUS
     rpc backgroundCopy(CopyRequest) returns (Copy) {}
-    rpc cancelCopy(Copy) returns (CopyStatus) {}
-    rpc getCopyStatus(Copy) returns (CopyStatus) {}
+    rpc cancelBackgroundCopy(Copy) returns (CopyStatus) {}
+    rpc getBackgroundCopyStatus(Copy) returns (CopyStatus) {}
     // List currently active copy operations
     // Specific to grpc, not part of Xenon library
-    rpc listCopyStatuses(Empty) returns (CopyStatuses) {}
+    rpc listBackgroundCopyStatuses(Empty) returns (CopyStatuses) {}
+    // Delete background copy, will also cancel when not done
+    rpc deleteBackgroundCopy(Copy) returns (Empty) {}
     // Synchronous recursive opy
     // in Xenon it is called copy() without CopyOption.ASYNCHRONOUS
     rpc copy(CopyRequest) returns (Empty) {}
     rpc move(SourceTarget) returns (Empty) {}
+    // delete a file/symlink or recursivly delete a directory
     rpc delete(Path) returns (Empty) {}
     rpc exists(Path) returns (Is) {}
     // in Xenon it is called newInputStream()
@@ -372,7 +375,7 @@ service XenonFiles {
     rpc setPosixFilePermissions(PosixFilePermissionsRequest) returns (Empty) {}
     rpc readSymbolicLink(Path) returns (Path) {}
     rpc isOpen(FileSystem) returns (Is) {}
-    // Closes a filestem, any actions running it with this filestystem will be terminated
+    // Closes a filestem, any actions running it with this filestystem will be terminated, will also forget the filesystem
     rpc close(FileSystem) returns (Empty) {}
     // List currently created filesystems
     // Specific to grpc, not part of Xenon library
@@ -406,6 +409,8 @@ service XenonJobs {
     rpc cancelJob(Job) returns (JobStatus) {}
     // Specific to grpc, not part of Xenon library
     rpc deleteJob(Job) returns (Empty) {}
+    // Close scheduler and forget it
+    // If scheduler is online then any jobs pending/running will become invalid
     rpc close(Scheduler) returns (Empty) {}
     // Specific to grpc, not part of Xenon library
     rpc listSchedulers(Empty) returns (Schedulers) {}

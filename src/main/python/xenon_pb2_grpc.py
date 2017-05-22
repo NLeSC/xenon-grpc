@@ -113,20 +113,25 @@ class XenonFilesStub(object):
         request_serializer=xenon__pb2.CopyRequest.SerializeToString,
         response_deserializer=xenon__pb2.Copy.FromString,
         )
-    self.cancelCopy = channel.unary_unary(
-        '/xenon.XenonFiles/cancelCopy',
+    self.cancelBackgroundCopy = channel.unary_unary(
+        '/xenon.XenonFiles/cancelBackgroundCopy',
         request_serializer=xenon__pb2.Copy.SerializeToString,
         response_deserializer=xenon__pb2.CopyStatus.FromString,
         )
-    self.getCopyStatus = channel.unary_unary(
-        '/xenon.XenonFiles/getCopyStatus',
+    self.getBackgroundCopyStatus = channel.unary_unary(
+        '/xenon.XenonFiles/getBackgroundCopyStatus',
         request_serializer=xenon__pb2.Copy.SerializeToString,
         response_deserializer=xenon__pb2.CopyStatus.FromString,
         )
-    self.listCopyStatuses = channel.unary_unary(
-        '/xenon.XenonFiles/listCopyStatuses',
+    self.listBackgroundCopyStatuses = channel.unary_unary(
+        '/xenon.XenonFiles/listBackgroundCopyStatuses',
         request_serializer=xenon__pb2.Empty.SerializeToString,
         response_deserializer=xenon__pb2.CopyStatuses.FromString,
+        )
+    self.deleteBackgroundCopy = channel.unary_unary(
+        '/xenon.XenonFiles/deleteBackgroundCopy',
+        request_serializer=xenon__pb2.Copy.SerializeToString,
+        response_deserializer=xenon__pb2.Empty.FromString,
         )
     self.copy = channel.unary_unary(
         '/xenon.XenonFiles/copy',
@@ -239,26 +244,33 @@ class XenonFilesServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def backgroundCopy(self, request, context):
-    """Asynchronous recursive opy
+    """Asynchronous recursive copy of files.
     in Xenon it is called copy() with CopyOption.ASYNCHRONOUS
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def cancelCopy(self, request, context):
+  def cancelBackgroundCopy(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def getCopyStatus(self, request, context):
+  def getBackgroundCopyStatus(self, request, context):
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def listCopyStatuses(self, request, context):
+  def listBackgroundCopyStatuses(self, request, context):
     """List currently active copy operations
     Specific to grpc, not part of Xenon library
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def deleteBackgroundCopy(self, request, context):
+    """Delete background copy, will also cancel when not done
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -278,6 +290,8 @@ class XenonFilesServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def delete(self, request, context):
+    """delete a file/symlink or recursivly delete a directory
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -332,7 +346,7 @@ class XenonFilesServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def close(self, request, context):
-    """Closes a filestem, any actions running it with this filestystem will be terminated
+    """Closes a filestem, any actions running it with this filestystem will be terminated, will also forget the filesystem
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -391,20 +405,25 @@ def add_XenonFilesServicer_to_server(servicer, server):
           request_deserializer=xenon__pb2.CopyRequest.FromString,
           response_serializer=xenon__pb2.Copy.SerializeToString,
       ),
-      'cancelCopy': grpc.unary_unary_rpc_method_handler(
-          servicer.cancelCopy,
+      'cancelBackgroundCopy': grpc.unary_unary_rpc_method_handler(
+          servicer.cancelBackgroundCopy,
           request_deserializer=xenon__pb2.Copy.FromString,
           response_serializer=xenon__pb2.CopyStatus.SerializeToString,
       ),
-      'getCopyStatus': grpc.unary_unary_rpc_method_handler(
-          servicer.getCopyStatus,
+      'getBackgroundCopyStatus': grpc.unary_unary_rpc_method_handler(
+          servicer.getBackgroundCopyStatus,
           request_deserializer=xenon__pb2.Copy.FromString,
           response_serializer=xenon__pb2.CopyStatus.SerializeToString,
       ),
-      'listCopyStatuses': grpc.unary_unary_rpc_method_handler(
-          servicer.listCopyStatuses,
+      'listBackgroundCopyStatuses': grpc.unary_unary_rpc_method_handler(
+          servicer.listBackgroundCopyStatuses,
           request_deserializer=xenon__pb2.Empty.FromString,
           response_serializer=xenon__pb2.CopyStatuses.SerializeToString,
+      ),
+      'deleteBackgroundCopy': grpc.unary_unary_rpc_method_handler(
+          servicer.deleteBackgroundCopy,
+          request_deserializer=xenon__pb2.Copy.FromString,
+          response_serializer=xenon__pb2.Empty.SerializeToString,
       ),
       'copy': grpc.unary_unary_rpc_method_handler(
           servicer.copy,
@@ -701,6 +720,9 @@ class XenonJobsServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def close(self, request, context):
+    """Close scheduler and forget it
+    If scheduler is online then any jobs pending/running will become invalid
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')

@@ -4,7 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
+import nl.esciencecenter.xenon.files.CopyStatus;
 import nl.esciencecenter.xenon.files.FileAttributes;
+import nl.esciencecenter.xenon.files.FileSystem;
+import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 
@@ -20,7 +23,7 @@ class Writers {
     private Writers() {
     }
 
-    static XenonProto.FileAttributes writeWritePermissions(FileAttributes a) {
+    static XenonProto.FileAttributes writeFileAttributes(FileAttributes a) {
         XenonProto.FileAttributes.Builder builder = XenonProto.FileAttributes.newBuilder()
             .setCreationTime(a.creationTime())
             .setIsDirectory(a.isDirectory())
@@ -86,6 +89,49 @@ class Writers {
             LOGGER.warn("Skipping posix file permissions, not supported for this path", e);
         }
         return permissions;
+    }
+
+    static XenonProto.Path writePath(Path path, XenonProto.FileSystem fs) {
+        return XenonProto.Path.newBuilder().setFilesystem(fs).setPath(path.getRelativePath().toString()).build();
+    }
+
+    static String getFileSystemId(FileSystem fileSystem) {
+        // TODO use more unique id, maybe use new label/alias field from request or a uuid
+        return fileSystem.getAdaptorName() + ":" + fileSystem.getLocation();
+    }
+
+    static XenonProto.FileSystem writeFileSystem(FileSystem fs) {
+        XenonProto.NewFileSystemRequest request = XenonProto.NewFileSystemRequest.newBuilder()
+            .setAdaptor(fs.getAdaptorName())
+            .setLocation(fs.getLocation())
+            .putAllProperties(fs.getProperties())
+            .build();
+        return XenonProto.FileSystem.newBuilder()
+            .setId(getFileSystemId(fs))
+            .setRequest(request)
+            .build();
+    }
+
+    static XenonProto.FileSystems writeFileSystems(FileSystem[] xenonfilesystems) {
+        XenonProto.FileSystems.Builder builder = XenonProto.FileSystems.newBuilder();
+        for (FileSystem fs : xenonfilesystems) {
+            builder.addFilesystems(writeFileSystem(fs));
+        }
+        return builder.build();
+    }
+
+    static XenonProto.CopyStatus writeCopyStatus(CopyStatus status, XenonProto.Copy copy) {
+        XenonProto.CopyStatus.Builder builder = XenonProto.CopyStatus.newBuilder()
+            .setBytesCopied(status.bytesCopied())
+            .setBytesToCopy(status.bytesToCopy())
+            .setCopy(copy)
+            .setState(status.getState())
+            .setDone(status.isDone())
+            .setRunning(status.isRunning());
+        if (status.hasException()) {
+            builder.setError(status.getException().getMessage());
+        }
+        return builder.build();
     }
 
 }
