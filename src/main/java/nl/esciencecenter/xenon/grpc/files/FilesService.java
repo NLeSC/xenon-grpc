@@ -1,21 +1,24 @@
 package nl.esciencecenter.xenon.grpc.files;
 
-import io.grpc.Status;
-import io.grpc.StatusException;
-import io.grpc.stub.StreamObserver;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.grpc.Parsers;
 import nl.esciencecenter.xenon.grpc.XenonFilesGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.grpc.XenonSingleton;
+import nl.esciencecenter.xenon.util.Utils;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import io.grpc.Status;
+import io.grpc.StatusException;
+import io.grpc.stub.StreamObserver;
 
 public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
     private final XenonSingleton singleton;
@@ -50,7 +53,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
             responseObserver.onNext(value);
             responseObserver.onCompleted();
         } catch (XenonException e) {
-            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).asException());
+            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
             responseObserver.onError(e);
         }
@@ -78,7 +81,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
             singleton.getInstance().files().close(filesystem);
             fileSystems.remove(request.getId());
         } catch (XenonException e) {
-            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).asException());
+            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
             responseObserver.onError(e);
         }
@@ -95,7 +98,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
             responseObserver.onNext(XenonProto.Is.newBuilder().setIs(value).build());
             responseObserver.onCompleted();
         } catch (XenonException e) {
-            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).asException());
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
             responseObserver.onError(e);
         }
@@ -115,4 +118,71 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
         }
         return fileSystems.get(id).getFileSystem();
     }
+
+    @Override
+    public void createDirectory(XenonProto.Path request, StreamObserver<XenonProto.Empty> responseObserver) {
+        Files files = singleton.getInstance().files();
+        try {
+            Path path = getPath(request);
+            files.createDirectory(path);
+            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (PathAlreadyExistsException e) {
+            responseObserver.onError(Status.ALREADY_EXISTS.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (StatusException e) {
+            responseObserver.onError(e);
+        } catch (XenonException e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        }
+    }
+
+    @Override
+    public void createDirectories(XenonProto.Path request, StreamObserver<XenonProto.Empty> responseObserver) {
+        Files files = singleton.getInstance().files();
+        try {
+            Path path = getPath(request);
+            files.createDirectories(path);
+            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (PathAlreadyExistsException e) {
+            responseObserver.onError(Status.ALREADY_EXISTS.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (StatusException e) {
+            responseObserver.onError(e);
+        } catch (XenonException e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        }
+    }
+
+    @Override
+    public void createFile(XenonProto.Path request, StreamObserver<XenonProto.Empty> responseObserver) {
+        Files files = singleton.getInstance().files();
+        try {
+            Path path = getPath(request);
+            files.createFile(path);
+            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (PathAlreadyExistsException e) {
+            responseObserver.onError(Status.ALREADY_EXISTS.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (StatusException e) {
+            responseObserver.onError(e);
+        } catch (XenonException e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        }
+    }
+
+    @Override
+    public void delete(XenonProto.Path request, StreamObserver<XenonProto.Empty> responseObserver) {
+        Files files = singleton.getInstance().files();
+        try {
+            Path path = getPath(request);
+            Utils.recursiveDelete(files, path);
+            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (StatusException e) {
+            responseObserver.onError(e);
+        } catch (XenonException e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        }
+    }
+
 }
