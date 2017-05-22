@@ -1,18 +1,12 @@
 package nl.esciencecenter.xenon.grpc.files;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
-import nl.esciencecenter.xenon.files.CopyStatus;
-import nl.esciencecenter.xenon.files.FileAttributes;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.files.PosixFilePermission;
+import nl.esciencecenter.xenon.files.*;
 import nl.esciencecenter.xenon.grpc.XenonProto;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /*
     Writers to convert Xenon objects to gRPC response fields
@@ -133,5 +127,4 @@ class Writers {
         }
         return builder.build();
     }
-
 }

@@ -235,20 +235,21 @@ message Schedulers {
 }
 
 message JobDescription {
-    string executable = 1;
-    repeated string arguments = 2;
-    string workingDirectory = 3;
-    map<string, string> environment = 4;
-    string queueName = 5;
-    bool interactive = 6;
-    uint64 maxTime = 7;
-    uint32 nodeCount = 8;
-    uint32 processesPerNode = 9;
-    bool startSingleProcess = 10;
-    string stdErr = 11;
-    string stdIn = 12;
-    string stdOut = 13;
-    map<string, string> options = 14;
+    Scheduler scheduler = 1;
+    string executable = 2;
+    repeated string arguments = 3;
+    string workingDirectory = 4;
+    map<string, string> environment = 5;
+    string queueName = 6;
+    bool interactive = 7;
+    uint32 maxTime = 8;
+    uint32 nodeCount = 9;
+    uint32 processesPerNode = 10;
+    bool startSingleProcess = 11;
+    string stdErr = 12;
+    string stdIn = 13;
+    string stdOut = 14;
+    map<string, string> options = 15;
 }
 
 message SubmitJobRequest {
@@ -275,7 +276,12 @@ message Queues {
 
 message SchedulerAndQueues {
     Scheduler scheduler = 1;
-    repeated Queues queues = 2;
+    repeated string queues = 2;
+}
+
+message SchedulerAndQueue {
+    Scheduler scheduler = 1;
+    string queue = 2;
 }
 
 message JobStatus {
@@ -286,12 +292,12 @@ message JobStatus {
     int32 exitCode = 6;
     string errorMessage = 7;
     enum ErrorType {
-        Empty = 0;
-        NotFound = 1;
-        Cancelled = 2;
-        SchedulerError = 3;
-        SchedulerNotFound = 4;
-        Other = 5;
+        EMPTY = 0;
+        NOT_FOUND = 1;
+        CANCELLED = 2;
+        SCHEDULER_ERROR = 3;
+        SCHEDULER_NOT_FOUND = 4;
+        OTHER = 5;
     }
     ErrorType errorType = 8;
     Job job = 9;
@@ -403,7 +409,7 @@ service XenonJobs {
     rpc getJobs(SchedulerAndQueues) returns (Jobs) {}
     rpc getJobStatus(Job) returns (JobStatus) {}
     rpc getJobStatuses(Jobs) returns (JobStatuses) {}
-    rpc getQueueStatus(SchedulerAndQueues) returns (QueueStatus) {}
+    rpc getQueueStatus(SchedulerAndQueue) returns (QueueStatus) {}
     rpc getQueueStatuses(SchedulerAndQueues) returns (QueueStatuses) {}
     rpc waitUntilDone(Job) returns (JobStatus) {}
     rpc waitUntilRunning(Job) returns (JobStatus) {}

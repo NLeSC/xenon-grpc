@@ -563,7 +563,7 @@ class XenonJobsStub(object):
         )
     self.getQueueStatus = channel.unary_unary(
         '/xenon.XenonJobs/getQueueStatus',
-        request_serializer=xenon__pb2.SchedulerAndQueues.SerializeToString,
+        request_serializer=xenon__pb2.SchedulerAndQueue.SerializeToString,
         response_deserializer=xenon__pb2.QueueStatus.FromString,
         )
     self.getQueueStatuses = channel.unary_unary(
@@ -796,7 +796,7 @@ def add_XenonJobsServicer_to_server(servicer, server):
       ),
       'getQueueStatus': grpc.unary_unary_rpc_method_handler(
           servicer.getQueueStatus,
-          request_deserializer=xenon__pb2.SchedulerAndQueues.FromString,
+          request_deserializer=xenon__pb2.SchedulerAndQueue.FromString,
           response_serializer=xenon__pb2.QueueStatus.SerializeToString,
       ),
       'getQueueStatuses': grpc.unary_unary_rpc_method_handler(
