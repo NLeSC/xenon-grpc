@@ -1,4 +1,4 @@
-Experiment to combine Xenon (nlesc.github.io/Xenon/) and gRpc (http://www.grpc.io/).
+Experiment to combine Xenon (https://nlesc.github.io/Xenon/) and gRpc (http://www.grpc.io/).
 
 [![Build Status](https://travis-ci.org/NLeSC/xenon-cli.svg?branch=master)](https://travis-ci.org/NLeSC/xenon-cli)
 [![Build status](https://ci.appveyor.com/api/projects/status/tep8bad05e76a69w/branch/master?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon-cli/branch/master)
