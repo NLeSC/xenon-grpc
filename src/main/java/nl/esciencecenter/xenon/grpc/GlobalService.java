@@ -1,5 +1,6 @@
 package nl.esciencecenter.xenon.grpc;
 
+import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
 
 public class GlobalService extends XenonGlobalGrpc.XenonGlobalImplBase {
@@ -12,8 +13,12 @@ public class GlobalService extends XenonGlobalGrpc.XenonGlobalImplBase {
 
     @Override
     public void newXenon(XenonProto.Properties request, StreamObserver<XenonProto.Empty> responseObserver) {
-        singleton.setProperties(request.getPropertiesMap());
-        responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
-        responseObserver.onCompleted();
+        try {
+            singleton.setProperties(request.getPropertiesMap());
+            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (StatusException e) {
+            responseObserver.onError(e);
+        }
     }
 }

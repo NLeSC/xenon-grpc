@@ -1,0 +1,9 @@
+sudo: false
+jdk: oraclejdk8
+addons:
+  sonarqube:
+    organization: nlesc
+script:
+  - ./gradlew check 
+  - ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN
+

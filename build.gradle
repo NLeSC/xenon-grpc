@@ -1,21 +1,24 @@
-apply plugin: 'java'
-apply plugin: 'com.google.protobuf'
-apply plugin: 'application'
-apply plugin: 'idea'
-
-version = '0.0.1'
-mainClassName = 'nl.esciencecenter.xenon.grpc.XenonServer'
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.0'
-    }
+plugins {
+    id 'java'
+    id 'com.google.protobuf' version '0.8.1'
+    // distribution
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '2.0.0'
+    // ide
+    id 'idea'
+    // test coverage
+    id 'jacoco'
+    // quality
+    id 'org.sonarqube' version '2.4'
 }
 
+version = '0.0.1'
+applicationName = 'xenon-grpc'
+group = 'nlesc'
+mainClassName = 'nl.esciencecenter.xenon.grpc.XenonServer'
 ext.grpcVersion = '1.3.0'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -28,6 +31,8 @@ dependencies {
     compile "io.grpc:grpc-stub:${grpcVersion}"
     compile 'org.slf4j:slf4j-api:1.7.25'
     compile 'nl.esciencecenter.xenon:xenon:1.2.2'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:+'
 }
 
 protobuf {
@@ -57,5 +62,29 @@ idea {
         // https://discuss.gradle.org/t/support-for-intellij-2016/15294/8
         sourceDirs += file("${projectDir}/build/generated/source/proto/main/java")
         sourceDirs += file("${projectDir}/build/generated/source/proto/main/grpc")
+    }
+}
+
+// use shadow dists everywhere
+distZip.enabled = false
+distTar.enabled = false
+
+jacocoTestReport {
+    // Exclude classes of generated source code by protoc
+    // See https://stackoverflow.com/questions/29887805/filter-jacoco-coverage-reports-with-gradle
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ['nl/esciencecenter/xenon/grpc/XenonProto*',
+                                        'nl/esciencecenter/xenon/grpc/Xenon*Grpc*'])
+        })
+    }
+}
+
+sonarqube {
+    properties {
+        property 'sonar.host.url', 'https://sonarqube.com'
+        property 'sonar.organization', project.group
+        property 'sonar.language', 'java'
+        property 'sonar.links.homepage', 'https://github.com/NLeSC/xenon-grpc'
     }
 }

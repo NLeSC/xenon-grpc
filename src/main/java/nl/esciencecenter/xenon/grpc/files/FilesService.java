@@ -2,7 +2,7 @@ package nl.esciencecenter.xenon.grpc.files;
 
 import static java.util.UUID.randomUUID;
 import static nl.esciencecenter.xenon.grpc.files.Parsers.parseCopyOptions;
-import static nl.esciencecenter.xenon.grpc.files.Parsers.parseOpenOption;
+import static nl.esciencecenter.xenon.grpc.files.Parsers.parseOpenOptions;
 import static nl.esciencecenter.xenon.grpc.files.Parsers.parsePermissions;
 import static nl.esciencecenter.xenon.grpc.files.Writers.getFileSystemId;
 import static nl.esciencecenter.xenon.grpc.files.Writers.mapFileAdaptorDescription;
@@ -257,7 +257,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
                     if (pipe == null) {
                         Files files = singleton.getInstance().files();
                         Path path = getPath(value.getPath());
-                        pipe = files.newOutputStream(path, parseOpenOption(value.getOptionsList()));
+                        pipe = files.newOutputStream(path, parseOpenOptions(value.getOptionsList()));
                     }
                     pipe.write(value.getBuffer().toByteArray());
                 } catch (XenonException | IOException e) {
@@ -359,6 +359,19 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
         Files files = singleton.getInstance().files();
         try {
             FileSystem[] xenonFilesystems = Utils.getLocalFileSystems(files);
+            XenonProto.NewFileSystemRequest.Builder builder = XenonProto.NewFileSystemRequest.newBuilder();
+
+            // Store file systems for later use
+            for (FileSystem xenonFilesystem : xenonFilesystems) {
+                String fileSystemId = getFileSystemId(xenonFilesystem);
+                XenonProto.NewFileSystemRequest fsRequest = builder
+                    .setAdaptor(xenonFilesystem.getAdaptorName())
+                    .setLocation(xenonFilesystem.getLocation())
+                    .putAllProperties(xenonFilesystem.getProperties())
+                    .build();
+                fileSystems.put(fileSystemId, new FileSystemContainer(fsRequest, xenonFilesystem));
+            }
+
             XenonProto.FileSystems filesystems = writeFileSystems(xenonFilesystems);
             responseObserver.onNext(filesystems);
             responseObserver.onCompleted();

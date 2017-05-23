@@ -17,7 +17,7 @@ class Parsers {
     private Parsers() {
     }
 
-    static OpenOption[] parseOpenOption(List<XenonProto.WriteRequest.OpenOption> optionsList) throws StatusException {
+    static OpenOption[] parseOpenOptions(List<XenonProto.WriteRequest.OpenOption> optionsList) throws StatusException {
         List<OpenOption> options = new ArrayList<>();
         // OpenOption is only used to write a file, so always add WRITE option.
         options.add(OpenOption.WRITE);

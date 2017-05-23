@@ -1,0 +1,17 @@
+version: '{branch}-{build}'
+cache:
+- C:\Users\appveyor\.m2
+- C:\Users\appveyor\.gradle\caches\
+- C:\Users\appveyor\.gradle\wrapper\
+build_script:
+- cmd: ./gradlew.bat assemble
+test_script:
+- cmd: ./gradlew.bat check
+on_finish:
+- cmd: del /S C:\Users\appveyor\.gradle\caches\modules-2\modules-2.lock
+- ps: >-
+    $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
+
+    Get-ChildItem "build/test-results/test/" -Filter *.xml | Foreach-Object{
+        (New-Object 'System.Net.WebClient').UploadFile($url, $_.FullName)
+    }

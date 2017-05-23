@@ -7,6 +7,7 @@ import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
 
+import io.grpc.StatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,14 +23,15 @@ public class XenonSingleton {
             } catch (XenonException e) {
                 // TODO something better
                 logger.error(e.getMessage(), e);
-                e.printStackTrace();
             }
         }
         return instance;
     }
 
-    void setProperties(Map<String, String> properties) {
+    void setProperties(Map<String, String> properties) throws StatusException {
+        if (instance != null) {
+            throw io.grpc.Status.FAILED_PRECONDITION.withDescription("Unable to set properties after other calls").asException();
+        }
         this.properties = properties;
-        // TODO complain when instance already exists with different properties
     }
 }

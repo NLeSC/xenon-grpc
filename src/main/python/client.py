@@ -77,7 +77,9 @@ def run_adaptordescriptions():
 def run_exists(path):
     channel = grpc.insecure_channel('localhost:50051')
     files = xenon_pb2_grpc.XenonFilesStub(channel)
-    localfs = files.newFileSystem(xenon_pb2.NewFileSystemRequest(adaptor='file'))
+    localfss = files.localFileSystems(xenon_pb2.Empty())
+    localfs = localfss[0]
+    # localfs = files.newFileSystem(xenon_pb2.NewFileSystemRequest(adaptor='file'))
     response = files.exists(xenon_pb2.Path(filesystem=localfs, path=path))
     print(response)
 
