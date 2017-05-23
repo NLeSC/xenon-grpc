@@ -21,21 +21,20 @@ public class Parsers {
     private Parsers() {
     }
 
-    public static Credential parseCredential(Xenon xenon, XenonProto.PasswordCredential password, XenonProto.CertificateCredential certificate) throws StatusException, XenonException {
+    public static Credential parseCredential(Xenon xenon, String scheme, XenonProto.PasswordCredential password, XenonProto.CertificateCredential certificate) throws StatusException, XenonException {
         Credentials creds = xenon.credentials();
         try {
             Credential credential;
-            String dummyScheme = "local";
             // if embedded message is not set then the request field will have the default instance,
             if (!XenonProto.CertificateCredential.getDefaultInstance().equals(certificate)) {
                 // TODO use simpler constructor when Xenon 2.0 is released
-                credential = creds.newCertificateCredential(dummyScheme, certificate.getCertfile(), null, certificate.getPassphrase().toCharArray(), null);
+                credential = creds.newCertificateCredential(scheme, certificate.getCertfile(), null, certificate.getPassphrase().toCharArray(), null);
             } else if (!XenonProto.PasswordCredential.getDefaultInstance().equals(password)) {
                 // TODO use simpler constructor when Xenon 2.0 is released
-                credential = creds.newPasswordCredential(dummyScheme, password.getUsername(), password.getPassword().toCharArray(), null);
+                credential = creds.newPasswordCredential(scheme, password.getUsername(), password.getPassword().toCharArray(), null);
             } else {
                 // TODO remove when Xenon 2.0 is released
-                credential = creds.getDefaultCredential(dummyScheme);
+                credential = creds.getDefaultCredential(scheme);
             }
             return credential;
         } catch (CertificateNotFoundException | InvalidLocationException | InvalidSchemeException | InvalidCredentialException | InvalidPropertyException | UnknownPropertyException e) {

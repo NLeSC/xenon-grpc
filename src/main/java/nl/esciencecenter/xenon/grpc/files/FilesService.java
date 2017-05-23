@@ -65,7 +65,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
         Files files = singleton.getInstance().files();
 
         try {
-            Credential credential = Parsers.parseCredential(singleton.getInstance(), request.getPassword(), request.getCertificate());
+            Credential credential = Parsers.parseCredential(singleton.getInstance(), request.getAdaptor(), request.getPassword(), request.getCertificate());
             FileSystem fileSystem = files.newFileSystem(
                     request.getAdaptor(),
                     request.getLocation(),

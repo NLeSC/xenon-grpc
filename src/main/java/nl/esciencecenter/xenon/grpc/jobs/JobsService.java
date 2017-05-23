@@ -53,7 +53,7 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
     public void newScheduler(XenonProto.NewSchedulerRequest request, StreamObserver<XenonProto.Scheduler> responseObserver) {
         Jobs jobs = singleton.getInstance().jobs();
         try {
-            Credential credential = Parsers.parseCredential(singleton.getInstance(), request.getPassword(), request.getCertificate());
+            Credential credential = Parsers.parseCredential(singleton.getInstance(), request.getAdaptor(), request.getPassword(), request.getCertificate());
             Scheduler scheduler = jobs.newScheduler(
                 request.getAdaptor(),
                 request.getLocation(),
