@@ -1,9 +1,9 @@
 Experiment to combine Xenon (https://nlesc.github.io/Xenon/) and gRpc (http://www.grpc.io/).
 
-[![Build Status](https://travis-ci.org/NLeSC/xenon-cli.svg?branch=master)](https://travis-ci.org/NLeSC/xenon-cli)
-[![Build status](https://ci.appveyor.com/api/projects/status/tep8bad05e76a69w/branch/master?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon-cli/branch/master)
-[![SonarQube Gate](https://sonarqube.com/api/badges/gate?key=nlesc%3Axenon-cli)](https://sonarqube.com/dashboard?id=nlesc%3Axenon-cli)
-[![SonarQube Coverage](https://sonarqube.com/api/badges/measure?key=nlesc%3Axenon-cli&metric=coverage)](https://sonarqube.com/component_measures/domain/Coverage?id=nlesc%3Axenon-cli)
+[![Build Status](https://travis-ci.org/NLeSC/xenon-grpc.svg?branch=master)](https://travis-ci.org/NLeSC/xenon-grpc)
+[![Build status](https://ci.appveyor.com/api/projects/status/tep8bad05e76a69w/branch/master?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon-grpc/branch/master)
+[![SonarQube Gate](https://sonarqube.com/api/badges/gate?key=nlesc%3Axenon-grpc)](https://sonarqube.com/dashboard?id=nlesc%3Axenon-grpc)
+[![SonarQube Coverage](https://sonarqube.com/api/badges/measure?key=nlesc%3Axenon-grpc&metric=coverage)](https://sonarqube.com/component_measures/domain/Coverage?id=nlesc%3Axenon-grpc)
 
 # Develop
 
