@@ -20,9 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static nl.esciencecenter.xenon.grpc.jobs.Writers.mapJobDescription;
-import static nl.esciencecenter.xenon.grpc.jobs.Writers.mapJobStatus;
-import static nl.esciencecenter.xenon.grpc.jobs.Writers.mapQueueStatus;
+import static nl.esciencecenter.xenon.grpc.jobs.Writers.*;
 
 
 public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {

@@ -19,22 +19,35 @@ class Writers {
         return builder.build();
     }
 
-    static  JobDescription mapJobDescription(XenonProto.SubmitJobRequest request) {
+    static String defaultValue(String value) {
+        if (value.isEmpty()) {
+            return null;
+        }
+        return value;
+    }
+
+    static JobDescription mapJobDescription(XenonProto.SubmitJobRequest request) {
         XenonProto.JobDescription d = request.getDescription();
         JobDescription description = new JobDescription();
         description.setExecutable(d.getExecutable());
         description.setArguments(d.getArgumentsList().toArray(new String[0]));
         description.setWorkingDirectory(d.getWorkingDirectory());
         description.setEnvironment(d.getEnvironmentMap());
-        description.setQueueName(d.getQueueName());
+        description.setQueueName(defaultValue(d.getQueueName()));
         description.setInteractive(d.getInteractive());
-        description.setMaxTime(d.getMaxTime());
-        description.setNodeCount(d.getNodeCount());
-        description.setProcessesPerNode(d.getProcessesPerNode());
+        if (d.getMaxTime() != 0) {
+            description.setMaxTime(d.getMaxTime());
+        }
+        if (d.getNodeCount() != 0) {
+            description.setNodeCount(d.getNodeCount());
+        }
+        if (d.getProcessesPerNode() != 0) {
+            description.setProcessesPerNode(d.getProcessesPerNode());
+        }
         description.setStartSingleProcess(d.getStartSingleProcess());
-        description.setStderr(d.getStdErr());
-        description.setStdin(d.getStdIn());
-        description.setStdout(d.getStdOut());
+        description.setStderr(defaultValue(d.getStdErr()));
+        description.setStdin(defaultValue(d.getStdIn()));
+        description.setStdout(defaultValue(d.getStdOut()));
         description.setJobOptions(d.getOptionsMap());
         return description;
     }
