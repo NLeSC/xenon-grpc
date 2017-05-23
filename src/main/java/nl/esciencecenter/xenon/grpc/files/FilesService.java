@@ -5,6 +5,7 @@ import static nl.esciencecenter.xenon.grpc.files.Parsers.parseCopyOptions;
 import static nl.esciencecenter.xenon.grpc.files.Parsers.parseOpenOption;
 import static nl.esciencecenter.xenon.grpc.files.Parsers.parsePermissions;
 import static nl.esciencecenter.xenon.grpc.files.Writers.getFileSystemId;
+import static nl.esciencecenter.xenon.grpc.files.Writers.mapFileAdaptorDescription;
 import static nl.esciencecenter.xenon.grpc.files.Writers.writeCopyStatus;
 import static nl.esciencecenter.xenon.grpc.files.Writers.writeFileAttributes;
 import static nl.esciencecenter.xenon.grpc.files.Writers.writeFileSystems;
@@ -19,6 +20,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import nl.esciencecenter.xenon.AdaptorStatus;
+import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.files.Copy;
@@ -38,6 +41,7 @@ import nl.esciencecenter.xenon.grpc.XenonSingleton;
 import nl.esciencecenter.xenon.util.FileVisitor;
 import nl.esciencecenter.xenon.util.Utils;
 
+import com.google.protobuf.ByteString;
 import io.grpc.Status;
 import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
@@ -215,6 +219,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
     @Override
     public void read(XenonProto.Path request, StreamObserver<XenonProto.FileStream> responseObserver) {
         Files files = singleton.getInstance().files();
+        XenonProto.FileStream.Builder builder = XenonProto.FileStream.newBuilder();
         InputStream pipe = null;
         try {
             Path path = getPath(request);
@@ -222,7 +227,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
             // Read file in chunks and pass on as stream of byte arrays
             byte[] buffer = new byte[BUFFER_SIZE];
             while (pipe.read(buffer) != -1) {
-                responseObserver.onNext(XenonProto.FileStream.parseFrom(buffer));
+                responseObserver.onNext(builder.setBuffer(ByteString.copyFrom(buffer)).build());
             }
             responseObserver.onCompleted();
         } catch (StatusException e) {
@@ -266,9 +271,10 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
             public void onError(Throwable t) {
                 if (pipe != null) {
                     try {
+                        LOGGER.warn("Error from client", t);
                         pipe.close();
                     } catch (IOException e) {
-                        LOGGER.warn("Error from client", e);
+                        LOGGER.warn("Error from server", e);
                     }
                 }
             }
@@ -279,7 +285,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
                     try {
                         pipe.close();
                     } catch (IOException e) {
-                        LOGGER.warn("Error from client", e);
+                        LOGGER.warn("Error from server", e);
                     }
                 }
                 responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
@@ -491,6 +497,35 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
     }
 
     @Override
+    public void getAdaptorDescription(XenonProto.AdaptorName request, StreamObserver<XenonProto.FileAdaptorDescription> responseObserver) {
+        Xenon xenon = singleton.getInstance();
+        try {
+            AdaptorStatus status = xenon.getAdaptorStatus(request.getName());
+            XenonProto.FileAdaptorDescription description = mapFileAdaptorDescription(status);
+            responseObserver.onNext(description);
+            responseObserver.onCompleted();
+        } catch (XenonException e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        }
+    }
+
+    @Override
+    public void getAdaptorDescriptions(XenonProto.Empty request, StreamObserver<XenonProto.FileAdaptorDescriptions> responseObserver) {
+        Xenon xenon = singleton.getInstance();
+        // TODO use xenon.files().getAdaptorDescriptions(), when https://github.com/NLeSC/Xenon/issues/430 is completed
+        // TODO Filter getAdaptorStatuses on file capable adaptors
+        AdaptorStatus[] statuses = xenon.getAdaptorStatuses();
+
+        XenonProto.FileAdaptorDescriptions.Builder setBuilder = XenonProto.FileAdaptorDescriptions.newBuilder();
+        for (AdaptorStatus status : statuses) {
+            XenonProto.FileAdaptorDescription description = mapFileAdaptorDescription(status);
+            setBuilder.addDescriptions(description);
+        }
+        responseObserver.onNext(setBuilder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void deleteBackgroundCopy(XenonProto.Copy request, StreamObserver<XenonProto.Empty> responseObserver) {
         Files files = singleton.getInstance().files();
         try {
@@ -500,6 +535,8 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
                 files.cancelCopy(copy);
             }
             copyBackgroundTasks.remove(request.getId());
+            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onCompleted();
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {

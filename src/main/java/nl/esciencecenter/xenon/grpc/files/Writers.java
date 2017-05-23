@@ -1,12 +1,23 @@
 package nl.esciencecenter.xenon.grpc.files;
 
-import nl.esciencecenter.xenon.files.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import nl.esciencecenter.xenon.AdaptorStatus;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
+import nl.esciencecenter.xenon.files.CopyStatus;
+import nl.esciencecenter.xenon.files.FileAttributes;
+import nl.esciencecenter.xenon.files.FileSystem;
+import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.grpc.XenonProto;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /*
     Writers to convert Xenon objects to gRPC response fields
@@ -126,5 +137,27 @@ class Writers {
             builder.setError(status.getException().getMessage());
         }
         return builder.build();
+    }
+
+    static XenonProto.FileAdaptorDescription mapFileAdaptorDescription(AdaptorStatus status) {
+        XenonProto.PropertyDescription.Builder propBuilder = XenonProto.PropertyDescription.newBuilder();
+        List<XenonProto.PropertyDescription> supportedProperties = Arrays.stream(status.getSupportedProperties())
+            .filter(p -> p.getLevels().contains(XenonPropertyDescription.Component.FILESYSTEM))
+            .map(p -> propBuilder
+                .setName(p.getName())
+                .setDescription(p.getDescription())
+                .setDefaultValue(p.getDefaultValue())
+                // TODO map p.getType() to XenonProto.PropertyDescription.Type
+                //.setType(p.getType())
+                .build()
+            ).collect(Collectors.toList());
+
+        XenonProto.FileAdaptorDescription.Builder builder = XenonProto.FileAdaptorDescription.newBuilder();
+        return builder
+            .setName(status.getName())
+            .setDescription(status.getDescription())
+            .addAllSupportedLocations(Arrays.asList(status.getSupportedLocations()))
+            .addAllSupportedProperties(supportedProperties)
+            .build();
     }
 }

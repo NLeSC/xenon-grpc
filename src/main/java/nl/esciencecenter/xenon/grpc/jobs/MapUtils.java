@@ -1,10 +1,16 @@
 package nl.esciencecenter.xenon.grpc.jobs;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import nl.esciencecenter.xenon.AdaptorStatus;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.jobs.*;
 
-class Writers {
-    private Writers() {
+class MapUtils {
+    private MapUtils() {
     }
 
     static XenonProto.QueueStatus mapQueueStatus(QueueStatus status, XenonProto.Scheduler scheduler) {
@@ -52,6 +58,31 @@ class Writers {
         return description;
     }
 
+    static XenonProto.JobDescription mapJobDescription(Job job, XenonProto.Scheduler scheduler) {
+        XenonProto.JobDescription.Builder builder = XenonProto.JobDescription.newBuilder()
+            .setScheduler(scheduler);
+        JobDescription description = job.getJobDescription();
+        if (description != null) {
+            builder
+                .setExecutable(description.getExecutable())
+                .addAllArguments(description.getArguments())
+                .setWorkingDirectory(description.getWorkingDirectory())
+                .putAllEnvironment(description.getEnvironment())
+                .setQueueName(description.getQueueName())
+                .setInteractive(description.isInteractive())
+                .setMaxTime(description.getMaxTime())
+                .setNodeCount(description.getNodeCount())
+                .setProcessesPerNode(description.getProcessesPerNode())
+                .setStartSingleProcess(description.isStartSingleProcess())
+                .setStdErr(description.getStderr())
+                .setStdIn(description.getStdin())
+                .setStdOut(description.getStdout())
+                .putAllOptions(description.getJobOptions())
+            ;
+        }
+        return builder.build();
+    }
+
     static XenonProto.JobStatus mapJobStatus(JobStatus status, XenonProto.JobDescription description) {
         XenonProto.JobStatus.Builder builder = XenonProto.JobStatus.newBuilder()
                 .setState(status.getState())
@@ -85,4 +116,29 @@ class Writers {
         return XenonProto.JobStatus.ErrorType.OTHER;
     }
 
+    static XenonProto.Job mapJob(String key, XenonProto.JobDescription description) {
+        return XenonProto.Job.newBuilder().setId(key).setDescription(description).build();
+    }
+
+    static XenonProto.JobAdaptorDescription mapJobAdaptorDescription(AdaptorStatus status) {
+        XenonProto.PropertyDescription.Builder propBuilder = XenonProto.PropertyDescription.newBuilder();
+        List<XenonProto.PropertyDescription> supportedProperties = Arrays.stream(status.getSupportedProperties())
+            .filter(p -> p.getLevels().contains(XenonPropertyDescription.Component.SCHEDULER))
+            .map(p -> propBuilder
+                .setName(p.getName())
+                .setDescription(p.getDescription())
+                .setDefaultValue(p.getDefaultValue())
+                // TODO map p.getType() to XenonProto.PropertyDescription.Type
+                //.setType(p.getType())
+                .build()
+            ).collect(Collectors.toList());
+
+        XenonProto.JobAdaptorDescription.Builder builder = XenonProto.JobAdaptorDescription.newBuilder();
+        return builder
+            .setName(status.getName())
+            .setDescription(status.getDescription())
+            .addAllSupportedLocations(Arrays.asList(status.getSupportedLocations()))
+            .addAllSupportedProperties(supportedProperties)
+            .build();
+    }
 }
