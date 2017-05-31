@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='xenon.proto',
   package='xenon',
   syntax='proto3',
-  serialized_pb=_b('\n\x0bxenon.proto\x12\x05xenon\"\x07\n\x05\x45mpty\"v\n\nProperties\x12\x35\n\nproperties\x18\x01 \x03(\x0b\x32!.xenon.Properties.PropertiesEntry\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xcb\x01\n\x13PropertyDescription\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x14\n\x0c\x64\x65\x66\x61ultValue\x18\x03 \x01(\t\x12-\n\x04type\x18\x04 \x01(\x0e\x32\x1f.xenon.PropertyDescription.Type\"L\n\x04Type\x12\n\n\x06STRING\x10\x00\x12\x0b\n\x07\x42OOLEAN\x10\x01\x12\x0b\n\x07INTEGER\x10\x02\x12\n\n\x06\x44OUBLE\x10\x03\x12\x08\n\x04LONG\x10\x04\x12\x08\n\x04SIZE\x10\x05\"F\n\x14PropertyDescriptions\x12.\n\nproperties\x18\x01 \x03(\x0b\x32\x1a.xenon.PropertyDescription\"\xee\x01\n\x15JobAdaptorDescription\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x1a\n\x12supportedLocations\x18\x03 \x03(\t\x12\x37\n\x13supportedProperties\x18\x04 \x03(\x0b\x32\x1a.xenon.PropertyDescription\x12\x0e\n\x06online\x18\x05 \x01(\x08\x12\x1b\n\x13supportsInteractive\x18\x06 \x01(\x08\x12\x15\n\rsupportsBatch\x18\x07 \x01(\x08\x12\x19\n\x11supportedVersions\x18\x08 \x03(\t\"L\n\x16JobAdaptorDescriptions\x12\x32\n\x0c\x64\x65scriptions\x18\x01 \x03(\x0b\x32\x1c.xenon.JobAdaptorDescription\"\xb0\x01\n\x16\x46ileAdaptorDescription\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x1a\n\x12supportedLocations\x18\x03 \x03(\t\x12\x37\n\x13supportedProperties\x18\x04 \x03(\x0b\x32\x1a.xenon.PropertyDescription\x12\x1e\n\x16supportsThirdPartyCopy\x18\x05 \x01(\x08\"N\n\x17\x46ileAdaptorDescriptions\x12\x33\n\x0c\x64\x65scriptions\x18\x01 \x03(\x0b\x32\x1d.xenon.FileAdaptorDescription\"\x1b\n\x0b\x41\x64\x61ptorName\x12\x0c\n\x04name\x18\x01 \x01(\t\"=\n\x15\x43\x65rtificateCredential\x12\x10\n\x08\x63\x65rtfile\x18\x01 \x01(\t\x12\x12\n\npassphrase\x18\x02 \x01(\t\"8\n\x12PasswordCredential\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\"\x9f\x02\n\x14NewFileSystemRequest\x12\x0f\n\x07\x61\x64\x61ptor\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x01(\t\x12?\n\nproperties\x18\x03 \x03(\x0b\x32+.xenon.NewFileSystemRequest.PropertiesEntry\x12\x33\n\x0b\x63\x65rtificate\x18\x04 \x01(\x0b\x32\x1c.xenon.CertificateCredentialH\x00\x12-\n\x08password\x18\x05 \x01(\x0b\x32\x19.xenon.PasswordCredentialH\x00\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0c\n\ncredential\"F\n\nFileSystem\x12\n\n\x02id\x18\x01 \x01(\t\x12,\n\x07request\x18\x02 \x01(\x0b\x32\x1b.xenon.NewFileSystemRequest\"5\n\x0b\x46ileSystems\x12&\n\x0b\x66ilesystems\x18\x01 \x03(\x0b\x32\x11.xenon.FileSystem\";\n\x04Path\x12%\n\nfilesystem\x18\x01 \x01(\x0b\x32\x11.xenon.FileSystem\x12\x0c\n\x04path\x18\x02 \x01(\t\"\xce\x01\n\x0b\x43opyRequest\x12\x1b\n\x06source\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12\x1b\n\x06target\x18\x02 \x01(\x0b\x32\x0b.xenon.Path\x12.\n\x07options\x18\x03 \x03(\x0e\x32\x1d.xenon.CopyRequest.CopyOption\"U\n\nCopyOption\x12\n\n\x06\x43REATE\x10\x00\x12\x0b\n\x07REPLACE\x10\x01\x12\n\n\x06IGNORE\x10\x02\x12\n\n\x06\x41PPEND\x10\x03\x12\n\n\x06RESUME\x10\x04\x12\n\n\x06VERIFY\x10\x05\"H\n\x0cSourceTarget\x12\x1b\n\x06source\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12\x1b\n\x06target\x18\x02 \x01(\x0b\x32\x0b.xenon.Path\"7\n\x04\x43opy\x12\n\n\x02id\x18\x01 \x01(\t\x12#\n\x07request\x18\x02 \x01(\x0b\x32\x12.xenon.CopyRequest\"\x8e\x01\n\nCopyStatus\x12\x19\n\x04\x63opy\x18\x01 \x01(\x0b\x32\x0b.xenon.Copy\x12\x13\n\x0b\x62ytesCopied\x18\x02 \x01(\x04\x12\x13\n\x0b\x62ytesToCopy\x18\x03 \x01(\x04\x12\x0c\n\x04\x64one\x18\x04 \x01(\x08\x12\x0f\n\x07running\x18\x05 \x01(\x08\x12\r\n\x05state\x18\x06 \x01(\t\x12\r\n\x05\x65rror\x18\x07 \x01(\t\"3\n\x0c\x43opyStatuses\x12#\n\x08statuses\x18\x01 \x03(\x0b\x32\x11.xenon.CopyStatus\"\xda\x02\n\x0e\x46ileAttributes\x12\x14\n\x0c\x63reationTime\x18\x01 \x01(\x04\x12\r\n\x05group\x18\x02 \x01(\t\x12\x13\n\x0bisDirectory\x18\x03 \x01(\x08\x12\x14\n\x0cisExecutable\x18\x04 \x01(\x08\x12\x10\n\x08isHidden\x18\x05 \x01(\x08\x12\x0f\n\x07isOther\x18\x06 \x01(\x08\x12\x12\n\nisReadable\x18\x07 \x01(\x08\x12\x15\n\risRegularFile\x18\x08 \x01(\x08\x12\x16\n\x0eisSymbolicLink\x18\t \x01(\x08\x12\x12\n\nisWritable\x18\n \x01(\x08\x12\x16\n\x0elastAccessTime\x18\x0b \x01(\x04\x12\x18\n\x10lastModifiedTime\x18\x0c \x01(\x04\x12\r\n\x05owner\x18\r \x01(\t\x12/\n\x0bpermissions\x18\x0e \x03(\x0e\x32\x1a.xenon.PosixFilePermission\x12\x0c\n\x04size\x18\x0f \x01(\x04\"i\n\x1bPosixFilePermissionsRequest\x12\x19\n\x04path\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12/\n\x0bpermissions\x18\x02 \x03(\x0e\x32\x1a.xenon.PosixFilePermission\"\x1c\n\nFileStream\x12\x0e\n\x06\x62uffer\x18\x01 \x01(\x0c\"\xbc\x01\n\x0cWriteRequest\x12\x19\n\x04path\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12\x0e\n\x06\x62uffer\x18\x02 \x01(\x0c\x12/\n\x07options\x18\x03 \x03(\x0e\x32\x1e.xenon.WriteRequest.OpenOption\"P\n\nOpenOption\x12\n\n\x06\x43REATE\x10\x00\x12\x08\n\x04OPEN\x10\x01\x12\x12\n\x0eOPEN_OR_CREATE\x10\x02\x12\n\n\x06\x41PPEND\x10\x03\x12\x0c\n\x08TRUNCATE\x10\x04\"\x8b\x01\n\x13WalkFileTreeRequest\x12\x1a\n\x05start\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12\x19\n\x11withoutAttributes\x18\x02 \x01(\x08\x12\x10\n\x08maxDepth\x18\x03 \x01(\r\x12\x13\n\x0b\x66ollowLinks\x18\x04 \x01(\x08\x12\x16\n\x0e\x66ilenameRegexp\x18\x05 \x01(\t\"Z\n\x12PathWithAttributes\x12\x19\n\x04path\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12)\n\nattributes\x18\x02 \x01(\x0b\x32\x15.xenon.FileAttributes\"\x9d\x02\n\x13NewSchedulerRequest\x12\x0f\n\x07\x61\x64\x61ptor\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x01(\t\x12>\n\nproperties\x18\x03 \x03(\x0b\x32*.xenon.NewSchedulerRequest.PropertiesEntry\x12\x33\n\x0b\x63\x65rtificate\x18\x04 \x01(\x0b\x32\x1c.xenon.CertificateCredentialH\x00\x12-\n\x08password\x18\x05 \x01(\x0b\x32\x19.xenon.PasswordCredentialH\x00\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0c\n\ncredential\"D\n\tScheduler\x12\n\n\x02id\x18\x01 \x01(\t\x12+\n\x07request\x18\x02 \x01(\x0b\x32\x1a.xenon.NewSchedulerRequest\"2\n\nSchedulers\x12$\n\nschedulers\x18\x01 \x03(\x0b\x32\x10.xenon.Scheduler\"\xfd\x03\n\x0eJobDescription\x12#\n\tscheduler\x18\x01 \x01(\x0b\x32\x10.xenon.Scheduler\x12\x12\n\nexecutable\x18\x02 \x01(\t\x12\x11\n\targuments\x18\x03 \x03(\t\x12\x18\n\x10workingDirectory\x18\x04 \x01(\t\x12;\n\x0b\x65nvironment\x18\x05 \x03(\x0b\x32&.xenon.JobDescription.EnvironmentEntry\x12\x11\n\tqueueName\x18\x06 \x01(\t\x12\x13\n\x0binteractive\x18\x07 \x01(\x08\x12\x0f\n\x07maxTime\x18\x08 \x01(\r\x12\x11\n\tnodeCount\x18\t \x01(\r\x12\x18\n\x10processesPerNode\x18\n \x01(\r\x12\x1a\n\x12startSingleProcess\x18\x0b \x01(\x08\x12\x0e\n\x06stdErr\x18\x0c \x01(\t\x12\r\n\x05stdIn\x18\r \x01(\t\x12\x0e\n\x06stdOut\x18\x0e \x01(\t\x12\x33\n\x07options\x18\x0f \x03(\x0b\x32\".xenon.JobDescription.OptionsEntry\x1a\x32\n\x10\x45nvironmentEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a.\n\x0cOptionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"c\n\x10SubmitJobRequest\x12#\n\tscheduler\x18\x01 \x01(\x0b\x32\x10.xenon.Scheduler\x12*\n\x0b\x64\x65scription\x18\x02 \x01(\x0b\x32\x15.xenon.JobDescription\"=\n\x03Job\x12\n\n\x02id\x18\x01 \x01(\t\x12*\n\x0b\x64\x65scription\x18\x02 \x01(\x0b\x32\x15.xenon.JobDescription\" \n\x04Jobs\x12\x18\n\x04jobs\x18\x01 \x03(\x0b\x32\n.xenon.Job\"\x15\n\x05Queue\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x16\n\x06Queues\x12\x0c\n\x04name\x18\x01 \x03(\t\"I\n\x12SchedulerAndQueues\x12#\n\tscheduler\x18\x01 \x01(\x0b\x32\x10.xenon.Scheduler\x12\x0e\n\x06queues\x18\x02 \x03(\t\"G\n\x11SchedulerAndQueue\x12#\n\tscheduler\x18\x01 \x01(\x0b\x32\x10.xenon.Scheduler\x12\r\n\x05queue\x18\x02 \x01(\t\"\xb7\x03\n\tJobStatus\x12\r\n\x05state\x18\x01 \x01(\t\x12\x0f\n\x07running\x18\x02 \x01(\x08\x12\x0c\n\x04\x64one\x18\x03 \x01(\x08\x12X\n\x1cschedulerSpecificInformation\x18\x04 \x03(\x0b\x32\x32.xenon.JobStatus.SchedulerSpecificInformationEntry\x12\x10\n\x08\x65xitCode\x18\x06 \x01(\x05\x12\x14\n\x0c\x65rrorMessage\x18\x07 \x01(\t\x12-\n\terrorType\x18\x08 \x01(\x0e\x32\x1a.xenon.JobStatus.ErrorType\x12\x17\n\x03job\x18\t \x01(\x0b\x32\n.xenon.Job\x1a\x43\n!SchedulerSpecificInformationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"m\n\tErrorType\x12\t\n\x05\x45MPTY\x10\x00\x12\r\n\tNOT_FOUND\x10\x01\x12\r\n\tCANCELLED\x10\x02\x12\x13\n\x0fSCHEDULER_ERROR\x10\x03\x12\x17\n\x13SCHEDULER_NOT_FOUND\x10\x04\x12\t\n\x05OTHER\x10\x05\"1\n\x0bJobStatuses\x12\"\n\x08statuses\x18\x01 \x03(\x0b\x32\x10.xenon.JobStatus\"\xf0\x01\n\x0bQueueStatus\x12\x0c\n\x04name\x18\x01 \x01(\t\x12#\n\tscheduler\x18\x02 \x01(\x0b\x32\x10.xenon.Scheduler\x12Z\n\x1cschedulerSpecificInformation\x18\x03 \x03(\x0b\x32\x34.xenon.QueueStatus.SchedulerSpecificInformationEntry\x12\r\n\x05\x65rror\x18\x04 \x01(\t\x1a\x43\n!SchedulerSpecificInformationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"5\n\rQueueStatuses\x12$\n\x08statuses\x18\x01 \x03(\x0b\x32\x12.xenon.QueueStatus\"8\n\x0eJobInputStream\x12\x17\n\x03job\x18\x01 \x01(\x0b\x32\n.xenon.Job\x12\r\n\x05stdin\x18\x02 \x01(\x0c\"2\n\x10JobOutputStreams\x12\x0e\n\x06stdout\x18\x01 \x01(\x0c\x12\x0e\n\x06stderr\x18\x02 \x01(\x0c\"\x10\n\x02Is\x12\n\n\x02is\x18\x01 \x01(\x08*\xbe\x01\n\x13PosixFilePermission\x12\x08\n\x04NONE\x10\x00\x12\x0e\n\nOWNER_READ\x10\x01\x12\x0f\n\x0bOWNER_WRITE\x10\x02\x12\x11\n\rOWNER_EXECUTE\x10\x03\x12\x0e\n\nGROUP_READ\x10\x04\x12\x0f\n\x0bGROUP_WRITE\x10\x05\x12\x11\n\rGROUP_EXECUTE\x10\x06\x12\x0f\n\x0bOTHERS_READ\x10\x07\x12\x10\n\x0cOTHERS_WRITE\x10\x08\x12\x12\n\x0eOTHERS_EXECUTE\x10\t2\x83\x01\n\x0bXenonGlobal\x12-\n\x08newXenon\x12\x11.xenon.Properties\x1a\x0c.xenon.Empty\"\x00\x12\x45\n\x16getSupportedProperties\x12\x0c.xenon.Empty\x1a\x1b.xenon.PropertyDescriptions\"\x00\x32\xde\n\n\nXenonFiles\x12H\n\x16getAdaptorDescriptions\x12\x0c.xenon.Empty\x1a\x1e.xenon.FileAdaptorDescriptions\"\x00\x12L\n\x15getAdaptorDescription\x12\x12.xenon.AdaptorName\x1a\x1d.xenon.FileAdaptorDescription\"\x00\x12\x41\n\rnewFileSystem\x12\x1b.xenon.NewFileSystemRequest\x1a\x11.xenon.FileSystem\"\x00\x12\x30\n\x11\x63reateDirectories\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12.\n\x0f\x63reateDirectory\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12)\n\ncreateFile\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12\x33\n\x0e\x62\x61\x63kgroundCopy\x12\x12.xenon.CopyRequest\x1a\x0b.xenon.Copy\"\x00\x12\x38\n\x14\x63\x61ncelBackgroundCopy\x12\x0b.xenon.Copy\x1a\x11.xenon.CopyStatus\"\x00\x12;\n\x17getBackgroundCopyStatus\x12\x0b.xenon.Copy\x1a\x11.xenon.CopyStatus\"\x00\x12\x41\n\x1alistBackgroundCopyStatuses\x12\x0c.xenon.Empty\x1a\x13.xenon.CopyStatuses\"\x00\x12\x33\n\x14\x64\x65leteBackgroundCopy\x12\x0b.xenon.Copy\x1a\x0c.xenon.Empty\"\x00\x12*\n\x04\x63opy\x12\x12.xenon.CopyRequest\x1a\x0c.xenon.Empty\"\x00\x12+\n\x04move\x12\x13.xenon.SourceTarget\x1a\x0c.xenon.Empty\"\x00\x12%\n\x06\x64\x65lete\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12\"\n\x06\x65xists\x12\x0b.xenon.Path\x1a\t.xenon.Is\"\x00\x12*\n\x04read\x12\x0b.xenon.Path\x1a\x11.xenon.FileStream\"\x00\x30\x01\x12.\n\x05write\x12\x13.xenon.WriteRequest\x1a\x0c.xenon.Empty\"\x00(\x01\x12I\n\x0cwalkFileTree\x12\x1a.xenon.WalkFileTreeRequest\x1a\x19.xenon.PathWithAttributes\"\x00\x30\x01\x12\x35\n\rgetAttributes\x12\x0b.xenon.Path\x1a\x15.xenon.FileAttributes\"\x00\x12M\n\x17setPosixFilePermissions\x12\".xenon.PosixFilePermissionsRequest\x1a\x0c.xenon.Empty\"\x00\x12.\n\x10readSymbolicLink\x12\x0b.xenon.Path\x1a\x0b.xenon.Path\"\x00\x12(\n\x06isOpen\x12\x11.xenon.FileSystem\x1a\t.xenon.Is\"\x00\x12*\n\x05\x63lose\x12\x11.xenon.FileSystem\x1a\x0c.xenon.Empty\"\x00\x12\x35\n\x0flistFileSystems\x12\x0c.xenon.Empty\x1a\x12.xenon.FileSystems\"\x00\x12\x36\n\x10localFileSystems\x12\x0c.xenon.Empty\x1a\x12.xenon.FileSystems\"\x00\x32\x86\t\n\tXenonJobs\x12G\n\x16getAdaptorDescriptions\x12\x0c.xenon.Empty\x1a\x1d.xenon.JobAdaptorDescriptions\"\x00\x12K\n\x15getAdaptorDescription\x12\x12.xenon.AdaptorName\x1a\x1c.xenon.JobAdaptorDescription\"\x00\x12>\n\x0cnewScheduler\x12\x1a.xenon.NewSchedulerRequest\x1a\x10.xenon.Scheduler\"\x00\x12\x32\n\tsubmitJob\x12\x17.xenon.SubmitJobRequest\x1a\n.xenon.Job\"\x00\x12.\n\tgetQueues\x12\x10.xenon.Scheduler\x1a\r.xenon.Queues\"\x00\x12\x37\n\x13getDefaultQueueName\x12\x10.xenon.Scheduler\x1a\x0c.xenon.Queue\"\x00\x12\x33\n\x07getJobs\x12\x19.xenon.SchedulerAndQueues\x1a\x0b.xenon.Jobs\"\x00\x12.\n\x0cgetJobStatus\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\x33\n\x0egetJobStatuses\x12\x0b.xenon.Jobs\x1a\x12.xenon.JobStatuses\"\x00\x12@\n\x0egetQueueStatus\x12\x18.xenon.SchedulerAndQueue\x1a\x12.xenon.QueueStatus\"\x00\x12\x45\n\x10getQueueStatuses\x12\x19.xenon.SchedulerAndQueues\x1a\x14.xenon.QueueStatuses\"\x00\x12/\n\rwaitUntilDone\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\x32\n\x10waitUntilRunning\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\x42\n\ngetStreams\x12\x15.xenon.JobInputStream\x1a\x17.xenon.JobOutputStreams\"\x00(\x01\x30\x01\x12\'\n\x06isOpen\x12\x10.xenon.Scheduler\x1a\t.xenon.Is\"\x00\x12+\n\tcancelJob\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\'\n\tdeleteJob\x12\n.xenon.Job\x1a\x0c.xenon.Empty\"\x00\x12)\n\x05\x63lose\x12\x10.xenon.Scheduler\x1a\x0c.xenon.Empty\"\x00\x12\x33\n\x0elistSchedulers\x12\x0c.xenon.Empty\x1a\x11.xenon.Schedulers\"\x00\x12\'\n\x08listJobs\x12\x0c.xenon.Empty\x1a\x0b.xenon.Jobs\"\x00\x12\x32\n\x0elocalScheduler\x12\x0c.xenon.Empty\x1a\x10.xenon.Scheduler\"\x00\x42*\n\x1cnl.esciencecenter.xenon.grpcB\nXenonProtob\x06proto3')
+  serialized_pb=_b('\n\x0bxenon.proto\x12\x05xenon\"\x07\n\x05\x45mpty\"v\n\nProperties\x12\x35\n\nproperties\x18\x01 \x03(\x0b\x32!.xenon.Properties.PropertiesEntry\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xcb\x01\n\x13PropertyDescription\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x14\n\x0c\x64\x65\x66\x61ultValue\x18\x03 \x01(\t\x12-\n\x04type\x18\x04 \x01(\x0e\x32\x1f.xenon.PropertyDescription.Type\"L\n\x04Type\x12\n\n\x06STRING\x10\x00\x12\x0b\n\x07\x42OOLEAN\x10\x01\x12\x0b\n\x07INTEGER\x10\x02\x12\n\n\x06\x44OUBLE\x10\x03\x12\x08\n\x04LONG\x10\x04\x12\x08\n\x04SIZE\x10\x05\"F\n\x14PropertyDescriptions\x12.\n\nproperties\x18\x01 \x03(\x0b\x32\x1a.xenon.PropertyDescription\"\xee\x01\n\x15JobAdaptorDescription\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x1a\n\x12supportedLocations\x18\x03 \x03(\t\x12\x37\n\x13supportedProperties\x18\x04 \x03(\x0b\x32\x1a.xenon.PropertyDescription\x12\x0e\n\x06online\x18\x05 \x01(\x08\x12\x1b\n\x13supportsInteractive\x18\x06 \x01(\x08\x12\x15\n\rsupportsBatch\x18\x07 \x01(\x08\x12\x19\n\x11supportedVersions\x18\x08 \x03(\t\"L\n\x16JobAdaptorDescriptions\x12\x32\n\x0c\x64\x65scriptions\x18\x01 \x03(\x0b\x32\x1c.xenon.JobAdaptorDescription\"\xb0\x01\n\x16\x46ileAdaptorDescription\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x1a\n\x12supportedLocations\x18\x03 \x03(\t\x12\x37\n\x13supportedProperties\x18\x04 \x03(\x0b\x32\x1a.xenon.PropertyDescription\x12\x1e\n\x16supportsThirdPartyCopy\x18\x05 \x01(\x08\"N\n\x17\x46ileAdaptorDescriptions\x12\x33\n\x0c\x64\x65scriptions\x18\x01 \x03(\x0b\x32\x1d.xenon.FileAdaptorDescription\"\x1b\n\x0b\x41\x64\x61ptorName\x12\x0c\n\x04name\x18\x01 \x01(\t\"O\n\x15\x43\x65rtificateCredential\x12\x10\n\x08\x63\x65rtfile\x18\x01 \x01(\t\x12\x12\n\npassphrase\x18\x02 \x01(\t\x12\x10\n\x08username\x18\x03 \x01(\t\"8\n\x12PasswordCredential\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\"\x9f\x02\n\x14NewFileSystemRequest\x12\x0f\n\x07\x61\x64\x61ptor\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x01(\t\x12?\n\nproperties\x18\x03 \x03(\x0b\x32+.xenon.NewFileSystemRequest.PropertiesEntry\x12\x33\n\x0b\x63\x65rtificate\x18\x04 \x01(\x0b\x32\x1c.xenon.CertificateCredentialH\x00\x12-\n\x08password\x18\x05 \x01(\x0b\x32\x19.xenon.PasswordCredentialH\x00\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0c\n\ncredential\"F\n\nFileSystem\x12\n\n\x02id\x18\x01 \x01(\t\x12,\n\x07request\x18\x02 \x01(\x0b\x32\x1b.xenon.NewFileSystemRequest\"5\n\x0b\x46ileSystems\x12&\n\x0b\x66ilesystems\x18\x01 \x03(\x0b\x32\x11.xenon.FileSystem\";\n\x04Path\x12%\n\nfilesystem\x18\x01 \x01(\x0b\x32\x11.xenon.FileSystem\x12\x0c\n\x04path\x18\x02 \x01(\t\"\xce\x01\n\x0b\x43opyRequest\x12\x1b\n\x06source\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12\x1b\n\x06target\x18\x02 \x01(\x0b\x32\x0b.xenon.Path\x12.\n\x07options\x18\x03 \x03(\x0e\x32\x1d.xenon.CopyRequest.CopyOption\"U\n\nCopyOption\x12\n\n\x06\x43REATE\x10\x00\x12\x0b\n\x07REPLACE\x10\x01\x12\n\n\x06IGNORE\x10\x02\x12\n\n\x06\x41PPEND\x10\x03\x12\n\n\x06RESUME\x10\x04\x12\n\n\x06VERIFY\x10\x05\"H\n\x0cSourceTarget\x12\x1b\n\x06source\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12\x1b\n\x06target\x18\x02 \x01(\x0b\x32\x0b.xenon.Path\"7\n\x04\x43opy\x12\n\n\x02id\x18\x01 \x01(\t\x12#\n\x07request\x18\x02 \x01(\x0b\x32\x12.xenon.CopyRequest\"\x8e\x01\n\nCopyStatus\x12\x19\n\x04\x63opy\x18\x01 \x01(\x0b\x32\x0b.xenon.Copy\x12\x13\n\x0b\x62ytesCopied\x18\x02 \x01(\x04\x12\x13\n\x0b\x62ytesToCopy\x18\x03 \x01(\x04\x12\x0c\n\x04\x64one\x18\x04 \x01(\x08\x12\x0f\n\x07running\x18\x05 \x01(\x08\x12\r\n\x05state\x18\x06 \x01(\t\x12\r\n\x05\x65rror\x18\x07 \x01(\t\"3\n\x0c\x43opyStatuses\x12#\n\x08statuses\x18\x01 \x03(\x0b\x32\x11.xenon.CopyStatus\"\xda\x02\n\x0e\x46ileAttributes\x12\x14\n\x0c\x63reationTime\x18\x01 \x01(\x04\x12\r\n\x05group\x18\x02 \x01(\t\x12\x13\n\x0bisDirectory\x18\x03 \x01(\x08\x12\x14\n\x0cisExecutable\x18\x04 \x01(\x08\x12\x10\n\x08isHidden\x18\x05 \x01(\x08\x12\x0f\n\x07isOther\x18\x06 \x01(\x08\x12\x12\n\nisReadable\x18\x07 \x01(\x08\x12\x15\n\risRegularFile\x18\x08 \x01(\x08\x12\x16\n\x0eisSymbolicLink\x18\t \x01(\x08\x12\x12\n\nisWritable\x18\n \x01(\x08\x12\x16\n\x0elastAccessTime\x18\x0b \x01(\x04\x12\x18\n\x10lastModifiedTime\x18\x0c \x01(\x04\x12\r\n\x05owner\x18\r \x01(\t\x12/\n\x0bpermissions\x18\x0e \x03(\x0e\x32\x1a.xenon.PosixFilePermission\x12\x0c\n\x04size\x18\x0f \x01(\x04\"i\n\x1bPosixFilePermissionsRequest\x12\x19\n\x04path\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12/\n\x0bpermissions\x18\x02 \x03(\x0e\x32\x1a.xenon.PosixFilePermission\"\x1c\n\nFileStream\x12\x0e\n\x06\x62uffer\x18\x01 \x01(\x0c\"\xbc\x01\n\x0cWriteRequest\x12\x19\n\x04path\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12\x0e\n\x06\x62uffer\x18\x02 \x01(\x0c\x12/\n\x07options\x18\x03 \x03(\x0e\x32\x1e.xenon.WriteRequest.OpenOption\"P\n\nOpenOption\x12\n\n\x06\x43REATE\x10\x00\x12\x08\n\x04OPEN\x10\x01\x12\x12\n\x0eOPEN_OR_CREATE\x10\x02\x12\n\n\x06\x41PPEND\x10\x03\x12\x0c\n\x08TRUNCATE\x10\x04\"\x8b\x01\n\x13WalkFileTreeRequest\x12\x1a\n\x05start\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12\x19\n\x11withoutAttributes\x18\x02 \x01(\x08\x12\x10\n\x08maxDepth\x18\x03 \x01(\r\x12\x13\n\x0b\x66ollowLinks\x18\x04 \x01(\x08\x12\x16\n\x0e\x66ilenameRegexp\x18\x05 \x01(\t\"Z\n\x12PathWithAttributes\x12\x19\n\x04path\x18\x01 \x01(\x0b\x32\x0b.xenon.Path\x12)\n\nattributes\x18\x02 \x01(\x0b\x32\x15.xenon.FileAttributes\"\x9d\x02\n\x13NewSchedulerRequest\x12\x0f\n\x07\x61\x64\x61ptor\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x01(\t\x12>\n\nproperties\x18\x03 \x03(\x0b\x32*.xenon.NewSchedulerRequest.PropertiesEntry\x12\x33\n\x0b\x63\x65rtificate\x18\x04 \x01(\x0b\x32\x1c.xenon.CertificateCredentialH\x00\x12-\n\x08password\x18\x05 \x01(\x0b\x32\x19.xenon.PasswordCredentialH\x00\x1a\x31\n\x0fPropertiesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x0c\n\ncredential\"D\n\tScheduler\x12\n\n\x02id\x18\x01 \x01(\t\x12+\n\x07request\x18\x02 \x01(\x0b\x32\x1a.xenon.NewSchedulerRequest\"2\n\nSchedulers\x12$\n\nschedulers\x18\x01 \x03(\x0b\x32\x10.xenon.Scheduler\"\xfd\x03\n\x0eJobDescription\x12#\n\tscheduler\x18\x01 \x01(\x0b\x32\x10.xenon.Scheduler\x12\x12\n\nexecutable\x18\x02 \x01(\t\x12\x11\n\targuments\x18\x03 \x03(\t\x12\x18\n\x10workingDirectory\x18\x04 \x01(\t\x12;\n\x0b\x65nvironment\x18\x05 \x03(\x0b\x32&.xenon.JobDescription.EnvironmentEntry\x12\x11\n\tqueueName\x18\x06 \x01(\t\x12\x13\n\x0binteractive\x18\x07 \x01(\x08\x12\x0f\n\x07maxTime\x18\x08 \x01(\r\x12\x11\n\tnodeCount\x18\t \x01(\r\x12\x18\n\x10processesPerNode\x18\n \x01(\r\x12\x1a\n\x12startSingleProcess\x18\x0b \x01(\x08\x12\x0e\n\x06stdErr\x18\x0c \x01(\t\x12\r\n\x05stdIn\x18\r \x01(\t\x12\x0e\n\x06stdOut\x18\x0e \x01(\t\x12\x33\n\x07options\x18\x0f \x03(\x0b\x32\".xenon.JobDescription.OptionsEntry\x1a\x32\n\x10\x45nvironmentEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a.\n\x0cOptionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"c\n\x10SubmitJobRequest\x12#\n\tscheduler\x18\x01 \x01(\x0b\x32\x10.xenon.Scheduler\x12*\n\x0b\x64\x65scription\x18\x02 \x01(\x0b\x32\x15.xenon.JobDescription\"=\n\x03Job\x12\n\n\x02id\x18\x01 \x01(\t\x12*\n\x0b\x64\x65scription\x18\x02 \x01(\x0b\x32\x15.xenon.JobDescription\" \n\x04Jobs\x12\x18\n\x04jobs\x18\x01 \x03(\x0b\x32\n.xenon.Job\"\x15\n\x05Queue\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x16\n\x06Queues\x12\x0c\n\x04name\x18\x01 \x03(\t\"I\n\x12SchedulerAndQueues\x12#\n\tscheduler\x18\x01 \x01(\x0b\x32\x10.xenon.Scheduler\x12\x0e\n\x06queues\x18\x02 \x03(\t\"G\n\x11SchedulerAndQueue\x12#\n\tscheduler\x18\x01 \x01(\x0b\x32\x10.xenon.Scheduler\x12\r\n\x05queue\x18\x02 \x01(\t\"\xb7\x03\n\tJobStatus\x12\r\n\x05state\x18\x01 \x01(\t\x12\x0f\n\x07running\x18\x02 \x01(\x08\x12\x0c\n\x04\x64one\x18\x03 \x01(\x08\x12X\n\x1cschedulerSpecificInformation\x18\x04 \x03(\x0b\x32\x32.xenon.JobStatus.SchedulerSpecificInformationEntry\x12\x10\n\x08\x65xitCode\x18\x06 \x01(\x05\x12\x14\n\x0c\x65rrorMessage\x18\x07 \x01(\t\x12-\n\terrorType\x18\x08 \x01(\x0e\x32\x1a.xenon.JobStatus.ErrorType\x12\x17\n\x03job\x18\t \x01(\x0b\x32\n.xenon.Job\x1a\x43\n!SchedulerSpecificInformationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"m\n\tErrorType\x12\t\n\x05\x45MPTY\x10\x00\x12\r\n\tNOT_FOUND\x10\x01\x12\r\n\tCANCELLED\x10\x02\x12\x13\n\x0fSCHEDULER_ERROR\x10\x03\x12\x17\n\x13SCHEDULER_NOT_FOUND\x10\x04\x12\t\n\x05OTHER\x10\x05\"1\n\x0bJobStatuses\x12\"\n\x08statuses\x18\x01 \x03(\x0b\x32\x10.xenon.JobStatus\"\xf0\x01\n\x0bQueueStatus\x12\x0c\n\x04name\x18\x01 \x01(\t\x12#\n\tscheduler\x18\x02 \x01(\x0b\x32\x10.xenon.Scheduler\x12Z\n\x1cschedulerSpecificInformation\x18\x03 \x03(\x0b\x32\x34.xenon.QueueStatus.SchedulerSpecificInformationEntry\x12\r\n\x05\x65rror\x18\x04 \x01(\t\x1a\x43\n!SchedulerSpecificInformationEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"5\n\rQueueStatuses\x12$\n\x08statuses\x18\x01 \x03(\x0b\x32\x12.xenon.QueueStatus\"8\n\x0eJobInputStream\x12\x17\n\x03job\x18\x01 \x01(\x0b\x32\n.xenon.Job\x12\r\n\x05stdin\x18\x02 \x01(\x0c\"2\n\x10JobOutputStreams\x12\x0e\n\x06stdout\x18\x01 \x01(\x0c\x12\x0e\n\x06stderr\x18\x02 \x01(\x0c\"\x10\n\x02Is\x12\n\n\x02is\x18\x01 \x01(\x08*\xbe\x01\n\x13PosixFilePermission\x12\x08\n\x04NONE\x10\x00\x12\x0e\n\nOWNER_READ\x10\x01\x12\x0f\n\x0bOWNER_WRITE\x10\x02\x12\x11\n\rOWNER_EXECUTE\x10\x03\x12\x0e\n\nGROUP_READ\x10\x04\x12\x0f\n\x0bGROUP_WRITE\x10\x05\x12\x11\n\rGROUP_EXECUTE\x10\x06\x12\x0f\n\x0bOTHERS_READ\x10\x07\x12\x10\n\x0cOTHERS_WRITE\x10\x08\x12\x12\n\x0eOTHERS_EXECUTE\x10\t2\x83\x01\n\x0bXenonGlobal\x12-\n\x08newXenon\x12\x11.xenon.Properties\x1a\x0c.xenon.Empty\"\x00\x12\x45\n\x16getSupportedProperties\x12\x0c.xenon.Empty\x1a\x1b.xenon.PropertyDescriptions\"\x00\x32\xde\n\n\nXenonFiles\x12H\n\x16getAdaptorDescriptions\x12\x0c.xenon.Empty\x1a\x1e.xenon.FileAdaptorDescriptions\"\x00\x12L\n\x15getAdaptorDescription\x12\x12.xenon.AdaptorName\x1a\x1d.xenon.FileAdaptorDescription\"\x00\x12\x41\n\rnewFileSystem\x12\x1b.xenon.NewFileSystemRequest\x1a\x11.xenon.FileSystem\"\x00\x12\x30\n\x11\x63reateDirectories\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12.\n\x0f\x63reateDirectory\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12)\n\ncreateFile\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12\x33\n\x0e\x62\x61\x63kgroundCopy\x12\x12.xenon.CopyRequest\x1a\x0b.xenon.Copy\"\x00\x12\x38\n\x14\x63\x61ncelBackgroundCopy\x12\x0b.xenon.Copy\x1a\x11.xenon.CopyStatus\"\x00\x12;\n\x17getBackgroundCopyStatus\x12\x0b.xenon.Copy\x1a\x11.xenon.CopyStatus\"\x00\x12\x41\n\x1alistBackgroundCopyStatuses\x12\x0c.xenon.Empty\x1a\x13.xenon.CopyStatuses\"\x00\x12\x33\n\x14\x64\x65leteBackgroundCopy\x12\x0b.xenon.Copy\x1a\x0c.xenon.Empty\"\x00\x12*\n\x04\x63opy\x12\x12.xenon.CopyRequest\x1a\x0c.xenon.Empty\"\x00\x12+\n\x04move\x12\x13.xenon.SourceTarget\x1a\x0c.xenon.Empty\"\x00\x12%\n\x06\x64\x65lete\x12\x0b.xenon.Path\x1a\x0c.xenon.Empty\"\x00\x12\"\n\x06\x65xists\x12\x0b.xenon.Path\x1a\t.xenon.Is\"\x00\x12*\n\x04read\x12\x0b.xenon.Path\x1a\x11.xenon.FileStream\"\x00\x30\x01\x12.\n\x05write\x12\x13.xenon.WriteRequest\x1a\x0c.xenon.Empty\"\x00(\x01\x12I\n\x0cwalkFileTree\x12\x1a.xenon.WalkFileTreeRequest\x1a\x19.xenon.PathWithAttributes\"\x00\x30\x01\x12\x35\n\rgetAttributes\x12\x0b.xenon.Path\x1a\x15.xenon.FileAttributes\"\x00\x12M\n\x17setPosixFilePermissions\x12\".xenon.PosixFilePermissionsRequest\x1a\x0c.xenon.Empty\"\x00\x12.\n\x10readSymbolicLink\x12\x0b.xenon.Path\x1a\x0b.xenon.Path\"\x00\x12(\n\x06isOpen\x12\x11.xenon.FileSystem\x1a\t.xenon.Is\"\x00\x12*\n\x05\x63lose\x12\x11.xenon.FileSystem\x1a\x0c.xenon.Empty\"\x00\x12\x35\n\x0flistFileSystems\x12\x0c.xenon.Empty\x1a\x12.xenon.FileSystems\"\x00\x12\x36\n\x10localFileSystems\x12\x0c.xenon.Empty\x1a\x12.xenon.FileSystems\"\x00\x32\x86\t\n\tXenonJobs\x12G\n\x16getAdaptorDescriptions\x12\x0c.xenon.Empty\x1a\x1d.xenon.JobAdaptorDescriptions\"\x00\x12K\n\x15getAdaptorDescription\x12\x12.xenon.AdaptorName\x1a\x1c.xenon.JobAdaptorDescription\"\x00\x12>\n\x0cnewScheduler\x12\x1a.xenon.NewSchedulerRequest\x1a\x10.xenon.Scheduler\"\x00\x12\x32\n\tsubmitJob\x12\x17.xenon.SubmitJobRequest\x1a\n.xenon.Job\"\x00\x12.\n\tgetQueues\x12\x10.xenon.Scheduler\x1a\r.xenon.Queues\"\x00\x12\x37\n\x13getDefaultQueueName\x12\x10.xenon.Scheduler\x1a\x0c.xenon.Queue\"\x00\x12\x33\n\x07getJobs\x12\x19.xenon.SchedulerAndQueues\x1a\x0b.xenon.Jobs\"\x00\x12.\n\x0cgetJobStatus\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\x33\n\x0egetJobStatuses\x12\x0b.xenon.Jobs\x1a\x12.xenon.JobStatuses\"\x00\x12@\n\x0egetQueueStatus\x12\x18.xenon.SchedulerAndQueue\x1a\x12.xenon.QueueStatus\"\x00\x12\x45\n\x10getQueueStatuses\x12\x19.xenon.SchedulerAndQueues\x1a\x14.xenon.QueueStatuses\"\x00\x12/\n\rwaitUntilDone\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\x32\n\x10waitUntilRunning\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\x42\n\ngetStreams\x12\x15.xenon.JobInputStream\x1a\x17.xenon.JobOutputStreams\"\x00(\x01\x30\x01\x12\'\n\x06isOpen\x12\x10.xenon.Scheduler\x1a\t.xenon.Is\"\x00\x12+\n\tcancelJob\x12\n.xenon.Job\x1a\x10.xenon.JobStatus\"\x00\x12\'\n\tdeleteJob\x12\n.xenon.Job\x1a\x0c.xenon.Empty\"\x00\x12)\n\x05\x63lose\x12\x10.xenon.Scheduler\x1a\x0c.xenon.Empty\"\x00\x12\x33\n\x0elistSchedulers\x12\x0c.xenon.Empty\x1a\x11.xenon.Schedulers\"\x00\x12\'\n\x08listJobs\x12\x0c.xenon.Empty\x1a\x0b.xenon.Jobs\"\x00\x12\x32\n\x0elocalScheduler\x12\x0c.xenon.Empty\x1a\x10.xenon.Scheduler\"\x00\x42*\n\x1cnl.esciencecenter.xenon.grpcB\nXenonProtob\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -73,8 +73,8 @@ _POSIXFILEPERMISSION = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=5319,
-  serialized_end=5509,
+  serialized_start=5337,
+  serialized_end=5527,
 )
 _sym_db.RegisterEnumDescriptor(_POSIXFILEPERMISSION)
 
@@ -162,8 +162,8 @@ _COPYREQUEST_COPYOPTION = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=1757,
-  serialized_end=1842,
+  serialized_start=1775,
+  serialized_end=1860,
 )
 _sym_db.RegisterEnumDescriptor(_COPYREQUEST_COPYOPTION)
 
@@ -196,8 +196,8 @@ _WRITEREQUEST_OPENOPTION = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=2768,
-  serialized_end=2848,
+  serialized_start=2786,
+  serialized_end=2866,
 )
 _sym_db.RegisterEnumDescriptor(_WRITEREQUEST_OPENOPTION)
 
@@ -234,8 +234,8 @@ _JOBSTATUS_ERRORTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=4730,
-  serialized_end=4839,
+  serialized_start=4748,
+  serialized_end=4857,
 )
 _sym_db.RegisterEnumDescriptor(_JOBSTATUS_ERRORTYPE)
 
@@ -669,6 +669,13 @@ _CERTIFICATECREDENTIAL = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='username', full_name='xenon.CertificateCredential.username', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -682,7 +689,7 @@ _CERTIFICATECREDENTIAL = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=1036,
-  serialized_end=1097,
+  serialized_end=1115,
 )
 
 
@@ -719,8 +726,8 @@ _PASSWORDCREDENTIAL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1099,
-  serialized_end=1155,
+  serialized_start=1117,
+  serialized_end=1173,
 )
 
 
@@ -818,8 +825,8 @@ _NEWFILESYSTEMREQUEST = _descriptor.Descriptor(
       name='credential', full_name='xenon.NewFileSystemRequest.credential',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=1158,
-  serialized_end=1445,
+  serialized_start=1176,
+  serialized_end=1463,
 )
 
 
@@ -856,8 +863,8 @@ _FILESYSTEM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1447,
-  serialized_end=1517,
+  serialized_start=1465,
+  serialized_end=1535,
 )
 
 
@@ -887,8 +894,8 @@ _FILESYSTEMS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1519,
-  serialized_end=1572,
+  serialized_start=1537,
+  serialized_end=1590,
 )
 
 
@@ -925,8 +932,8 @@ _PATH = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1574,
-  serialized_end=1633,
+  serialized_start=1592,
+  serialized_end=1651,
 )
 
 
@@ -971,8 +978,8 @@ _COPYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1636,
-  serialized_end=1842,
+  serialized_start=1654,
+  serialized_end=1860,
 )
 
 
@@ -1009,8 +1016,8 @@ _SOURCETARGET = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1844,
-  serialized_end=1916,
+  serialized_start=1862,
+  serialized_end=1934,
 )
 
 
@@ -1047,8 +1054,8 @@ _COPY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1918,
-  serialized_end=1973,
+  serialized_start=1936,
+  serialized_end=1991,
 )
 
 
@@ -1120,8 +1127,8 @@ _COPYSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1976,
-  serialized_end=2118,
+  serialized_start=1994,
+  serialized_end=2136,
 )
 
 
@@ -1151,8 +1158,8 @@ _COPYSTATUSES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2120,
-  serialized_end=2171,
+  serialized_start=2138,
+  serialized_end=2189,
 )
 
 
@@ -1280,8 +1287,8 @@ _FILEATTRIBUTES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2174,
-  serialized_end=2520,
+  serialized_start=2192,
+  serialized_end=2538,
 )
 
 
@@ -1318,8 +1325,8 @@ _POSIXFILEPERMISSIONSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2522,
-  serialized_end=2627,
+  serialized_start=2540,
+  serialized_end=2645,
 )
 
 
@@ -1349,8 +1356,8 @@ _FILESTREAM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2629,
-  serialized_end=2657,
+  serialized_start=2647,
+  serialized_end=2675,
 )
 
 
@@ -1395,8 +1402,8 @@ _WRITEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2660,
-  serialized_end=2848,
+  serialized_start=2678,
+  serialized_end=2866,
 )
 
 
@@ -1454,8 +1461,8 @@ _WALKFILETREEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2851,
-  serialized_end=2990,
+  serialized_start=2869,
+  serialized_end=3008,
 )
 
 
@@ -1492,8 +1499,8 @@ _PATHWITHATTRIBUTES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2992,
-  serialized_end=3082,
+  serialized_start=3010,
+  serialized_end=3100,
 )
 
 
@@ -1591,8 +1598,8 @@ _NEWSCHEDULERREQUEST = _descriptor.Descriptor(
       name='credential', full_name='xenon.NewSchedulerRequest.credential',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=3085,
-  serialized_end=3370,
+  serialized_start=3103,
+  serialized_end=3388,
 )
 
 
@@ -1629,8 +1636,8 @@ _SCHEDULER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3372,
-  serialized_end=3440,
+  serialized_start=3390,
+  serialized_end=3458,
 )
 
 
@@ -1660,8 +1667,8 @@ _SCHEDULERS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3442,
-  serialized_end=3492,
+  serialized_start=3460,
+  serialized_end=3510,
 )
 
 
@@ -1698,8 +1705,8 @@ _JOBDESCRIPTION_ENVIRONMENTENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3906,
-  serialized_end=3956,
+  serialized_start=3924,
+  serialized_end=3974,
 )
 
 _JOBDESCRIPTION_OPTIONSENTRY = _descriptor.Descriptor(
@@ -1735,8 +1742,8 @@ _JOBDESCRIPTION_OPTIONSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3958,
-  serialized_end=4004,
+  serialized_start=3976,
+  serialized_end=4022,
 )
 
 _JOBDESCRIPTION = _descriptor.Descriptor(
@@ -1863,8 +1870,8 @@ _JOBDESCRIPTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3495,
-  serialized_end=4004,
+  serialized_start=3513,
+  serialized_end=4022,
 )
 
 
@@ -1901,8 +1908,8 @@ _SUBMITJOBREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4006,
-  serialized_end=4105,
+  serialized_start=4024,
+  serialized_end=4123,
 )
 
 
@@ -1939,8 +1946,8 @@ _JOB = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4107,
-  serialized_end=4168,
+  serialized_start=4125,
+  serialized_end=4186,
 )
 
 
@@ -1970,8 +1977,8 @@ _JOBS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4170,
-  serialized_end=4202,
+  serialized_start=4188,
+  serialized_end=4220,
 )
 
 
@@ -2001,8 +2008,8 @@ _QUEUE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4204,
-  serialized_end=4225,
+  serialized_start=4222,
+  serialized_end=4243,
 )
 
 
@@ -2032,8 +2039,8 @@ _QUEUES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4227,
-  serialized_end=4249,
+  serialized_start=4245,
+  serialized_end=4267,
 )
 
 
@@ -2070,8 +2077,8 @@ _SCHEDULERANDQUEUES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4251,
-  serialized_end=4324,
+  serialized_start=4269,
+  serialized_end=4342,
 )
 
 
@@ -2108,8 +2115,8 @@ _SCHEDULERANDQUEUE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4326,
-  serialized_end=4397,
+  serialized_start=4344,
+  serialized_end=4415,
 )
 
 
@@ -2146,8 +2153,8 @@ _JOBSTATUS_SCHEDULERSPECIFICINFORMATIONENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4661,
-  serialized_end=4728,
+  serialized_start=4679,
+  serialized_end=4746,
 )
 
 _JOBSTATUS = _descriptor.Descriptor(
@@ -2226,8 +2233,8 @@ _JOBSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4400,
-  serialized_end=4839,
+  serialized_start=4418,
+  serialized_end=4857,
 )
 
 
@@ -2257,8 +2264,8 @@ _JOBSTATUSES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4841,
-  serialized_end=4890,
+  serialized_start=4859,
+  serialized_end=4908,
 )
 
 
@@ -2295,8 +2302,8 @@ _QUEUESTATUS_SCHEDULERSPECIFICINFORMATIONENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4661,
-  serialized_end=4728,
+  serialized_start=4679,
+  serialized_end=4746,
 )
 
 _QUEUESTATUS = _descriptor.Descriptor(
@@ -2346,8 +2353,8 @@ _QUEUESTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4893,
-  serialized_end=5133,
+  serialized_start=4911,
+  serialized_end=5151,
 )
 
 
@@ -2377,8 +2384,8 @@ _QUEUESTATUSES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5135,
-  serialized_end=5188,
+  serialized_start=5153,
+  serialized_end=5206,
 )
 
 
@@ -2415,8 +2422,8 @@ _JOBINPUTSTREAM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5190,
-  serialized_end=5246,
+  serialized_start=5208,
+  serialized_end=5264,
 )
 
 
@@ -2453,8 +2460,8 @@ _JOBOUTPUTSTREAMS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5248,
-  serialized_end=5298,
+  serialized_start=5266,
+  serialized_end=5316,
 )
 
 
@@ -2484,8 +2491,8 @@ _IS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5300,
-  serialized_end=5316,
+  serialized_start=5318,
+  serialized_end=5334,
 )
 
 _PROPERTIES_PROPERTIESENTRY.containing_type = _PROPERTIES

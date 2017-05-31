@@ -69,6 +69,7 @@ message CertificateCredential {
     // Path to certificate file
     string certfile = 1;
     string passphrase = 2;
+    string username = 3;
 }
 
 message PasswordCredential {
