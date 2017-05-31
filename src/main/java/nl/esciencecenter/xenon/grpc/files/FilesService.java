@@ -563,7 +563,12 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
         try {
             Path start = getPath(request.getStart());
             FileVisitor visitor = new FileRegexpVisitor(request.getStart().getFilesystem(), responseObserver, !request.getWithoutAttributes(), request.getFilenameRegexp());
-            Utils.walkFileTree(files, start, request.getFollowLinks(), request.getMaxDepth(), visitor);
+            Integer depth = request.getMaxDepth();
+            if (depth == 0) {
+                depth = Integer.MAX_VALUE;
+            }
+            Utils.walkFileTree(files, start, request.getFollowLinks(), depth, visitor);
+
             responseObserver.onCompleted();
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());

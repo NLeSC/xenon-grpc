@@ -206,7 +206,7 @@ message WalkFileTreeRequest {
     uint32 maxDepth = 3;
     // When true then will follow symbolic links
     bool followLinks = 4;
-    // Only files matching regexp will be returned. For example '\.txt$' will only return *.txt files.
+    // Only files matching regexp will be returned. For example '.*\\.txt$' will only return *.txt files.
     string filenameRegexp = 5;
 }
 

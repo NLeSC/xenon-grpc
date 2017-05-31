@@ -1,6 +1,7 @@
 package nl.esciencecenter.xenon.grpc.files;
 
-import io.grpc.stub.StreamObserver;
+import static nl.esciencecenter.xenon.grpc.files.Writers.writeFileAttributes;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.Files;
@@ -9,7 +10,7 @@ import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.util.FileVisitResult;
 import nl.esciencecenter.xenon.util.FileVisitor;
 
-import static nl.esciencecenter.xenon.grpc.files.Writers.writeFileAttributes;
+import io.grpc.stub.StreamObserver;
 
 public class FileRegexpVisitor implements FileVisitor {
     private final StreamObserver<XenonProto.PathWithAttributes> observer;
@@ -33,7 +34,7 @@ public class FileRegexpVisitor implements FileVisitor {
 
     @Override
     public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files) throws XenonException {
-        builder.setPath(pathBuilder.setPath(dir.getRelativePath().toString()));
+        builder.setPath(pathBuilder.setPath(dir.getRelativePath().getAbsolutePath()));
         if (returnAttributes) {
             builder.setAttributes(writeFileAttributes(attributes));
         }
@@ -43,7 +44,7 @@ public class FileRegexpVisitor implements FileVisitor {
 
     @Override
     public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws XenonException {
-        String path = file.getRelativePath().toString();
+        String path = file.getRelativePath().getAbsolutePath();
         if ("".equals(filenameRegexp) || path.matches(filenameRegexp)) {
             builder.setPath(pathBuilder.setPath(path));
             if (returnAttributes) {
