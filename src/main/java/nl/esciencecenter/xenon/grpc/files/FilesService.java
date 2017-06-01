@@ -14,6 +14,7 @@ import static nl.esciencecenter.xenon.grpc.files.Writers.writePath;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -425,7 +426,8 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
             Path target = getPath(request.getTarget());
             CopyOption[] options = parseCopyOptions(request.getOptionsList());
             // Mark ASYNCHRONOUS
-            List<CopyOption> asyncOptions = Arrays.asList(options);
+            List<CopyOption> asyncOptions = new ArrayList<>();
+            asyncOptions.addAll(Arrays.asList(options));
             asyncOptions.add(CopyOption.ASYNCHRONOUS);
 
             Copy copy = files.copy(source, target, asyncOptions.toArray(new CopyOption[0]));

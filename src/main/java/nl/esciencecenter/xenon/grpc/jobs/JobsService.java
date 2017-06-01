@@ -446,7 +446,7 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
 
     private XenonProto.Scheduler getSchedulerOfJob(Job job) throws StatusException {
         String jid = job.getIdentifier();
-        if (currentJobs.containsKey(jid)) {
+        if (!currentJobs.containsKey(jid)) {
             throw Status.NOT_FOUND.augmentDescription(jid).asException();
         }
         return currentJobs.get(jid).getRequest().getScheduler();

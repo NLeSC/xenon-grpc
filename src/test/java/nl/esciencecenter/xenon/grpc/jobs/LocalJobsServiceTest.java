@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 
 import io.grpc.StatusRuntimeException;
@@ -63,9 +64,28 @@ public class LocalJobsServiceTest extends LocalJobsServiceTestBase {
 
         XenonProto.QueueStatus response = client.getQueueStatus(request);
 
-        XenonProto.QueueStatus expected = XenonProto.QueueStatus.newBuilder()
-            .setName("multi")
+        XenonProto.QueueStatus expected = expectedQueueStatus();
+        assertEquals(expected, response);
+    }
+
+    private XenonProto.QueueStatus expectedQueueStatus() {
+        return XenonProto.QueueStatus.newBuilder()
+                .setName("multi")
+                .setScheduler(getScheduler())
+                .build();
+    }
+
+    @Test
+    public void getQueueStatuses() {
+        XenonProto.SchedulerAndQueues request = XenonProto.SchedulerAndQueues.newBuilder()
             .setScheduler(getScheduler())
+            .addQueues("multi")
+            .build();
+
+        XenonProto.QueueStatuses response = client.getQueueStatuses(request);
+
+        XenonProto.QueueStatuses expected = XenonProto.QueueStatuses.newBuilder()
+            .addStatuses(expectedQueueStatus())
             .build();
         assertEquals(expected, response);
     }
@@ -123,5 +143,26 @@ public class LocalJobsServiceTest extends LocalJobsServiceTestBase {
         } finally {
             client.deleteJob(job);
         }
+    }
+
+    @Test
+    public void getAdaptorDescriptions() {
+        XenonProto.JobAdaptorDescriptions response = client.getAdaptorDescriptions(empty());
+
+        assertEquals(5, response.getDescriptionsCount());
+    }
+
+    @Test
+    public void getAdaptorDescription() {
+        XenonProto.AdaptorName request = XenonProto.AdaptorName.newBuilder().setName("local").build();
+
+        XenonProto.JobAdaptorDescription response = client.getAdaptorDescription(request);
+
+        XenonProto.JobAdaptorDescription expected = XenonProto.JobAdaptorDescription.newBuilder()
+            .setName("local")
+            .setDescription(LocalAdaptor.ADAPTOR_DESCRIPTION)
+            .addAllSupportedLocations(Arrays.asList("(null)", "(empty string)", "/"))
+            .build();
+        assertEquals(expected, response);
     }
 }

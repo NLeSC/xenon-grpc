@@ -29,7 +29,7 @@ public class LocalFilesTestBase {
     XenonFilesGrpc.XenonFilesBlockingStub client;
 
     @Before
-    public void SetUp() throws IOException {
+    public void setUp() throws IOException {
         singleton = new XenonSingleton();
         FilesService service = new FilesService(singleton);
         server = InProcessServerBuilder.forName("test").addService(service).build();

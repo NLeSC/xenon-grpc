@@ -1,6 +1,7 @@
 package nl.esciencecenter.xenon.grpc.jobs;
 
 import static nl.esciencecenter.xenon.grpc.files.LocalFilesTestBase.empty;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import nl.esciencecenter.xenon.grpc.XenonProto;
@@ -14,6 +15,27 @@ public class LocalJobsSchedulersTest extends LocalJobsServiceTestBase {
         XenonProto.Schedulers response = client.listSchedulers(empty());
 
         assertTrue(response.getSchedulersList().isEmpty());
+    }
+
+    @Test
+    public void listSchedulers_justlocal() {
+        XenonProto.Scheduler scheduler = getScheduler();
+
+        XenonProto.Schedulers response = client.listSchedulers(empty());
+
+        XenonProto.Schedulers expected = XenonProto.Schedulers.newBuilder()
+            .addSchedulers(scheduler)
+            .build();
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void isOpen() {
+        XenonProto.Scheduler scheduler = getScheduler();
+
+        XenonProto.Is response = client.isOpen(scheduler);
+
+        assertTrue(response.getIs());
     }
 
     @Test
@@ -34,6 +56,14 @@ public class LocalJobsSchedulersTest extends LocalJobsServiceTestBase {
     @Test
     public void close_notfound() {
         client.close(getSchedulerNotFound());
+    }
+
+    @Test
+    public void close() {
+        client.close(getScheduler());
+
+        XenonProto.Schedulers currentSchedulers = client.listSchedulers(empty());
+        assertTrue(currentSchedulers.getSchedulersList().isEmpty());
     }
 
     XenonProto.Scheduler getSchedulerNotFound() {

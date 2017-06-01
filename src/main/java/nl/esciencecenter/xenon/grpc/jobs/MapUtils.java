@@ -34,7 +34,7 @@ class MapUtils {
         return builder.build();
     }
 
-    static String defaultValue(String value) {
+    private static String defaultValue(String value) {
         if (value.isEmpty()) {
             return null;
         }
@@ -101,7 +101,11 @@ class MapUtils {
                 .setId(status.getJob().getIdentifier())
                 .setDescription(description)
                 .build())
-            .setExitCode(status.getExitCode());
+            ;
+        Integer exitCode = status.getExitCode();
+        if (exitCode != null) {
+            builder.setExitCode(exitCode);
+        }
         Map<String, String> info = status.getSchedulerSpecficInformation();
         if (info != null) {
             builder.putAllSchedulerSpecificInformation(info);
