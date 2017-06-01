@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,84 +18,40 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.grpc.XenonFilesGrpc;
+import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.grpc.XenonSingleton;
 
-import io.grpc.ManagedChannel;
 import io.grpc.StatusRuntimeException;
-import io.grpc.inprocess.InProcessChannelBuilder;
-import io.grpc.inprocess.InProcessServerBuilder;
-import io.grpc.internal.ServerImpl;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
 
 /**
  * Tests files service using local adaptor.
  * The service is wrapped in a InProcessServer so it can be called using a client stub instead of using observers directly
  */
-public class LocalFilesServiceTest {
-    @Rule
-    public TemporaryFolder myfolder = new TemporaryFolder();
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-    private XenonSingleton singleton;
-    private ServerImpl server;
-    private ManagedChannel channel;
-    private XenonFilesGrpc.XenonFilesBlockingStub client;
-
-    @Before
-    public void SetUp() throws IOException {
-        singleton = new XenonSingleton();
-        FilesService service = new FilesService(singleton);
-        server = InProcessServerBuilder.forName("test").addService(service).build();
-        server.start();
-        channel = InProcessChannelBuilder.forName("test").directExecutor().usePlaintext(true).build();
-        client = XenonFilesGrpc.newBlockingStub(channel);
-    }
-
-    @After
-    public void tearDown() throws XenonException {
-        XenonFactory.endXenon(singleton.getInstance());
-        channel.shutdownNow();
-        server.shutdownNow();
-    }
-
+public class LocalFilesServiceTest extends LocalFilesTestBase {
     @Test
-    public void localFileSystems() {
-        XenonProto.Empty empty = XenonProto.Empty.getDefaultInstance();
+    public void getAdaptorDescription() {
+        XenonProto.AdaptorName request = XenonProto.AdaptorName.newBuilder().setName("local").build();
 
-        XenonProto.FileSystems response = client.localFileSystems(empty);
+        XenonProto.FileAdaptorDescription response = client.getAdaptorDescription(request);
+        XenonProto.FileAdaptorDescription expected = localAdaptorDescription();
 
-        assertTrue("Has some filesystems", response.getFilesystemsCount() > 0);
-    }
-
-    @Test
-    public void isOpen() {
-        XenonProto.FileSystem fs = getFs();
-
-        XenonProto.Is response = client.isOpen(fs);
-
-        assertTrue(response.getIs());
-    }
-
-    @Test
-    public void listFileSystems() {
-        XenonProto.FileSystem fs = getFs();
-        XenonProto.Empty empty = XenonProto.Empty.getDefaultInstance();
-
-        XenonProto.FileSystems response = client.listFileSystems(empty);
-
-        // TODO only OK on single filesystem machines
-        XenonProto.FileSystems expected = XenonProto.FileSystems.newBuilder().addFilesystems(fs).build();
         assertEquals(expected, response);
+    }
+
+    private XenonProto.FileAdaptorDescription localAdaptorDescription() {
+        return XenonProto.FileAdaptorDescription.newBuilder()
+                .setName("local")
+                .setDescription(LocalAdaptor.ADAPTOR_DESCRIPTION)
+                .addAllSupportedLocations(Arrays.asList("(null)", "(empty string)", "/"))
+                .build();
+    }
+
+    @Test
+    public void getAdaptorDescriptions() {
+        XenonProto.FileAdaptorDescriptions response = client.getAdaptorDescriptions(XenonProto.Empty.getDefaultInstance());
+
+        assertEquals(4, response.getDescriptionsCount());
     }
 
     @Test
@@ -107,19 +64,6 @@ public class LocalFilesServiceTest {
         XenonProto.Is response = client.exists(request);
 
         assertTrue(response.getIs());
-    }
-
-    /**
-     * @return first local fs
-     */
-    private XenonProto.FileSystem getFs() {
-        XenonProto.Empty empty = XenonProto.Empty.getDefaultInstance();
-        return client.localFileSystems(empty).getFilesystems(0);
-    }
-
-    private XenonProto.Path getLocalPath(String path) {
-        XenonProto.FileSystem fs =getFs();
-        return XenonProto.Path.newBuilder().setFilesystem(fs).setPath(path).build();
     }
 
     @Test
@@ -198,7 +142,6 @@ public class LocalFilesServiceTest {
         assertFalse(somefile.exists());
     }
 
-    @Ignore("service hangs")
     @Test
     public void getAttributes() throws IOException {
         String path = myfolder.getRoot().getAbsolutePath();
@@ -208,7 +151,8 @@ public class LocalFilesServiceTest {
 
         assertTrue("isDirectory", attribs.getIsDirectory());
         Path epath = myfolder.getRoot().toPath();
-        assertEquals("owner", Files.getOwner(epath), attribs.getOwner());
+        assertEquals("owner", Files.getOwner(epath).getName(), attribs.getOwner());
+        // TODO check other attribs
     }
 
     @Test
@@ -353,10 +297,23 @@ public class LocalFilesServiceTest {
     }
 
     @Test
-    public void listBackgroundCopyStatuses() {
-        XenonProto.Empty empty = XenonProto.Empty.getDefaultInstance();
-        XenonProto.CopyStatuses response = client.listBackgroundCopyStatuses(empty);
+    public void setPosixFilePermissions() throws IOException {
+        XenonProto.Path path = getLocalPath(myfolder.getRoot().getAbsolutePath());
+        XenonProto.PosixFilePermissionsRequest request = XenonProto.PosixFilePermissionsRequest.newBuilder()
+            .setPath(path)
+            .addPermissions(XenonProto.PosixFilePermission.OWNER_READ)
+            .addPermissions(XenonProto.PosixFilePermission.OWNER_WRITE)
+            .addPermissions(XenonProto.PosixFilePermission.OWNER_EXECUTE)
+            .build();
 
-        assertEquals(0, response.getStatusesCount());
+        client.setPosixFilePermissions(request);
+
+        Set<PosixFilePermission> attribs = Files.getPosixFilePermissions(myfolder.getRoot().toPath());
+        Set<PosixFilePermission> expected = new HashSet<>(Arrays.asList(
+            PosixFilePermission.OWNER_READ,
+            PosixFilePermission.OWNER_WRITE,
+            PosixFilePermission.OWNER_EXECUTE
+        ));
+        assertEquals(expected, attribs);
     }
 }

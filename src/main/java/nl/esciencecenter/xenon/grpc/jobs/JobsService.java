@@ -8,11 +8,12 @@ import static nl.esciencecenter.xenon.grpc.jobs.MapUtils.mapQueueStatus;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import nl.esciencecenter.xenon.AdaptorStatus;
 import nl.esciencecenter.xenon.Xenon;
@@ -86,9 +87,12 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
         AdaptorStatus[] statuses = xenon.getAdaptorStatuses();
 
         XenonProto.JobAdaptorDescriptions.Builder setBuilder = XenonProto.JobAdaptorDescriptions.newBuilder();
+        HashSet<String> jobBasedAdaptors = new HashSet<>(Arrays.asList("local", "ssh", "gridengine", "slurm", "torque"));
         for (AdaptorStatus status : statuses) {
-            XenonProto.JobAdaptorDescription description = mapJobAdaptorDescription(status);
-            setBuilder.addDescriptions(description);
+            if (jobBasedAdaptors.contains(status.getName())) {
+                XenonProto.JobAdaptorDescription description = mapJobAdaptorDescription(status);
+                setBuilder.addDescriptions(description);
+            }
         }
         responseObserver.onNext(setBuilder.build());
         responseObserver.onCompleted();
@@ -127,15 +131,14 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
 
     @Override
     public void close(XenonProto.Scheduler request, StreamObserver<XenonProto.Empty> responseObserver) {
-        if (schedulers.containsKey(request.getId())) {
-            responseObserver.onError(Status.NOT_FOUND.asException());
-        }
-        SchedulerContainer container = schedulers.get(request.getId());
         try {
-            singleton.getInstance().jobs().close(container.getScheduler());
+            Scheduler scheduler = getScheduler(request);
+            singleton.getInstance().jobs().close(scheduler);
             schedulers.remove(request.getId());
         } catch (XenonException e) {
-            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (StatusException e) {
+            responseObserver.onError(e);
         }
         responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
         responseObserver.onCompleted();
@@ -342,15 +345,16 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
     public void getJobStatuses(XenonProto.Jobs request, StreamObserver<XenonProto.JobStatuses> responseObserver) {
         Jobs jobs = singleton.getInstance().jobs();
 
-        Stream<JobContainer> currentJobsStream = request.getJobsList()
+        List<JobContainer> jobContainers = request.getJobsList()
             .stream()
             .filter(d -> currentJobs.containsKey(d.getId()))
-            .map(d -> currentJobs.get(d.getId()));
-        Job[] myjobs = currentJobsStream
+            .map(d -> currentJobs.get(d.getId()))
+            .collect(Collectors.toList());
+        Job[] myjobs = jobContainers.stream()
             .map(JobContainer::getJob)
             .collect(Collectors.toList())
             .toArray(new Job[0]);
-        Iterator<XenonProto.JobDescription> descriptions = currentJobsStream
+        Iterator<XenonProto.JobDescription> descriptions = jobContainers.stream()
             .map(JobContainer::getRequest)
             .map(XenonProto.SubmitJobRequest::getDescription)
             .iterator();
@@ -370,15 +374,21 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
         Jobs jobs = singleton.getInstance().jobs();
         try {
             Job job = getJob(request);
-            JobStatus status = jobs.getJobStatus(job);
-            if (!status.isDone()) {
-                jobs.cancelJob(job);
+            try {
+                JobStatus status = jobs.getJobStatus(job);
+                if (!status.isDone()) {
+                    jobs.cancelJob(job);
+                }
+            } catch (XenonException e) {
+                // when job is done then Xenon has forgotten about job,
+                // so only if xenon knows about job can it be canceled
+                if (!e.getMessage().contains("Job not found")) {
+                    responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+                }
             }
             currentJobs.remove(request.getId());
             responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
             responseObserver.onCompleted();
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
             responseObserver.onError(e);
         }

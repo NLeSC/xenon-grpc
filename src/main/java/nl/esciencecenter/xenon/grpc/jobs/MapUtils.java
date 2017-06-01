@@ -1,16 +1,20 @@
 package nl.esciencecenter.xenon.grpc.jobs;
 
-import java.util.ArrayList;
+import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
+
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import nl.esciencecenter.xenon.AdaptorStatus;
-import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.jobs.*;
-
-import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
+import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobCanceledException;
+import nl.esciencecenter.xenon.jobs.JobDescription;
+import nl.esciencecenter.xenon.jobs.JobStatus;
+import nl.esciencecenter.xenon.jobs.NoSuchJobException;
+import nl.esciencecenter.xenon.jobs.NoSuchSchedulerException;
+import nl.esciencecenter.xenon.jobs.QueueStatus;
 
 class MapUtils {
     private MapUtils() {
@@ -19,8 +23,11 @@ class MapUtils {
     static XenonProto.QueueStatus mapQueueStatus(QueueStatus status, XenonProto.Scheduler scheduler) {
         XenonProto.QueueStatus.Builder builder = XenonProto.QueueStatus.newBuilder()
                 .setName(status.getQueueName())
-                .setScheduler(scheduler)
-                .putAllSchedulerSpecificInformation(status.getSchedulerSpecficInformation());
+                .setScheduler(scheduler);
+        Map<String, String> info = status.getSchedulerSpecficInformation();
+        if (info != null) {
+            builder.putAllSchedulerSpecificInformation(info);
+        }
         if (status.hasException()) {
             builder.setError(status.getException().getMessage());
         }
@@ -87,15 +94,18 @@ class MapUtils {
 
     static XenonProto.JobStatus mapJobStatus(JobStatus status, XenonProto.JobDescription description) {
         XenonProto.JobStatus.Builder builder = XenonProto.JobStatus.newBuilder()
-                .setState(status.getState())
-                .setRunning(status.isRunning())
-                .setDone(status.isDone())
-                .putAllSchedulerSpecificInformation(status.getSchedulerSpecficInformation())
-                .setJob(XenonProto.Job.newBuilder()
-                        .setId(status.getJob().getIdentifier())
-                        .setDescription(description)
-                        .build())
-                .setExitCode(status.getExitCode());
+            .setState(status.getState())
+            .setRunning(status.isRunning())
+            .setDone(status.isDone())
+            .setJob(XenonProto.Job.newBuilder()
+                .setId(status.getJob().getIdentifier())
+                .setDescription(description)
+                .build())
+            .setExitCode(status.getExitCode());
+        Map<String, String> info = status.getSchedulerSpecficInformation();
+        if (info != null) {
+            builder.putAllSchedulerSpecificInformation(info);
+        }
         if (status.hasException()) {
             builder
                     .setErrorMessage(status.getException().getMessage())

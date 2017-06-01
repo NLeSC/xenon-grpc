@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -301,6 +302,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
             Path path = getPath(request);
             FileAttributes attributes = files.getAttributes(path);
             responseObserver.onNext(writeFileAttributes(attributes));
+            responseObserver.onCompleted();
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
@@ -530,9 +532,12 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
         AdaptorStatus[] statuses = xenon.getAdaptorStatuses();
 
         XenonProto.FileAdaptorDescriptions.Builder setBuilder = XenonProto.FileAdaptorDescriptions.newBuilder();
+        HashSet<String> fileBasedAdaptors = new HashSet<>(Arrays.asList("local", "ssh", "webdav", "ftp"));
         for (AdaptorStatus status : statuses) {
-            XenonProto.FileAdaptorDescription description = mapFileAdaptorDescription(status);
-            setBuilder.addDescriptions(description);
+            if (fileBasedAdaptors.contains(status.getName())) {
+                XenonProto.FileAdaptorDescription description = mapFileAdaptorDescription(status);
+                setBuilder.addDescriptions(description);
+            }
         }
         responseObserver.onNext(setBuilder.build());
         responseObserver.onCompleted();
