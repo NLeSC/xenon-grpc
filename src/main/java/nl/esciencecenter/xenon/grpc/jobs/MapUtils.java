@@ -47,7 +47,9 @@ class MapUtils {
         JobDescription description = new JobDescription();
         description.setExecutable(d.getExecutable());
         description.setArguments(d.getArgumentsList().toArray(new String[0]));
-        description.setWorkingDirectory(d.getWorkingDirectory());
+        if (!"".equals(d.getWorkingDirectory())) {
+            description.setWorkingDirectory(d.getWorkingDirectory());
+        }
         description.setEnvironment(d.getEnvironmentMap());
         description.setQueueName(defaultValue(d.getQueueName()));
         description.setInteractive(d.getInteractive());

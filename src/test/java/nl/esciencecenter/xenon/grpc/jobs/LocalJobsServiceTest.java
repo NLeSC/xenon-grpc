@@ -4,8 +4,13 @@ import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.xenon.grpc.XenonProto;
@@ -127,19 +132,46 @@ public class LocalJobsServiceTest extends LocalJobsServiceTestBase {
     @Test
     public void submitJob() {
         XenonProto.JobDescription description = XenonProto.JobDescription.newBuilder()
-            .setExecutable("hostname")
-            .setWorkingDirectory(myfolder.getRoot().getAbsolutePath())
-            .build();
+                .setExecutable("hostname")
+                .build();
         XenonProto.SubmitJobRequest request = XenonProto.SubmitJobRequest.newBuilder()
-            .setDescription(description)
-            .setScheduler(getScheduler())
-            .build();
+                .setDescription(description)
+                .setScheduler(getScheduler())
+                .build();
         XenonProto.Job job = client.submitJob(request);
         try {
             XenonProto.JobStatus doneStatus = client.waitUntilDone(job);
 
             assertEquals(0, doneStatus.getExitCode());
             // TODO assert more
+        } finally {
+            client.deleteJob(job);
+        }
+    }
+
+
+    @Test
+    public void submitJob_storeouterr2files() throws IOException {
+        XenonProto.JobDescription description = XenonProto.JobDescription.newBuilder()
+                .setExecutable("bash")
+                .addAllArguments(Arrays.asList("-c", "echo Hello World!"))
+                .setStdOut("stdout.txt")
+                .setStdErr("stderr.txt")
+                .setWorkingDirectory(myfolder.getRoot().getAbsolutePath())
+                .build();
+        XenonProto.SubmitJobRequest request = XenonProto.SubmitJobRequest.newBuilder()
+                .setDescription(description)
+                .setScheduler(getScheduler())
+                .build();
+        XenonProto.Job job = client.submitJob(request);
+        try {
+            XenonProto.JobStatus doneStatus = client.waitUntilDone(job);
+
+            assertEquals("Exit code",0, doneStatus.getExitCode());
+            List<String> stdOutLines = Files.readAllLines(new File(myfolder.getRoot(), "stdout.txt").toPath());
+            assertEquals("stdout.txt", Collections.singletonList("Hello World!"), stdOutLines);
+            List<String> stdErrLines = Files.readAllLines(new File(myfolder.getRoot(), "stderr.txt").toPath());
+            assertTrue("stderr.txt", stdErrLines.isEmpty());
         } finally {
             client.deleteJob(job);
         }
