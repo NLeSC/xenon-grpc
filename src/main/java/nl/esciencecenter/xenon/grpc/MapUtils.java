@@ -10,11 +10,11 @@ public class MapUtils {
     private MapUtils() {
     }
 
-    public static List<XenonProto.PropertyDescription> mapPropertyDescriptions(AdaptorStatus status) {
+    public static List<XenonProto.PropertyDescription> mapPropertyDescriptions(AdaptorStatus status, XenonPropertyDescription.Component level) {
         List<XenonProto.PropertyDescription> supportedProperties = new ArrayList<>();
         XenonProto.PropertyDescription.Builder propBuilder = XenonProto.PropertyDescription.newBuilder();
         for (XenonPropertyDescription prop : status.getSupportedProperties()) {
-            if (prop.getLevels().contains(XenonPropertyDescription.Component.SCHEDULER)) {
+            if (prop.getLevels().contains(level)) {
                 String defaultValue = prop.getDefaultValue();
                 if (defaultValue == null) {
                     defaultValue = "";
@@ -49,5 +49,9 @@ public class MapUtils {
             }
         }
         return supportedProperties;
+    }
+
+    public static XenonProto.Empty empty() {
+        return XenonProto.Empty.getDefaultInstance();
     }
 }

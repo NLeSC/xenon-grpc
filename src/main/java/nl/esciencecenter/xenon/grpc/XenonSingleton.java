@@ -1,17 +1,16 @@
 package nl.esciencecenter.xenon.grpc;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import io.grpc.StatusException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
-
-import io.grpc.StatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class XenonSingleton {
+import java.util.HashMap;
+import java.util.Map;
+
+public class XenonSingleton implements AutoCloseable {
     private Logger logger = LoggerFactory.getLogger(XenonSingleton.class);
     private Xenon instance = null;
     private Map<String,String> properties = new HashMap<>();
@@ -33,5 +32,15 @@ public class XenonSingleton {
             throw io.grpc.Status.FAILED_PRECONDITION.withDescription("Unable to set properties after other calls").asException();
         }
         this.properties = properties;
+    }
+
+    public void close() {
+        if (instance != null) {
+            try {
+                XenonFactory.endXenon(instance);
+            } catch (XenonException e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 }

@@ -37,7 +37,9 @@ public class Parsers {
                 credential = creds.getDefaultCredential(adaptor);
             }
             return credential;
-        } catch (CertificateNotFoundException | InvalidLocationException | InvalidSchemeException | InvalidCredentialException | InvalidPropertyException | UnknownPropertyException e) {
+        } catch (CertificateNotFoundException e) {
+            throw Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException();
+        } catch (InvalidLocationException | InvalidSchemeException | InvalidCredentialException | InvalidPropertyException | UnknownPropertyException e) {
             throw Status.INVALID_ARGUMENT.withDescription(e.getMessage()).withCause(e).asException();
         }
     }

@@ -1,6 +1,6 @@
 package nl.esciencecenter.xenon.grpc.jobs;
 
-import static nl.esciencecenter.xenon.grpc.files.LocalFilesTestBase.empty;
+import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -13,7 +13,7 @@ import org.junit.Test;
 /**
  * Tests which at start has a job pending or running job in the local scheduler
  */
-public class LocalJobSleeperTest extends LocalJobsServiceTestBase{
+public class LocalJobSleeperTest extends LocalJobsServiceTestBase {
     private XenonProto.Job job;
 
     @Before

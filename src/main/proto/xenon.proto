@@ -193,6 +193,8 @@ message WriteRequest {
         TRUNCATE = 4;
     }
     // Xenon.OpenOption.WRITE is always passed
+    // One of CREATE, OPEN or OPEN_OR_CREATE the options must be passed
+    // And one of APPEND or TRUNCATE must be passed
     repeated OpenOption options = 3;
 }
 

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.AdaptorStatus;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobCanceledException;
@@ -136,7 +137,7 @@ class MapUtils {
     }
 
     static XenonProto.JobAdaptorDescription mapJobAdaptorDescription(AdaptorStatus status) {
-        List<XenonProto.PropertyDescription> supportedProperties = mapPropertyDescriptions(status);
+        List<XenonProto.PropertyDescription> supportedProperties = mapPropertyDescriptions(status, XenonPropertyDescription.Component.SCHEDULER);
         return XenonProto.JobAdaptorDescription.newBuilder()
                 .setName(status.getName())
                 .setDescription(status.getDescription())

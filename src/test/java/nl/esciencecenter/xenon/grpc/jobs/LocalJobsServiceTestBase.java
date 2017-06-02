@@ -29,18 +29,19 @@ public class LocalJobsServiceTestBase {
     XenonJobsGrpc.XenonJobsBlockingStub client;
 
     @Before
-    public void SetUp() throws IOException {
+    public void setUp() throws IOException {
         singleton = new XenonSingleton();
         JobsService service = new JobsService(singleton);
-        server = InProcessServerBuilder.forName("test").addService(service).build();
+        String uniqueServerName = "in-process server for " + getClass();
+        server = InProcessServerBuilder.forName(uniqueServerName).directExecutor().addService(service).build();
         server.start();
-        channel = InProcessChannelBuilder.forName("test").directExecutor().usePlaintext(true).build();
+        channel = InProcessChannelBuilder.forName(uniqueServerName).directExecutor().usePlaintext(true).build();
         client = XenonJobsGrpc.newBlockingStub(channel);
     }
 
     @After
     public void tearDown() throws XenonException {
-        XenonFactory.endXenon(singleton.getInstance());
+        singleton.close();
         channel.shutdownNow();
         server.shutdownNow();
     }
@@ -48,7 +49,7 @@ public class LocalJobsServiceTestBase {
     /**
      * @return local scheduler
      */
-    public XenonProto.Scheduler getScheduler() {
+    XenonProto.Scheduler getScheduler() {
         XenonProto.Empty empty = XenonProto.Empty.getDefaultInstance();
         return client.localScheduler(empty);
     }

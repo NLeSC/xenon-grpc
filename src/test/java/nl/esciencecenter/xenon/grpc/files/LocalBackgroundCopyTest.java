@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import java.io.File;
 import java.io.IOException;
 
+import nl.esciencecenter.xenon.grpc.MapUtils;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 
 import io.grpc.StatusRuntimeException;
@@ -20,7 +21,7 @@ public class LocalBackgroundCopyTest extends LocalFilesTestBase {
 
     @Test
     public void listBackgroundCopyStatuses_empty() {
-        XenonProto.CopyStatuses response = client.listBackgroundCopyStatuses(empty());
+        XenonProto.CopyStatuses response = client.listBackgroundCopyStatuses(MapUtils.empty());
 
         assertEquals(0, response.getStatusesCount());
     }
@@ -70,7 +71,7 @@ public class LocalBackgroundCopyTest extends LocalFilesTestBase {
     public void listBackgroundCopyStatuses() {
         XenonProto.Copy copy = submitCopy();
 
-        XenonProto.CopyStatuses response = client.listBackgroundCopyStatuses(empty());
+        XenonProto.CopyStatuses response = client.listBackgroundCopyStatuses(MapUtils.empty());
 
         assertEquals("has 1 background copy", 1, response.getStatusesCount());
         XenonProto.CopyStatus status = response.getStatuses(0);
@@ -83,7 +84,7 @@ public class LocalBackgroundCopyTest extends LocalFilesTestBase {
 
         client.deleteBackgroundCopy(copy);
 
-        XenonProto.CopyStatuses response = client.listBackgroundCopyStatuses(empty());
+        XenonProto.CopyStatuses response = client.listBackgroundCopyStatuses(MapUtils.empty());
         assertEquals("Deleted copy is gone", 0, response.getStatusesCount());
     }
 

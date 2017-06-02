@@ -3,7 +3,7 @@ package nl.esciencecenter.xenon.grpc.files;
 import java.io.IOException;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
+import nl.esciencecenter.xenon.grpc.MapUtils;
 import nl.esciencecenter.xenon.grpc.XenonFilesGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.grpc.XenonSingleton;
@@ -32,15 +32,16 @@ public class LocalFilesTestBase {
     public void setUp() throws IOException {
         singleton = new XenonSingleton();
         FilesService service = new FilesService(singleton);
-        server = InProcessServerBuilder.forName("test").addService(service).build();
+        String uniqueServerName = "in-process server for " + getClass();
+        server = InProcessServerBuilder.forName(uniqueServerName).directExecutor().addService(service).build();
         server.start();
-        channel = InProcessChannelBuilder.forName("test").directExecutor().usePlaintext(true).build();
+        channel = InProcessChannelBuilder.forName(uniqueServerName).directExecutor().usePlaintext(true).build();
         client = XenonFilesGrpc.newBlockingStub(channel);
     }
 
     @After
     public void tearDown() throws XenonException {
-        XenonFactory.endXenon(singleton.getInstance());
+        singleton.close();
         channel.shutdownNow();
         server.shutdownNow();
     }
@@ -49,11 +50,7 @@ public class LocalFilesTestBase {
      * @return first local fs
      */
     XenonProto.FileSystem getFs() {
-        return client.localFileSystems(empty()).getFilesystems(0);
-    }
-
-    public static XenonProto.Empty empty() {
-        return XenonProto.Empty.getDefaultInstance();
+        return client.localFileSystems(MapUtils.empty()).getFilesystems(0);
     }
 
     XenonProto.Path getLocalPath(String path) {

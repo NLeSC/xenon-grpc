@@ -1,5 +1,6 @@
 package nl.esciencecenter.xenon.grpc.jobs;
 
+import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static nl.esciencecenter.xenon.grpc.jobs.MapUtils.mapJob;
 import static nl.esciencecenter.xenon.grpc.jobs.MapUtils.mapJobAdaptorDescription;
 import static nl.esciencecenter.xenon.grpc.jobs.MapUtils.mapJobDescription;
@@ -83,7 +84,6 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
     public void getAdaptorDescriptions(XenonProto.Empty request, StreamObserver<XenonProto.JobAdaptorDescriptions> responseObserver) {
         Xenon xenon = singleton.getInstance();
         // TODO use xenon.jobs().getAdaptorDescriptions(), when https://github.com/NLeSC/Xenon/issues/430 is completed
-        // TODO Filter getAdaptorStatuses on job capable adaptors
         AdaptorStatus[] statuses = xenon.getAdaptorStatuses();
 
         XenonProto.JobAdaptorDescriptions.Builder setBuilder = XenonProto.JobAdaptorDescriptions.newBuilder();
@@ -140,7 +140,7 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
         } catch (StatusException e) {
             responseObserver.onError(e);
         }
-        responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+        responseObserver.onNext(empty());
         responseObserver.onCompleted();
     }
 
@@ -387,7 +387,7 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
                 }
             }
             currentJobs.remove(request.getId());
-            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onNext(empty());
             responseObserver.onCompleted();
         } catch (StatusException e) {
             responseObserver.onError(e);

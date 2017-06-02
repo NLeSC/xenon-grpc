@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import nl.esciencecenter.xenon.AdaptorStatus;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
@@ -99,7 +98,7 @@ class Writers {
     }
 
     static XenonProto.Path writePath(Path path, XenonProto.FileSystem fs) {
-        return XenonProto.Path.newBuilder().setFilesystem(fs).setPath(path.getRelativePath().toString()).build();
+        return XenonProto.Path.newBuilder().setFilesystem(fs).setPath(path.getRelativePath().getAbsolutePath()).build();
     }
 
     static String getFileSystemId(FileSystem fileSystem) {
@@ -142,7 +141,7 @@ class Writers {
     }
 
     static XenonProto.FileAdaptorDescription mapFileAdaptorDescription(AdaptorStatus status) {
-        List<XenonProto.PropertyDescription> supportedProperties = mapPropertyDescriptions(status);
+        List<XenonProto.PropertyDescription> supportedProperties = mapPropertyDescriptions(status, XenonPropertyDescription.Component.FILESYSTEM);
         return XenonProto.FileAdaptorDescription.newBuilder()
             .setName(status.getName())
             .setDescription(status.getDescription())

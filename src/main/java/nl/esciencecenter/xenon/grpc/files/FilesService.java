@@ -1,6 +1,7 @@
 package nl.esciencecenter.xenon.grpc.files;
 
 import static java.util.UUID.randomUUID;
+import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static nl.esciencecenter.xenon.grpc.files.Parsers.parseCopyOptions;
 import static nl.esciencecenter.xenon.grpc.files.Parsers.parseOpenOptions;
 import static nl.esciencecenter.xenon.grpc.files.Parsers.parsePermissions;
@@ -118,7 +119,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
         } catch (StatusException e) {
             responseObserver.onError(e);
         }
-        responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+        responseObserver.onNext(empty());
         responseObserver.onCompleted();
     }
 
@@ -158,7 +159,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
         try {
             Path path = getPath(request);
             files.createDirectory(path);
-            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onNext(empty());
             responseObserver.onCompleted();
         } catch (PathAlreadyExistsException e) {
             responseObserver.onError(Status.ALREADY_EXISTS.withDescription(e.getMessage()).withCause(e).asException());
@@ -175,7 +176,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
         try {
             Path path = getPath(request);
             files.createDirectories(path);
-            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onNext(empty());
             responseObserver.onCompleted();
         } catch (PathAlreadyExistsException e) {
             responseObserver.onError(Status.ALREADY_EXISTS.withDescription(e.getMessage()).withCause(e).asException());
@@ -192,7 +193,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
         try {
             Path path = getPath(request);
             files.createFile(path);
-            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onNext(empty());
             responseObserver.onCompleted();
         } catch (PathAlreadyExistsException e) {
             responseObserver.onError(Status.ALREADY_EXISTS.withDescription(e.getMessage()).withCause(e).asException());
@@ -209,7 +210,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
         try {
             Path path = getPath(request);
             Utils.recursiveDelete(files, path);
-            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onNext(empty());
             responseObserver.onCompleted();
         } catch (StatusException e) {
             responseObserver.onError(e);
@@ -227,10 +228,11 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
             Path path = getPath(request);
             pipe = files.newInputStream(path);
             // Read file in chunks and pass on as stream of byte arrays
-            byte[] buffer = new byte[BUFFER_SIZE];
-            while (pipe.read(buffer) != -1) {
-                responseObserver.onNext(builder.setBuffer(ByteString.copyFrom(buffer)).build());
-            }
+            ByteString buffer;
+            do {
+                buffer = ByteString.readFrom(pipe, BUFFER_SIZE);
+                responseObserver.onNext(builder.setBuffer(buffer).build());
+            } while (!buffer.isEmpty());
             responseObserver.onCompleted();
         } catch (StatusException e) {
             responseObserver.onError(e);
@@ -290,7 +292,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
                         LOGGER.warn("Error from server", e);
                     }
                 }
-                responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+                responseObserver.onNext(empty());
                 responseObserver.onCompleted();
             }
         };
@@ -318,7 +320,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
             Path path = getPath(request.getPath());
             Set<PosixFilePermission> permissions = parsePermissions(request.getPermissionsList());
             files.setPosixFilePermissions(path, permissions);
-            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onNext(empty());
             responseObserver.onCompleted();
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
@@ -390,7 +392,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
             Path source = getPath(request.getSource());
             Path target = getPath(request.getTarget());
             files.move(source, target);
-            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onNext(empty());
             responseObserver.onCompleted();
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
@@ -409,7 +411,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
 
             Utils.recursiveCopy(files, source, target, options);
 
-            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onNext(empty());
             responseObserver.onCompleted();
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
@@ -530,7 +532,6 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
     public void getAdaptorDescriptions(XenonProto.Empty request, StreamObserver<XenonProto.FileAdaptorDescriptions> responseObserver) {
         Xenon xenon = singleton.getInstance();
         // TODO use xenon.files().getAdaptorDescriptions(), when https://github.com/NLeSC/Xenon/issues/430 is completed
-        // TODO Filter getAdaptorStatuses on file capable adaptors
         AdaptorStatus[] statuses = xenon.getAdaptorStatuses();
 
         XenonProto.FileAdaptorDescriptions.Builder setBuilder = XenonProto.FileAdaptorDescriptions.newBuilder();
@@ -555,7 +556,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
                 files.cancelCopy(copy);
             }
             copyBackgroundTasks.remove(request.getId());
-            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onNext(empty());
             responseObserver.onCompleted();
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());

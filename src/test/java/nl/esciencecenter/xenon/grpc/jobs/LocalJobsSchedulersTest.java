@@ -1,6 +1,6 @@
 package nl.esciencecenter.xenon.grpc.jobs;
 
-import static nl.esciencecenter.xenon.grpc.files.LocalFilesTestBase.empty;
+import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

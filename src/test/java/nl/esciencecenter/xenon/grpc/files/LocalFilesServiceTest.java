@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.protobuf.ByteString;
 import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 
@@ -280,20 +281,27 @@ public class LocalFilesServiceTest extends LocalFilesTestBase {
 
     @Test
     public void read() throws IOException {
-        File somefile = myfolder.newFile("nowyoutseeit");
+        File somefile = myfolder.newFile("source.txt");
         List<String> content = Arrays.asList("line1", "line2");
         Files.write(somefile.toPath(), content, Charset.defaultCharset());
         XenonProto.Path request = getLocalPath(somefile.getAbsolutePath());
 
         Iterator<XenonProto.FileStream> response = client.read(request);
-        List<XenonProto.FileStream> chunks = new ArrayList<>();
-        response.forEachRemaining(chunks::add);
-        String mergedContent = "";
-        for (XenonProto.FileStream chunk: chunks) {
-            mergedContent += chunk.getBuffer().toString(Charset.defaultCharset());
+
+        // concatenate response stream
+        ByteString result = null;
+        while (response.hasNext()) {
+            ByteString buffer = response.next().getBuffer();
+            if (result == null) {
+                result = buffer;
+            } else {
+                result = result.concat(buffer);
+            }
         }
-        assertTrue(mergedContent.startsWith("line1"));
-        // TODO compare whole content, but there are a bunch of ? at the end of the expected content
+        String sep = System.getProperty("line.separator");
+        String expected = "line1" + sep + "line2" + sep;
+        assert result != null;
+        assertEquals(expected, result.toString(Charset.defaultCharset()));
     }
 
     @Test
@@ -315,5 +323,17 @@ public class LocalFilesServiceTest extends LocalFilesTestBase {
             PosixFilePermission.OWNER_EXECUTE
         ));
         assertEquals(expected, attribs);
+    }
+
+    @Test
+    public void readSymbolicLink() throws IOException {
+        Path sourceFile = myfolder.newFile("source.txt").toPath();
+        Path symLink = new File(myfolder.getRoot(), "target.txt").toPath();
+        Files.createSymbolicLink(symLink, sourceFile);
+
+        XenonProto.Path response = client.readSymbolicLink(getLocalPath(symLink.toString()));
+
+        XenonProto.Path expected = getLocalPath(sourceFile.toString());
+        assertEquals(expected, response);
     }
 }

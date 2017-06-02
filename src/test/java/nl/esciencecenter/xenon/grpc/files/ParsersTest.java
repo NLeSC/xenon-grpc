@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.grpc.StatusException;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
@@ -27,6 +28,30 @@ public class ParsersTest {
         OpenOption[] response = parseOpenOptions(request);
 
         OpenOption[] expected = new OpenOption[] {OpenOption.WRITE, OpenOption.CREATE};
+        assertArrayEquals(expected, response);
+    }
+
+    @Test
+    public void test_parseOpenOptions_all() throws Exception {
+        // Protobuf defaults to first enum
+        List<XenonProto.WriteRequest.OpenOption> request = Arrays.asList(
+                XenonProto.WriteRequest.OpenOption.CREATE,
+                XenonProto.WriteRequest.OpenOption.OPEN,
+                XenonProto.WriteRequest.OpenOption.OPEN_OR_CREATE,
+                XenonProto.WriteRequest.OpenOption.APPEND,
+                XenonProto.WriteRequest.OpenOption.TRUNCATE
+        );
+
+        OpenOption[] response = parseOpenOptions(request);
+
+        OpenOption[] expected = new OpenOption[] {
+                OpenOption.WRITE,
+                OpenOption.CREATE,
+                OpenOption.OPEN,
+                OpenOption.OPEN_OR_CREATE,
+                OpenOption.APPEND,
+                OpenOption.TRUNCATE
+        };
         assertArrayEquals(expected, response);
     }
 
@@ -66,6 +91,30 @@ public class ParsersTest {
         CopyOption[] response = parseCopyOptions(request);
 
         CopyOption[] expected = new CopyOption[]{CopyOption.CREATE};
+        assertArrayEquals(expected, response);
+    }
+
+    @Test
+    public void test_parseCopyOptions_all() throws StatusException {
+        List<XenonProto.CopyRequest.CopyOption> request = Arrays.asList(
+                XenonProto.CopyRequest.CopyOption.CREATE,
+                XenonProto.CopyRequest.CopyOption.REPLACE,
+                XenonProto.CopyRequest.CopyOption.IGNORE,
+                XenonProto.CopyRequest.CopyOption.APPEND,
+                XenonProto.CopyRequest.CopyOption.RESUME,
+                XenonProto.CopyRequest.CopyOption.VERIFY
+        );
+
+        CopyOption[] response = parseCopyOptions(request);
+
+        CopyOption[] expected = new CopyOption[]{
+                CopyOption.CREATE,
+                CopyOption.REPLACE,
+                CopyOption.IGNORE,
+                CopyOption.APPEND,
+                CopyOption.RESUME,
+                CopyOption.VERIFY,
+        };
         assertArrayEquals(expected, response);
     }
 }
