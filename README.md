@@ -1,4 +1,7 @@
-Experiment to combine Xenon (https://nlesc.github.io/Xenon/) and gRpc (http://www.grpc.io/).
+gRPC (http://www.grpc.io/) server for Xenon (https://nlesc.github.io/Xenon/).
+
+Can be used to use Xenon in a non-java based language. 
+For example pyxenon (https://github.com/NLeSC/pyxenon) will use the Xenon gRPC server in the future. 
 
 [![Build Status](https://travis-ci.org/NLeSC/xenon-grpc.svg?branch=master)](https://travis-ci.org/NLeSC/xenon-grpc)
 [![Build status](https://ci.appveyor.com/api/projects/status/tep8bad05e76a69w/branch/master?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon-grpc/branch/master)
