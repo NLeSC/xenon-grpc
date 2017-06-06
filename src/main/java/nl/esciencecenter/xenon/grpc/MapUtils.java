@@ -34,6 +34,9 @@ public class MapUtils {
                     case DOUBLE:
                         type = XenonProto.PropertyDescription.Type.DOUBLE;
                         break;
+                    case STRING:
+                        type = XenonProto.PropertyDescription.Type.STRING;
+                        break;
                     case SIZE:
                         type = XenonProto.PropertyDescription.Type.SIZE;
                         break;

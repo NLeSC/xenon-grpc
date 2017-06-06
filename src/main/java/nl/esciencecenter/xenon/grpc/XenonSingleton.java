@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XenonSingleton implements AutoCloseable {
+public class XenonSingleton {
     private Logger logger = LoggerFactory.getLogger(XenonSingleton.class);
     private Xenon instance = null;
     private Map<String,String> properties = new HashMap<>();

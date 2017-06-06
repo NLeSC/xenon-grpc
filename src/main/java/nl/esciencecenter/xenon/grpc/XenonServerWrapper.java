@@ -23,10 +23,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLException;
 
-public class XenonServer {
+public class XenonServerWrapper {
     private static final String PROGRAM_NAME = "xenon-grpc-server";
-    private static final Logger LOGGER = LoggerFactory.getLogger(XenonServer.class);
-    private static final Integer DEFAULT_PORT = 50051;
+    private static final Logger LOGGER = LoggerFactory.getLogger(XenonServerWrapper.class);
+    static final Integer DEFAULT_PORT = 50051;
     private final ArgumentParser parser = buildArgumentParser();
     private File serverPrivateKey = null;
     private File clientCertChain = null;
@@ -38,20 +38,20 @@ public class XenonServer {
 
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        final XenonServer server;
-            server = new XenonServer();
-            server.start(args);
-            server.blockUntilShutdown();
+        final XenonServerWrapper server;
+        server = new XenonServerWrapper();
+        server.start(args);
+        server.blockUntilShutdown();
     }
 
-    private ArgumentParser buildArgumentParser() {
-        ArgumentParser parser = ArgumentParsers.newArgumentParser(PROGRAM_NAME)
+    ArgumentParser buildArgumentParser() {
+        ArgumentParser myparser = ArgumentParsers.newArgumentParser(PROGRAM_NAME)
                 .defaultHelp(true)
                 .description("gRPC (http://www.grpc.io/) server for Xenon (https://nlesc.github.io/Xenon/)");
-        parser.addArgument("--port", "-p")
+        myparser.addArgument("--port", "-p")
                 .type(Integer.class).setDefault(DEFAULT_PORT)
                 .help("Port to bind to");
-        ArgumentGroup serverGroup = parser
+        ArgumentGroup serverGroup = myparser
                 .addArgumentGroup("mutual TLS")
                 .description("Encrypted, client and server authenticated connection, " +
                         "all arguments are required for an encrypted, authenticated connection, " +
@@ -65,7 +65,7 @@ public class XenonServer {
         serverGroup.addArgument("--client-cert-chain")
                 .type(Arguments.fileType().verifyCanRead())
                 .help("Certificate chain file in PEM format for trusted client");
-        return parser;
+        return myparser;
     }
 
     private void blockUntilShutdown() throws InterruptedException {
@@ -82,6 +82,19 @@ public class XenonServer {
             return;
         }
 
+        serverBuilder();
+
+        server.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            // Use stderr here since the logger may have been reset by its JVM shutdown hook.
+            LOGGER.info("*** shutting down gRPC server since JVM is shutting down");
+            XenonServerWrapper.this.stop();
+            LOGGER.info("*** server shut down");
+        }));
+    }
+
+    private void serverBuilder() throws IOException {
         XenonSingleton singleton = new XenonSingleton();
         ServerBuilder<?> builder;
         if (useTLS) {
@@ -93,34 +106,27 @@ public class XenonServer {
                 .addService(new GlobalService(singleton))
                 .addService(new JobsService(singleton))
                 .addService(new FilesService(singleton))
-                .build()
-                .start();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-            System.err.println("*** shutting down gRPC server since JVM is shutting down");
-            XenonServer.this.stop();
-            System.err.println("*** server shut down");
-        }));
+                .build();
     }
 
-    private void parseArgs(String[] args) throws ArgumentParserException {
+    void parseArgs(String[] args) throws ArgumentParserException {
         Namespace res = parser.parseArgs(args);
         port = res.getInt("port");
         serverCertChain = optionalFileArgument(res, "server_cert_chain");
         serverPrivateKey = optionalFileArgument(res, "server_private_key");
         clientCertChain = optionalFileArgument(res, "client_cert_chain");
         useTLS = (serverCertChain != null && serverPrivateKey != null && clientCertChain != null);
-        if (serverCertChain == null || serverPrivateKey == null || clientCertChain == null) {
+        boolean anyTLS = (serverCertChain != null || serverPrivateKey != null || clientCertChain != null);
+        if (!useTLS && anyTLS) {
             throw new ArgumentParserException("Unable to enable mutual TLS. mutual TLS requires --server-cert-chain, --server-private-key and --client-cert-chain arguments set", parser);
         }
     }
 
     private ServerBuilder<?> secureServerBuilder() throws SSLException {
-        LOGGER.info("Server started, listening on " + port + " with mutual TLS");
+        LOGGER.info("Server started, listening on port {} with mutual TLS", port);
         LOGGER.info("On client use:");
-        LOGGER.info("- " + serverCertChain + " as server certificate chain file");
-        LOGGER.info("- " + clientCertChain + " as client certificate chain file");
+        LOGGER.info("- {} as server certificate chain file", serverCertChain);
+        LOGGER.info("- {} as client certificate chain file", clientCertChain);
         return NettyServerBuilder.forPort(port)
                 .sslContext(GrpcSslContexts.forServer(serverCertChain, serverPrivateKey)
                         .trustManager(clientCertChain)
@@ -131,7 +137,7 @@ public class XenonServer {
 
 
     private ServerBuilder<?> insecureServerBuilder() throws IOException {
-        LOGGER.info("Server started, listening on " + port);
+        LOGGER.info("Server started, listening on port {}", port);
         return ServerBuilder.forPort(port);
     }
 
@@ -150,4 +156,11 @@ public class XenonServer {
         return null;
     }
 
+    Integer getPort() {
+        return port;
+    }
+
+    boolean getUseTLS() {
+        return useTLS;
+    }
 }
