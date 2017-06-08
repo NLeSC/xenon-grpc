@@ -494,7 +494,7 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
                 if (streams != null) {
                     try {
                         streams.getStdin().close();
-                        forwarder.close();
+                        //forwarder.close();
                     } catch (IOException e) {
                         LOGGER.warn("Error from server", e);
                     }

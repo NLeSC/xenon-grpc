@@ -1,20 +1,24 @@
 package nl.esciencecenter.xenon.grpc.jobs;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+
+import java.io.IOException;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+
 import com.google.protobuf.ByteString;
+
 import io.grpc.stub.StreamObserver;
 import nl.esciencecenter.xenon.grpc.XenonJobsGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.grpc.XenonProto.JobOutputStreams;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-
-import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 public class LocalJobsStreamsTest extends LocalJobsServiceTestBase {
     private XenonJobsGrpc.XenonJobsStub aclient;
@@ -29,7 +33,6 @@ public class LocalJobsStreamsTest extends LocalJobsServiceTestBase {
         aclient = XenonJobsGrpc.newStub(channel);
     }
 
-    @Ignore("Requires implementation")
     @Test
     public void getStreams_wc() {
         // submit job
@@ -39,10 +42,12 @@ public class LocalJobsStreamsTest extends LocalJobsServiceTestBase {
                 .setWorkingDirectory(myfolder.getRoot().getAbsolutePath())
                 .setInteractive(true)
                 .build();
+        
         XenonProto.SubmitJobRequest jobRequest = XenonProto.SubmitJobRequest.newBuilder()
                 .setDescription(description)
                 .setScheduler(getScheduler())
                 .build();
+        
         XenonProto.Job job = client.submitJob(jobRequest);
         // mock receiver
         @SuppressWarnings("unchecked")
@@ -57,14 +62,16 @@ public class LocalJobsStreamsTest extends LocalJobsServiceTestBase {
                 .setJob(job)
                 .setStdin(stdin)
                 .build();
+        
         requestObserver.onNext(request);
         requestObserver.onCompleted();
-
+               
         // receive
         ArgumentCaptor<JobOutputStreams> responseCapturer = ArgumentCaptor.forClass(JobOutputStreams.class);
         verify(responseObserver, timeout(100)).onNext(responseCapturer.capture());
-        ByteString expectedStdout = ByteString.copyFromUtf8("      1       4      16");
+        ByteString expectedStdout = ByteString.copyFromUtf8("      0       4      15\n");
         JobOutputStreams response = responseCapturer.getValue();
+        
         JobOutputStreams expected = JobOutputStreams.newBuilder()
                 .setStdout(expectedStdout)
                 .build();
