@@ -42,3 +42,33 @@ pip install -r requirements.txt
 python -m grpc_tools.protoc -I../proto --python_out=. --grpc_python_out=. ../proto/xenon.proto
 python client.py
 ```
+
+## Mutual TLS
+
+Create self-signed certificate and use for server and client on same machine.
+Make sure `Common Name` field is filled with hostname of machine.
+See http://httpd.apache.org/docs/2.4/ssl/ssl_faq.html#selfcert
+
+
+```bash
+openssl req -new -x509 -nodes -out server.crt -keyout server.key
+./build/install/xenon-grpc/bin/xenon-grpc --server-cert-chain server.crt --server-private-key server.key --client-cert-chain server.crt
+```
+
+In a ipython shell in src/main/python dir
+```python
+import grpc
+import xenon_pb2
+import xenon_pb2_grpc
+import socket
+
+creds = grpc.ssl_channel_credentials(
+    root_certificates=open('../../../server.crt').read(),
+    private_key=open('../../../server.key', 'rb').read(),
+    certificate_chain=open('../../../server.crt', 'rb').read()
+)
+channel = grpc.secure_channel(socket.gethostname() + ':50051', creds)
+stub = xenon_pb2_grpc.XenonJobsStub(channel)
+response = stub.getAdaptorDescriptions(xenon_pb2.Empty())
+print(response)
+```
