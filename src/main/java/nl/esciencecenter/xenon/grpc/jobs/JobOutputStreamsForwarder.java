@@ -27,13 +27,14 @@ class JobOutputStreamsForwarder {
         
         private boolean stdout = false;
         
-        public StreamForwarder(InputStream in, boolean stdout) {
+        StreamForwarder(InputStream in, boolean stdout) {
         	super("Stream forwarder " + (stdout ? "stdout" : "stderr"));
         	this.in = in;
             this.stdout = stdout;
             setDaemon(true);
         }
-        
+
+        @Override
         public void run() {
             try {
                 while (true) {

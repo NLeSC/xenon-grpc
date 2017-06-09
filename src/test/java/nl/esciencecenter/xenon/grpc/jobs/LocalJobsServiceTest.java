@@ -120,7 +120,7 @@ public class LocalJobsServiceTest extends LocalJobsServiceTestBase {
         client.waitUntilRunning(getNotFoundJob());
     }
 
-    XenonProto.Job getNotFoundJob() {
+    private XenonProto.Job getNotFoundJob() {
         String someId = "some-id-that-does-not-exist";
         thrown.expect(StatusRuntimeException.class);
         thrown.expectMessage("NOT_FOUND: " + someId);

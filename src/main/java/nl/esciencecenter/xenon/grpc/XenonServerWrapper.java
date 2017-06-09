@@ -136,7 +136,7 @@ public class XenonServerWrapper {
     }
 
 
-    private ServerBuilder<?> insecureServerBuilder() throws IOException {
+    private ServerBuilder<?> insecureServerBuilder() {
         LOGGER.info("Server started, listening on port {}", port);
         return ServerBuilder.forPort(port);
     }

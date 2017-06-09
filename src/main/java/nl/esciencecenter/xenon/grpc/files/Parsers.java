@@ -49,6 +49,9 @@ class Parsers {
         Set<PosixFilePermission> permissions = new HashSet<>();
         for (XenonProto.PosixFilePermission permission:  permissionsValueList) {
             switch (permission) {
+                case NONE:
+                    // Do nothing with NONE, this allows for a file with no permission
+                    break;
                 case OWNER_READ:
                     permissions.add(PosixFilePermission.OWNER_READ);
                     break;

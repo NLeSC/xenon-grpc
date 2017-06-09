@@ -18,7 +18,7 @@ import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-public class LocalFilesTestBase {
+abstract public class LocalFilesTestBase {
     @Rule
     public TemporaryFolder myfolder = new TemporaryFolder();
     @Rule

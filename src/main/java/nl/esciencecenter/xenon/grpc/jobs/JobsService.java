@@ -371,26 +371,30 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
 
     @Override
     public void deleteJob(XenonProto.Job request, StreamObserver<XenonProto.Empty> responseObserver) {
-        Jobs jobs = singleton.getInstance().jobs();
         try {
             Job job = getJob(request);
-            try {
-                JobStatus status = jobs.getJobStatus(job);
-                if (!status.isDone()) {
-                    jobs.cancelJob(job);
-                }
-            } catch (XenonException e) {
-                // when job is done then Xenon has forgotten about job,
-                // so only if xenon knows about job can it be canceled
-                if (!e.getMessage().contains("Job not found")) {
-                    responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-                }
-            }
+            cancelJob(job);
             currentJobs.remove(request.getId());
             responseObserver.onNext(empty());
             responseObserver.onCompleted();
         } catch (StatusException e) {
             responseObserver.onError(e);
+        }
+    }
+
+    private void cancelJob(Job job) throws StatusException {
+        try {
+            Jobs jobs = singleton.getInstance().jobs();
+            JobStatus status = jobs.getJobStatus(job);
+            if (!status.isDone()) {
+                jobs.cancelJob(job);
+            }
+        } catch (XenonException e) {
+            // when job is done then Xenon has forgotten about job,
+            // so only if xenon knows about job can it be canceled
+            if (!e.getMessage().contains("Job not found")) {
+                throw Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException();
+            }
         }
     }
 
@@ -494,7 +498,6 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
                 if (streams != null) {
                     try {
                         streams.getStdin().close();
-                        //forwarder.close();
                     } catch (IOException e) {
                         LOGGER.warn("Error from server", e);
                     }
