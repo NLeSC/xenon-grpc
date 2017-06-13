@@ -54,7 +54,7 @@ abstract public class LocalFilesTestBase {
     }
 
     XenonProto.Path getLocalPath(String path) {
-        XenonProto.FileSystem fs =getFs();
+        XenonProto.FileSystem fs = getFs();
         return XenonProto.Path.newBuilder().setFilesystem(fs).setPath(path).build();
     }
 }
