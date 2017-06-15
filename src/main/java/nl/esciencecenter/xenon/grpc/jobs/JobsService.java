@@ -192,7 +192,7 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
         try {
             Scheduler scheduler = getScheduler(request);
             boolean open = jobs.isOpen(scheduler);
-            responseObserver.onNext(XenonProto.Is.newBuilder().setIs(open).build());
+            responseObserver.onNext(XenonProto.Is.newBuilder().setValue(open).build());
             responseObserver.onCompleted();
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());

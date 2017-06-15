@@ -35,7 +35,7 @@ public class LocalJobsSchedulersTest extends LocalJobsServiceTestBase {
 
         XenonProto.Is response = client.isOpen(scheduler);
 
-        assertTrue(response.getIs());
+        assertTrue(response.getValue());
     }
 
     @Test
@@ -66,7 +66,7 @@ public class LocalJobsSchedulersTest extends LocalJobsServiceTestBase {
         assertTrue(currentSchedulers.getSchedulersList().isEmpty());
     }
 
-    XenonProto.Scheduler getSchedulerNotFound() {
+    private XenonProto.Scheduler getSchedulerNotFound() {
         String someId = "some-id-that-does-not-exist";
         thrown.expect(StatusRuntimeException.class);
         thrown.expectMessage("NOT_FOUND: " + someId);

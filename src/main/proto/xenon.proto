@@ -173,12 +173,12 @@ message FileAttributes {
     uint64 size = 15;
 }
 
-message PosixFilePermissionsRequest {
+message SetPosixFilePermissionsRequest {
     Path path = 1;
     repeated PosixFilePermission permissions = 2;
 }
 
-message FileStream {
+message ReadResponse {
     bytes buffer = 1;
 }
 
@@ -332,7 +332,7 @@ message JobOutputStreams {
 }
 
 message Is {
-    bool is = 1;
+    bool value = 1;
 }
 
 // The functionality of the Xenon XenonFactory class
@@ -375,7 +375,7 @@ service XenonFiles {
     rpc delete(Path) returns (Empty) {}
     rpc exists(Path) returns (Is) {}
     // in Xenon it is called newInputStream()
-    rpc read(Path) returns (stream FileStream) {}
+    rpc read(Path) returns (stream ReadResponse) {}
     // in Xenon it is called newOutputStream()
     rpc write(stream WriteRequest) returns (Empty) {}
     // In Xenon its functonality is split into newAttributesDirectoryStream, newDirectoryStream and
@@ -384,7 +384,7 @@ service XenonFiles {
     // limited filtering is offered as a regexp filter on filename.
     rpc walkFileTree(WalkFileTreeRequest) returns (stream PathWithAttributes) {}
     rpc getAttributes(Path) returns (FileAttributes) {}
-    rpc setPosixFilePermissions(PosixFilePermissionsRequest) returns (Empty) {}
+    rpc setPosixFilePermissions(SetPosixFilePermissionsRequest) returns (Empty) {}
     rpc readSymbolicLink(Path) returns (Path) {}
     rpc isOpen(FileSystem) returns (Is) {}
     // Closes a filestem, any actions running it with this filestystem will be terminated, will also forget the filesystem

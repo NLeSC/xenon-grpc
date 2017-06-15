@@ -25,7 +25,7 @@ public class LocalFilesFileSystemsTest extends LocalFilesTestBase {
 
         XenonProto.Is response = client.isOpen(fs);
 
-        assertTrue(response.getIs());
+        assertTrue(response.getValue());
     }
 
     @Test

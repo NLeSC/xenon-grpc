@@ -129,7 +129,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
         try {
             Path path = getPath(request);
             boolean value = files.exists(path);
-            responseObserver.onNext(XenonProto.Is.newBuilder().setIs(value).build());
+            responseObserver.onNext(XenonProto.Is.newBuilder().setValue(value).build());
             responseObserver.onCompleted();
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
@@ -220,9 +220,9 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
     }
 
     @Override
-    public void read(XenonProto.Path request, StreamObserver<XenonProto.FileStream> responseObserver) {
+    public void read(XenonProto.Path request, StreamObserver<XenonProto.ReadResponse> responseObserver) {
         Files files = singleton.getInstance().files();
-        XenonProto.FileStream.Builder builder = XenonProto.FileStream.newBuilder();
+        XenonProto.ReadResponse.Builder builder = XenonProto.ReadResponse.newBuilder();
         InputStream pipe = null;
         try {
             Path path = getPath(request);
@@ -314,7 +314,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
     }
 
     @Override
-    public void setPosixFilePermissions(XenonProto.PosixFilePermissionsRequest request, StreamObserver<XenonProto.Empty> responseObserver) {
+    public void setPosixFilePermissions(XenonProto.SetPosixFilePermissionsRequest request, StreamObserver<XenonProto.Empty> responseObserver) {
         Files files = singleton.getInstance().files();
         try {
             Path path = getPath(request.getPath());
@@ -350,7 +350,7 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
         try {
             FileSystem filesystem = getFileSystem(request);
             boolean open = files.isOpen(filesystem);
-            responseObserver.onNext(XenonProto.Is.newBuilder().setIs(open).build());
+            responseObserver.onNext(XenonProto.Is.newBuilder().setValue(open).build());
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {

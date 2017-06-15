@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.google.protobuf.ByteString;
 import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 
+import com.google.protobuf.ByteString;
 import io.grpc.StatusRuntimeException;
 import org.junit.Test;
 
@@ -64,7 +64,7 @@ public class LocalFilesServiceTest extends LocalFilesTestBase {
 
         XenonProto.Is response = client.exists(request);
 
-        assertTrue(response.getIs());
+        assertTrue(response.getValue());
     }
 
     @Test
@@ -76,7 +76,7 @@ public class LocalFilesServiceTest extends LocalFilesTestBase {
 
         XenonProto.Is response = client.exists(request);
 
-        assertFalse(response.getIs());
+        assertFalse(response.getValue());
     }
 
     @Test
@@ -286,7 +286,7 @@ public class LocalFilesServiceTest extends LocalFilesTestBase {
         Files.write(somefile.toPath(), content, Charset.defaultCharset());
         XenonProto.Path request = getLocalPath(somefile.getAbsolutePath());
 
-        Iterator<XenonProto.FileStream> response = client.read(request);
+        Iterator<XenonProto.ReadResponse> response = client.read(request);
 
         // concatenate response stream
         ByteString result = null;
@@ -307,7 +307,7 @@ public class LocalFilesServiceTest extends LocalFilesTestBase {
     @Test
     public void setPosixFilePermissions() throws IOException {
         XenonProto.Path path = getLocalPath(myfolder.getRoot().getAbsolutePath());
-        XenonProto.PosixFilePermissionsRequest request = XenonProto.PosixFilePermissionsRequest.newBuilder()
+        XenonProto.SetPosixFilePermissionsRequest request = XenonProto.SetPosixFilePermissionsRequest.newBuilder()
             .setPath(path)
             .addPermissions(XenonProto.PosixFilePermission.OWNER_READ)
             .addPermissions(XenonProto.PosixFilePermission.OWNER_WRITE)
