@@ -37,7 +37,7 @@ public class LocalFilesFileSystemsTest extends LocalFilesTestBase {
 
         // TODO only OK on single filesystem machines
         XenonProto.FileSystems expected = XenonProto.FileSystems.newBuilder().addFilesystems(fs).build();
-        assertEquals(expected, response);
+        assertEquals(expected.getFilesystems(0), response.getFilesystems(0));
     }
 
 

@@ -114,13 +114,13 @@ public class FilesService extends XenonFilesGrpc.XenonFilesImplBase {
             // TODO cancel+delete any background copy tasks running on this filesystem
             singleton.getInstance().files().close(filesystem);
             fileSystems.remove(request.getId());
+            responseObserver.onNext(empty());
+            responseObserver.onCompleted();
         } catch (XenonException e) {
             responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
             responseObserver.onError(e);
         }
-        responseObserver.onNext(empty());
-        responseObserver.onCompleted();
     }
 
     @Override
