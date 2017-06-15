@@ -1,8 +1,20 @@
 package nl.esciencecenter.xenon.grpc;
 
+import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
+import javax.net.ssl.SSLException;
+
+import nl.esciencecenter.xenon.XenonFactory;
+import nl.esciencecenter.xenon.grpc.files.FilesService;
+import nl.esciencecenter.xenon.grpc.jobs.JobsService;
+import nl.esciencecenter.xenon.util.Utils;
+
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
 import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NettyServerBuilder;
 import io.netty.handler.ssl.ClientAuth;
@@ -12,16 +24,8 @@ import net.sourceforge.argparse4j.inf.ArgumentGroup;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
-import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.grpc.files.FilesService;
-import nl.esciencecenter.xenon.grpc.jobs.JobsService;
-
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.net.ssl.SSLException;
 
 public class XenonServerWrapper {
     private static final String PROGRAM_NAME = "xenon-grpc-server";
@@ -65,6 +69,7 @@ public class XenonServerWrapper {
         serverGroup.addArgument("--client-cert-chain")
                 .type(Arguments.fileType().verifyCanRead())
                 .help("Certificate chain file in PEM format for trusted client");
+        myparser.addArgument("--proto").action(storeTrue()).help("Print proto file of server and exits");
         return myparser;
     }
 
@@ -111,6 +116,9 @@ public class XenonServerWrapper {
 
     void parseArgs(String[] args) throws ArgumentParserException {
         Namespace res = parser.parseArgs(args);
+        if (res.getBoolean("proto")) {
+            printProto();
+        }
         port = res.getInt("port");
         serverCertChain = optionalFileArgument(res, "server_cert_chain");
         serverPrivateKey = optionalFileArgument(res, "server_private_key");
@@ -120,6 +128,16 @@ public class XenonServerWrapper {
         if (!useTLS && anyTLS) {
             throw new ArgumentParserException("Unable to enable mutual TLS. mutual TLS requires --server-cert-chain, --server-private-key and --client-cert-chain arguments set", parser);
         }
+    }
+
+    private void printProto() {
+        InputStream proto = getClass().getResourceAsStream("/xenon.proto");
+        try {
+            Utils.copy(proto, System.out, 1000);
+        } catch (IOException e) {
+            LOGGER.warn(e.getMessage(), e);
+        }
+        System.exit(0);
     }
 
     private ServerBuilder<?> secureServerBuilder() throws SSLException {
