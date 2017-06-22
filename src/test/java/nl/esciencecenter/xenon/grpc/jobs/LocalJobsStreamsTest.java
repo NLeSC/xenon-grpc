@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 
 import java.io.IOException;
 
@@ -76,7 +77,7 @@ public class LocalJobsStreamsTest extends LocalJobsServiceTestBase {
         verify(responseObserver, never()).onError(any(Throwable.class));
     }
 
-    @Ignore("request.onCompleted is called too soon causing failure")
+    //@Ignore("request.onCompleted is called too soon causing failure")
     @Test
     public void getStreams_cat_multiline() {
         // submit job
@@ -97,30 +98,34 @@ public class LocalJobsStreamsTest extends LocalJobsServiceTestBase {
         @SuppressWarnings("unchecked")
         StreamObserver<JobOutputStreams> responseObserver = mock(StreamObserver.class);
         ArgumentCaptor<JobOutputStreams> responseCapturer = ArgumentCaptor.forClass(JobOutputStreams.class);
-
+        InOrder inorder = inOrder(responseObserver);
         // call method under test
-        StreamObserver<XenonProto.JobInputStream> requestObserver = aclient.getStreams(responseObserver);
+        StreamObserver<XenonProto.JobInputStream> requestWriter = aclient.getStreams(responseObserver);
 
         // send first message
         XenonProto.JobInputStream.Builder builder = XenonProto.JobInputStream.newBuilder()
                 .setJob(job);
         ByteString line1 = ByteString.copyFromUtf8("first line\n");
         XenonProto.JobInputStream request1 = builder.setStdin(line1).build();
-        requestObserver.onNext(request1);
+        requestWriter.onNext(request1);
+
         // receive first message
-        verify(responseObserver, timeout(100)).onNext(responseCapturer.capture());
+        inorder.verify(responseObserver, timeout(100)).onNext(responseCapturer.capture());
         JobOutputStreams expected1 = JobOutputStreams.newBuilder().setStdout(line1).build();
         assertEquals(expected1, responseCapturer.getValue());
+
         // send second message
         ByteString line2 = ByteString.copyFromUtf8("second line\n");
         XenonProto.JobInputStream request2 = builder.setStdin(line2).build();
-        requestObserver.onNext(request2);
+        requestWriter.onNext(request2);
+
+
         // receive second message
-        verify(responseObserver, timeout(100)).onNext(responseCapturer.capture());
+        inorder.verify(responseObserver, timeout(100)).onNext(responseCapturer.capture());
         JobOutputStreams expected2 = JobOutputStreams.newBuilder().setStdout(line2).build();
         assertEquals(expected2, responseCapturer.getValue());
-        requestObserver.onCompleted();
 
+        requestWriter.onCompleted();
         // no surprises
         verify(responseObserver, timeout(100)).onCompleted();
         verify(responseObserver, never()).onError(any(Throwable.class));

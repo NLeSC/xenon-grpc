@@ -472,7 +472,9 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
                         forwarder = new JobOutputStreamsForwarder(responseObserver, streams.getStderr(), streams.getStdout());
                     }
                     // write incoming stdin to xenons stdin
+
                     streams.getStdin().write(value.getStdin().toByteArray());
+                    streams.getStdin().flush();
                 } catch (XenonException | IOException e) {
                     responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
                 } catch (StatusException e) {

@@ -61,10 +61,10 @@ class JobOutputStreamsForwarder {
         }
     }
     
-    JobOutputStreamsForwarder(StreamObserver<XenonProto.JobOutputStreams> responseObserver, InputStream stderr, InputStream stdout) {
-        this.observer = responseObserver;
+    JobOutputStreamsForwarder(StreamObserver<XenonProto.JobOutputStreams> responseWriter, InputStream stderr, InputStream stdout) {
+        this.observer = responseWriter;
         builder = XenonProto.JobOutputStreams.newBuilder();
-        // We should fully read the in and output streams here (non blocking and in parallel) and forward the data to the responseObserver. 
+        // We should fully read the in and output streams here (non blocking and in parallel) and forward the data to the responseWriter.
         new StreamForwarder(stdout, true).start();
         new StreamForwarder(stderr, false).start();
     }
