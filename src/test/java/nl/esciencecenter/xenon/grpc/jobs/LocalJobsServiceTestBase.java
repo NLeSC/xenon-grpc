@@ -3,7 +3,6 @@ package nl.esciencecenter.xenon.grpc.jobs;
 import java.io.IOException;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.grpc.XenonJobsGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.grpc.XenonSingleton;

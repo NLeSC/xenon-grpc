@@ -1,21 +1,26 @@
 package nl.esciencecenter.xenon.grpc.jobs;
 
-import com.google.protobuf.ByteString;
-import io.grpc.stub.StreamObserver;
-import nl.esciencecenter.xenon.grpc.XenonJobsGrpc;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.grpc.XenonProto.JobOutputStreams;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
+import static java.lang.Thread.sleep;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import nl.esciencecenter.xenon.grpc.XenonJobsGrpc;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+import nl.esciencecenter.xenon.grpc.XenonProto.JobOutputStreams;
+
+import com.google.protobuf.ByteString;
+import io.grpc.stub.StreamObserver;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 
 public class LocalJobsStreamsTest extends LocalJobsServiceTestBase {
     private XenonJobsGrpc.XenonJobsStub aclient;
@@ -77,9 +82,8 @@ public class LocalJobsStreamsTest extends LocalJobsServiceTestBase {
         verify(responseObserver, never()).onError(any(Throwable.class));
     }
 
-    //@Ignore("request.onCompleted is called too soon causing failure")
     @Test
-    public void getStreams_cat_multiline() {
+    public void getStreams_cat_multiline() throws InterruptedException {
         // submit job
         XenonProto.JobDescription description = XenonProto.JobDescription.newBuilder()
                 .setExecutable("cat")
@@ -97,6 +101,23 @@ public class LocalJobsStreamsTest extends LocalJobsServiceTestBase {
         // mock receiver
         @SuppressWarnings("unchecked")
         StreamObserver<JobOutputStreams> responseObserver = mock(StreamObserver.class);
+//        StreamObserver<JobOutputStreams> responseObserver = new StreamObserver<JobOutputStreams>() {
+//            @Override
+//            public void onNext(JobOutputStreams value) {
+//              //  System.err.println(value.getStderr().toString(Charset.defaultCharset()));
+//               // System.err.println(value.getStdout().toString(Charset.defaultCharset()));
+//            }
+//
+//            @Override
+//            public void onError(Throwable t) {
+//                System.err.println("onError");
+//            }
+//
+//            @Override
+//            public void onCompleted() {
+//                System.err.println("onClose");
+//            }
+//        };
         ArgumentCaptor<JobOutputStreams> responseCapturer = ArgumentCaptor.forClass(JobOutputStreams.class);
         InOrder inorder = inOrder(responseObserver);
         // call method under test
@@ -109,23 +130,30 @@ public class LocalJobsStreamsTest extends LocalJobsServiceTestBase {
         XenonProto.JobInputStream request1 = builder.setStdin(line1).build();
         requestWriter.onNext(request1);
 
+        sleep(100);
+
         // receive first message
         inorder.verify(responseObserver, timeout(100)).onNext(responseCapturer.capture());
         JobOutputStreams expected1 = JobOutputStreams.newBuilder().setStdout(line1).build();
         assertEquals(expected1, responseCapturer.getValue());
 
+        sleep(100);
+
         // send second message
         ByteString line2 = ByteString.copyFromUtf8("second line\n");
         XenonProto.JobInputStream request2 = builder.setStdin(line2).build();
         requestWriter.onNext(request2);
+        requestWriter.onCompleted();
 
+        sleep(100);
 
         // receive second message
         inorder.verify(responseObserver, timeout(100)).onNext(responseCapturer.capture());
+        System.err.println("Been here");
         JobOutputStreams expected2 = JobOutputStreams.newBuilder().setStdout(line2).build();
         assertEquals(expected2, responseCapturer.getValue());
 
-        requestWriter.onCompleted();
+        System.err.println("Been here2");
         // no surprises
         verify(responseObserver, timeout(100)).onCompleted();
         verify(responseObserver, never()).onError(any(Throwable.class));
