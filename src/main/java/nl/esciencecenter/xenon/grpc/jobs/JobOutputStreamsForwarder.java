@@ -71,7 +71,7 @@ class JobOutputStreamsForwarder {
         new StreamForwarder(stderr, false).start();
     }
 
-    private void writeOut(XenonProto.JobOutputStreams response) {
+    private synchronized void writeOut(XenonProto.JobOutputStreams response) {
     	observer.onNext(response);
     }
 
