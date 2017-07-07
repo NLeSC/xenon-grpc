@@ -40,8 +40,7 @@ class JobOutputStreamsForwarder {
                 while (true) {
 
                     int read = in.read(buffer);
-                    System.err.println("Been here" + this.stdout);
-                    if (read > 0) { 
+                    if (read > 0) {
                     	XenonProto.JobOutputStreams response;
                     	
                     	if (stdout) {
@@ -53,7 +52,6 @@ class JobOutputStreamsForwarder {
                     	writeOut(response);
 
                     } else if (read == -1) {
-                        System.err.println("Close" + this.stdout);
                         close();
                         return;
                     }                }
@@ -77,7 +75,6 @@ class JobOutputStreamsForwarder {
 
     public synchronized void close() {
     	if (++streamsDone == 2) {
-            System.err.println("Closeall");
     		observer.onCompleted();
     	}
     }
