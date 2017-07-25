@@ -402,11 +402,12 @@ service XenonFiles {
 // - newPath, a Xenon Path is contructed by FileSystem + RelativePath, in grpc the message Path has FileSystem + RelativePath, making the Xenon Path hidden from the grpc API
 
 // The Jobs API of Xenon. This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about schedulers and jobs.
-service XenonJobs {
-    rpc getAdaptorDescriptions(Empty) returns (JobAdaptorDescriptions) {}
-    rpc getAdaptorDescription(AdaptorName) returns (JobAdaptorDescription) {}
-    rpc newScheduler(NewSchedulerRequest) returns (Scheduler) {}
-    rpc submitJob(SubmitJobRequest) returns (Job) {}
+service XenonSchedulers {
+    rpc getAdaptorDescriptions(Empty) returns (SchedulerAdaptorDescriptions) {}
+    rpc getAdaptorDescription(AdaptorName) returns (SchedulerAdaptorDescription) {}
+    rpc create(createRequest) returns (Scheduler) {}
+    rpc submitBatchJob(SubmitBatchJobRequest) returns (Job) {}
+    rpc submitInteractiveJob(stream SubmitInteractiveJobRequest) returns (stream SubmitInteractiveJobResponse) {}
     rpc getQueues(Scheduler) returns (Queues) {}
     rpc getDefaultQueueName(Scheduler) returns (Queue) {}
     rpc getJobs(SchedulerAndQueues) returns (Jobs) {}
@@ -416,7 +417,6 @@ service XenonJobs {
     rpc getQueueStatuses(SchedulerAndQueues) returns (QueueStatuses) {}
     rpc waitUntilDone(Job) returns (JobStatus) {}
     rpc waitUntilRunning(Job) returns (JobStatus) {}
-    rpc getStreams(stream JobInputStream) returns (stream JobOutputStreams) {}
     rpc isOpen(Scheduler) returns (Is) {}
     rpc cancelJob(Job) returns (JobStatus) {}
     // Specific to grpc, not part of Xenon library
