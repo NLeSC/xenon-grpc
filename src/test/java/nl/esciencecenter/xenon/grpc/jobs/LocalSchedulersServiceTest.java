@@ -18,7 +18,7 @@ import nl.esciencecenter.xenon.grpc.XenonProto;
 import io.grpc.StatusRuntimeException;
 import org.junit.Test;
 
-public class LocalJobsServiceTest extends LocalJobsServiceTestBase {
+public class LocalSchedulersServiceTest extends LocalSchedulersServiceTestBase {
     @Test
     public void listJobs_empty() {
         XenonProto.Jobs response = client.listJobs(empty());

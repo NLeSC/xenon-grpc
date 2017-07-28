@@ -6,7 +6,6 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.grpc.MapUtils;
 import nl.esciencecenter.xenon.grpc.XenonFilesGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.grpc.XenonSingleton;
 
 import io.grpc.ManagedChannel;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -31,7 +30,7 @@ abstract public class LocalFilesTestBase {
     @Before
     public void setUp() throws IOException {
         singleton = new XenonSingleton();
-        FilesService service = new FilesService(singleton);
+        FileSystemsService service = new FileSystemsService(singleton);
         String uniqueServerName = "in-process server for " + getClass();
         server = InProcessServerBuilder.forName(uniqueServerName).directExecutor().addService(service).build();
         server.start();

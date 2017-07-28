@@ -12,8 +12,8 @@ import io.grpc.stub.StreamObserver;
 
 class JobOutputStreamsForwarder {
     
-	private final XenonProto.JobOutputStreams.Builder builder;
-    private final StreamObserver<XenonProto.JobOutputStreams> observer;
+	private final XenonProto.SubmitInteractiveJobResponse.Builder builder;
+    private final StreamObserver<XenonProto.SubmitInteractiveJobResponse> observer;
 
 	private static final int BUFFER_SIZE = 1024;
     
@@ -41,7 +41,7 @@ class JobOutputStreamsForwarder {
 
                     int read = in.read(buffer);
                     if (read > 0) {
-                    	XenonProto.JobOutputStreams response;
+                    	XenonProto.SubmitInteractiveJobResponse response;
                     	
                     	if (stdout) {
                     		response = builder.clearStderr().setStdout(ByteString.copyFrom(buffer, 0, read)).build();
@@ -61,15 +61,15 @@ class JobOutputStreamsForwarder {
         }
     }
     
-    JobOutputStreamsForwarder(StreamObserver<XenonProto.JobOutputStreams> responseWriter, InputStream stderr, InputStream stdout) {
+    JobOutputStreamsForwarder(StreamObserver<XenonProto.SubmitInteractiveJobResponse> responseWriter, InputStream stderr, InputStream stdout, XenonProto.Job job) {
         this.observer = responseWriter;
-        builder = XenonProto.JobOutputStreams.newBuilder();
+        builder = XenonProto.SubmitInteractiveJobResponse.newBuilder().setJob(job);
         // We should fully read the in and output streams here (non blocking and in parallel) and forward the data to the responseWriter.
         new StreamForwarder(stdout, true).start();
         new StreamForwarder(stderr, false).start();
     }
 
-    private synchronized void writeOut(XenonProto.JobOutputStreams response) {
+    private synchronized void writeOut(XenonProto.SubmitInteractiveJobResponse response) {
     	observer.onNext(response);
     }
 

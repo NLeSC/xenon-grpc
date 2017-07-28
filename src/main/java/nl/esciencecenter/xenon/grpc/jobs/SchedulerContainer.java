@@ -1,18 +1,18 @@
 package nl.esciencecenter.xenon.grpc.jobs;
 
 import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.jobs.Scheduler;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 public class SchedulerContainer {
     private final Scheduler scheduler;
-    private final XenonProto.NewSchedulerRequest request;
+    private final XenonProto.CreateSchedulerRequest request;
 
-    SchedulerContainer(XenonProto.NewSchedulerRequest request, Scheduler scheduler) {
+    SchedulerContainer(XenonProto.CreateSchedulerRequest request, Scheduler scheduler) {
         this.request = request;
         this.scheduler = scheduler;
     }
 
-    public XenonProto.NewSchedulerRequest getRequest() {
+    public XenonProto.CreateSchedulerRequest getRequest() {
         return request;
     }
 

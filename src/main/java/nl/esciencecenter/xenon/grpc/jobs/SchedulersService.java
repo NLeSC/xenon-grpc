@@ -1,70 +1,45 @@
 package nl.esciencecenter.xenon.grpc.jobs;
 
-import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
-import static nl.esciencecenter.xenon.grpc.jobs.MapUtils.mapJob;
-import static nl.esciencecenter.xenon.grpc.jobs.MapUtils.mapJobAdaptorDescription;
-import static nl.esciencecenter.xenon.grpc.jobs.MapUtils.mapJobDescription;
-import static nl.esciencecenter.xenon.grpc.jobs.MapUtils.mapJobStatus;
-import static nl.esciencecenter.xenon.grpc.jobs.MapUtils.mapQueueStatus;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
-import nl.esciencecenter.xenon.AdaptorStatus;
-import nl.esciencecenter.xenon.Xenon;
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.grpc.Parsers;
-import nl.esciencecenter.xenon.grpc.XenonJobsGrpc;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.grpc.XenonSingleton;
-import nl.esciencecenter.xenon.jobs.Job;
-import nl.esciencecenter.xenon.jobs.JobDescription;
-import nl.esciencecenter.xenon.jobs.JobStatus;
-import nl.esciencecenter.xenon.jobs.Jobs;
-import nl.esciencecenter.xenon.jobs.QueueStatus;
-import nl.esciencecenter.xenon.jobs.Scheduler;
-import nl.esciencecenter.xenon.jobs.Streams;
-
 import io.grpc.Status;
 import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
+import nl.esciencecenter.xenon.UnknownAdaptorException;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.grpc.Parsers;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+import nl.esciencecenter.xenon.grpc.XenonSchedulersGrpc;
+import nl.esciencecenter.xenon.schedulers.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
-public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobsService.class);
+import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
+import static nl.esciencecenter.xenon.grpc.jobs.MapUtils.*;
 
-    private final XenonSingleton singleton;
+
+public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBase {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulersService.class);
+
     private final Map<String, SchedulerContainer> schedulers = new ConcurrentHashMap<>();
-    private final Map<String, JobContainer> currentJobs = new ConcurrentHashMap<>();
-
-    public JobsService(XenonSingleton singleton) {
-        super();
-        this.singleton = singleton;
-    }
+    private final Map<String, XenonProto.Scheduler> currentJobs = new ConcurrentHashMap<>();
 
     @Override
-    public void newScheduler(XenonProto.NewSchedulerRequest request, StreamObserver<XenonProto.Scheduler> responseObserver) {
-        Jobs jobs = singleton.getInstance().jobs();
+    public void createScheduler(XenonProto.CreateSchedulerRequest request, StreamObserver<XenonProto.Scheduler> responseObserver) {
         try {
-            Credential credential = Parsers.parseCredential(singleton.getInstance(), request.getAdaptor(), request.getPassword(), request.getCertificate());
-            Scheduler scheduler = jobs.newScheduler(
+            Credential credential = Parsers.parseCredential(request.getDefaultCred(), request.getPassword(), request.getCertificate());
+            Scheduler scheduler = Scheduler.create(
                 request.getAdaptor(),
                 request.getLocation(),
                 credential,
                 request.getPropertiesMap()
             );
 
-            // TODO use more unique id, maybe use new label/alias field from request or a uuid
-            String id = scheduler.getAdaptorName() + ":" + scheduler.getLocation();
+            String id = scheduler.getAdaptorName() + "://" + credential.getUsername() + "@" + scheduler.getLocation();
             schedulers.put(id, new SchedulerContainer(request, scheduler));
 
             XenonProto.Scheduler value = XenonProto.Scheduler.newBuilder()
@@ -81,35 +56,28 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
     }
 
     @Override
-    public void getAdaptorDescriptions(XenonProto.Empty request, StreamObserver<XenonProto.JobAdaptorDescriptions> responseObserver) {
-        Xenon xenon = singleton.getInstance();
-        // TODO use xenon.jobs().getAdaptorDescriptions(), when https://github.com/NLeSC/Xenon/issues/430 is completed
-        AdaptorStatus[] statuses = xenon.getAdaptorStatuses();
-
-        XenonProto.JobAdaptorDescriptions.Builder setBuilder = XenonProto.JobAdaptorDescriptions.newBuilder();
-        HashSet<String> jobBasedAdaptors = new HashSet<>(Arrays.asList("local", "ssh", "gridengine", "slurm", "torque"));
-        for (AdaptorStatus status : statuses) {
-            if (jobBasedAdaptors.contains(status.getName())) {
-                XenonProto.JobAdaptorDescription description = mapJobAdaptorDescription(status);
-                setBuilder.addDescriptions(description);
-            }
+    public void getAdaptorDescription(XenonProto.AdaptorName request, StreamObserver<XenonProto.SchedulerAdaptorDescription> responseObserver) {
+        try {
+            SchedulerAdaptorDescription descIn = Scheduler.getAdaptorDescription(request.getName());
+            XenonProto.SchedulerAdaptorDescription description = mapJobAdaptorDescription(descIn);
+            responseObserver.onNext(description);
+            responseObserver.onCompleted();
+        } catch (UnknownAdaptorException e) {
+            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
         }
-        responseObserver.onNext(setBuilder.build());
-        responseObserver.onCompleted();
     }
 
     @Override
-    public void getAdaptorDescription(XenonProto.AdaptorName request, StreamObserver<XenonProto.JobAdaptorDescription> responseObserver) {
-        Xenon xenon = singleton.getInstance();
-        try {
-            // TODO use xenon.jobs().getAdaptorDescription(name), when https://github.com/NLeSC/Xenon/issues/430 is completed
-            AdaptorStatus status = xenon.getAdaptorStatus(request.getName());
-            XenonProto.JobAdaptorDescription description = mapJobAdaptorDescription(status);
-            responseObserver.onNext(description);
-            responseObserver.onCompleted();
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+    public void getAdaptorDescriptions(XenonProto.Empty request, StreamObserver<XenonProto.SchedulerAdaptorDescriptions> responseObserver) {
+        SchedulerAdaptorDescription[] descriptions = Scheduler.getAdaptorDescriptions();
+
+        XenonProto.SchedulerAdaptorDescriptions.Builder setBuilder = XenonProto.SchedulerAdaptorDescriptions.newBuilder();
+        for (SchedulerAdaptorDescription descriptionIn : descriptions) {
+            XenonProto.SchedulerAdaptorDescription description = mapJobAdaptorDescription(descriptionIn);
+            setBuilder.addDescriptions(description);
         }
+        responseObserver.onNext(setBuilder.build());
+        responseObserver.onCompleted();
     }
 
     @Override
@@ -118,7 +86,7 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
         XenonProto.Scheduler.Builder builder = XenonProto.Scheduler.newBuilder();
 
         for (Map.Entry<String, SchedulerContainer> entry : schedulers.entrySet()) {
-            XenonProto.NewSchedulerRequest schedulerRequest = entry.getValue().getRequest();
+            XenonProto.CreateSchedulerRequest schedulerRequest = entry.getValue().getRequest();
             setBuilder.addSchedulers(builder
                 .setId(entry.getKey())
                 .setRequest(schedulerRequest)
@@ -133,7 +101,7 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
     public void close(XenonProto.Scheduler request, StreamObserver<XenonProto.Empty> responseObserver) {
         try {
             Scheduler scheduler = getScheduler(request);
-            singleton.getInstance().jobs().close(scheduler);
+            scheduler.close();
             schedulers.remove(request.getId());
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
@@ -146,16 +114,15 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
 
     @Override
     public void localScheduler(XenonProto.Empty request, StreamObserver<XenonProto.Scheduler> responseObserver) {
-        XenonProto.NewSchedulerRequest schedulerRequest = XenonProto.NewSchedulerRequest.newBuilder().setAdaptor("local").build();
-        newScheduler(schedulerRequest, responseObserver);
+        XenonProto.CreateSchedulerRequest schedulerRequest = XenonProto.CreateSchedulerRequest.newBuilder().setAdaptor("local").build();
+        createScheduler(schedulerRequest, responseObserver);
     }
 
     @Override
     public void getDefaultQueueName(XenonProto.Scheduler request, StreamObserver<XenonProto.Queue> responseObserver) {
-        Jobs jobs = singleton.getInstance().jobs();
         try {
             Scheduler scheduler = getScheduler(request);
-            String queue = jobs.getDefaultQueueName(scheduler);
+            String queue = scheduler.getDefaultQueueName();
             responseObserver.onNext(XenonProto.Queue.newBuilder().setName(queue).build());
             responseObserver.onCompleted();
         } catch (XenonException e) {
@@ -177,21 +144,21 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
     public void getQueues(XenonProto.Scheduler request, StreamObserver<XenonProto.Queues> responseObserver) {
         try {
             Scheduler scheduler = getScheduler(request);
-            // TODO change to jobs.getQueueNames(scheduler) when Xenon v2 is released
             String[] queues = scheduler.getQueueNames();
             responseObserver.onNext(XenonProto.Queues.newBuilder().addAllName(Arrays.asList(queues)).build());
             responseObserver.onCompleted();
         } catch (StatusException e) {
             responseObserver.onError(e);
+        } catch (XenonException e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         }
     }
 
     @Override
     public void isOpen(XenonProto.Scheduler request, StreamObserver<XenonProto.Is> responseObserver) {
-        Jobs jobs = singleton.getInstance().jobs();
         try {
             Scheduler scheduler = getScheduler(request);
-            boolean open = jobs.isOpen(scheduler);
+            boolean open = scheduler.isOpen();
             responseObserver.onNext(XenonProto.Is.newBuilder().setValue(open).build());
             responseObserver.onCompleted();
         } catch (XenonException e) {
@@ -203,10 +170,9 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
 
     @Override
     public void getQueueStatus(XenonProto.SchedulerAndQueue request, StreamObserver<XenonProto.QueueStatus> responseObserver) {
-        Jobs jobs = singleton.getInstance().jobs();
         try {
             Scheduler scheduler = getScheduler(request.getScheduler());
-            QueueStatus status = jobs.getQueueStatus(scheduler, request.getQueue());
+            QueueStatus status = scheduler.getQueueStatus(request.getQueue());
             XenonProto.QueueStatus response = mapQueueStatus(status, request.getScheduler());
             responseObserver.onNext(response);
             responseObserver.onCompleted();
@@ -219,11 +185,10 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
 
     @Override
     public void getQueueStatuses(XenonProto.SchedulerAndQueues request, StreamObserver<XenonProto.QueueStatuses> responseObserver) {
-        Jobs jobs = singleton.getInstance().jobs();
         try {
             Scheduler scheduler = getScheduler(request.getScheduler());
             String[] queues = request.getQueuesList().toArray(new String[0]);
-            QueueStatus[] statuses = jobs.getQueueStatuses(scheduler, queues);
+            QueueStatus[] statuses = scheduler.getQueueStatuses(queues);
             XenonProto.QueueStatuses.Builder builder = XenonProto.QueueStatuses.newBuilder();
             for (QueueStatus status : statuses) {
                 builder.addStatuses(mapQueueStatus(status, request.getScheduler()));
@@ -238,18 +203,19 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
     }
 
     @Override
-    public void submitJob(XenonProto.SubmitJobRequest request, StreamObserver<XenonProto.Job> responseObserver) {
-        Jobs jobs = singleton.getInstance().jobs();
+    public void submitBatchJob(XenonProto.SubmitBatchJobRequest request, StreamObserver<XenonProto.Job> responseObserver) {
         try {
-            Scheduler scheduler = getScheduler(request.getScheduler());
-            JobDescription description = mapJobDescription(request);
+            XenonProto.Scheduler requestScheduler = request.getScheduler();
+            Scheduler scheduler = getScheduler(requestScheduler);
+            XenonProto.JobDescription requestDescription = request.getDescription();
+            JobDescription description = mapJobDescription(requestDescription);
 
-            Job job = jobs.submitJob(scheduler, description);
-            currentJobs.put(job.getIdentifier(), new JobContainer(request, job));
+            String jobIdentifier = scheduler.submitBatchJob(description);
+            currentJobs.put(jobIdentifier, requestScheduler);
 
             XenonProto.Job response = XenonProto.Job.newBuilder()
-                .setId(job.getIdentifier())
-                .setDescription(request.getDescription())
+                .setId(jobIdentifier)
+                .setScheduler(request.getScheduler())
                 .build();
 
             responseObserver.onNext(response);
@@ -263,15 +229,16 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
 
     @Override
     public void cancelJob(XenonProto.Job request, StreamObserver<XenonProto.JobStatus> responseObserver) {
-        Jobs jobs = singleton.getInstance().jobs();
         try {
-            Job job = getJob(request);
+            Scheduler scheduler = getScheduler(request.getScheduler());
 
-            JobStatus status = jobs.cancelJob(job);
+            JobStatus status = scheduler.cancelJob(request.getId());
 
-            XenonProto.JobStatus response = mapJobStatus(status, request.getDescription());
+            XenonProto.JobStatus response = mapJobStatus(status, request.getScheduler());
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+        } catch (NoSuchJobException e) {
+            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
@@ -279,25 +246,18 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
         }
     }
 
-    private Job getJob(XenonProto.Job request) throws StatusException {
-        String id = request.getId();
-        if (!currentJobs.containsKey(id)) {
-            throw Status.NOT_FOUND.augmentDescription(id).asException();
-        }
-        return currentJobs.get(id).getJob();
-    }
-
     @Override
     public void getJobStatus(XenonProto.Job request, StreamObserver<XenonProto.JobStatus> responseObserver) {
-        Jobs jobs = singleton.getInstance().jobs();
         try {
-            Job job = getJob(request);
+            Scheduler scheduler = getScheduler(request.getScheduler());
 
-            JobStatus status = jobs.getJobStatus(job);
+            JobStatus status = scheduler.getJobStatus(request.getId());
 
-            XenonProto.JobStatus response = mapJobStatus(status, request.getDescription());
+            XenonProto.JobStatus response = mapJobStatus(status, request.getScheduler());
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+        } catch (NoSuchJobException e) {
+            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
@@ -307,15 +267,16 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
 
     @Override
     public void waitUntilDone(XenonProto.Job request, StreamObserver<XenonProto.JobStatus> responseObserver) {
-        Jobs jobs = singleton.getInstance().jobs();
         try {
-            Job job = getJob(request);
+            Scheduler scheduler = getScheduler(request.getScheduler());
 
-            JobStatus status = jobs.waitUntilDone(job, Long.MAX_VALUE);
+            JobStatus status = scheduler.waitUntilDone(request.getId(), Long.MAX_VALUE);
 
-            XenonProto.JobStatus response = mapJobStatus(status, request.getDescription());
+            XenonProto.JobStatus response = mapJobStatus(status, request.getScheduler());
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+        } catch (NoSuchJobException e) {
+            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
@@ -325,15 +286,16 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
 
     @Override
     public void waitUntilRunning(XenonProto.Job request, StreamObserver<XenonProto.JobStatus> responseObserver) {
-        Jobs jobs = singleton.getInstance().jobs();
         try {
-            Job job = getJob(request);
+            Scheduler scheduler = getScheduler(request.getScheduler());
 
-            JobStatus status = jobs.waitUntilRunning(job, Long.MAX_VALUE);
+            JobStatus status = scheduler.waitUntilRunning(request.getId(), Long.MAX_VALUE);
 
-            XenonProto.JobStatus response = mapJobStatus(status, request.getDescription());
+            XenonProto.JobStatus response = mapJobStatus(status, request.getScheduler());
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+        } catch (NoSuchJobException e) {
+            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
@@ -363,7 +325,7 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
         XenonProto.JobStatuses.Builder builder = XenonProto.JobStatuses.newBuilder();
         // TODO check statuses are returned in same order as array of argument
         while (statuses.hasNext() && descriptions.hasNext()) {
-            builder.addStatuses(mapJobStatus(statuses.next(), descriptions.next()));
+            builder.addStatuses(mapJobStatus(statuses.next(), descriptions.next(), scheduler));
         }
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
@@ -410,12 +372,11 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
 
     @Override
     public void getJobs(XenonProto.SchedulerAndQueues request, StreamObserver<XenonProto.Jobs> responseObserver) {
-        Jobs jobs = singleton.getInstance().jobs();
         try {
             XenonProto.Scheduler schedulerProto = request.getScheduler();
             Scheduler scheduler = getScheduler(schedulerProto);
             String[] queues = request.getQueuesList().toArray(new String[0]);
-            Job[] jobsOfScheduler = jobs.getJobs(scheduler, queues);
+            String[] jobsOfScheduler = scheduler.getJobs(queues);
 
             XenonProto.Jobs response = getJobs(schedulerProto, jobsOfScheduler);
             responseObserver.onNext(response);
@@ -427,52 +388,50 @@ public class JobsService extends XenonJobsGrpc.XenonJobsImplBase {
         }
     }
 
-    private XenonProto.Jobs getJobs(XenonProto.Scheduler schedulerProto, Job[] jobsOfScheduler) throws StatusException {
+    private XenonProto.Jobs getJobs(XenonProto.Scheduler schedulerProto, String[] jobsOfScheduler) throws StatusException {
         XenonProto.Jobs.Builder builder = XenonProto.Jobs.newBuilder();
         XenonProto.Job.Builder jobBuilder = XenonProto.Job.newBuilder();
         XenonProto.SubmitJobRequest.Builder jobRequestBuilder = XenonProto.SubmitJobRequest.newBuilder().setScheduler(schedulerProto);
-        for (Job job : jobsOfScheduler) {
+        for (String job : jobsOfScheduler) {
             XenonProto.JobDescription description;
-            if (currentJobs.containsKey(job.getIdentifier()) && schedulerProto.equals(getSchedulerOfJob(job))) {
+            if (currentJobs.containsKey(job) && schedulerProto.equals(getSchedulerOfJob(job))) {
                 // Use existing job from currentJobs map
-                description = currentJobs.get(job.getIdentifier()).getRequest().getDescription();
+                description = currentJobs.get(job).getRequest().getDescription();
             } else {
                 description = mapJobDescription(job, schedulerProto);
                 XenonProto.SubmitJobRequest jobRequest = jobRequestBuilder.setDescription(description).build();
                 // Register jobs of jobsOfScheduler into myjobs
-                currentJobs.put(job.getIdentifier(), new JobContainer(jobRequest, job));
+                currentJobs.put(job, schedulerProto);
             }
-            XenonProto.Job protoJob = jobBuilder.setId(job.getIdentifier()).setDescription(description).build();
+            XenonProto.Job protoJob = jobBuilder.setId(job).setDescription(description).build();
             builder.addJobs(protoJob);
         }
         return builder.build();
     }
 
-    private XenonProto.Scheduler getSchedulerOfJob(Job job) throws StatusException {
-        String jid = job.getIdentifier();
-        if (!currentJobs.containsKey(jid)) {
-            throw Status.NOT_FOUND.augmentDescription(jid).asException();
+    private XenonProto.Scheduler getSchedulerOfJob(String job) throws StatusException {
+        if (!currentJobs.containsKey(job)) {
+            throw Status.NOT_FOUND.augmentDescription(job).asException();
         }
-        return currentJobs.get(jid).getRequest().getScheduler();
+        return currentJobs.get(job);
     }
 
     @Override
-    public StreamObserver<XenonProto.JobInputStream> getStreams(StreamObserver<XenonProto.JobOutputStreams> responseObserver) {
-        return new StreamObserver<XenonProto.JobInputStream>() {
+    public StreamObserver<XenonProto.SubmitInteractiveJobRequest> submitInteractiveJob(StreamObserver<XenonProto.SubmitInteractiveJobResponse> responseObserver) {
+        return new StreamObserver<XenonProto.SubmitInteractiveJobRequest>() {
             private JobOutputStreamsForwarder forwarder;
             private Streams streams;
 
             @Override
-            public void onNext(XenonProto.JobInputStream value) {
+            public void onNext(XenonProto.SubmitInteractiveJobRequest value) {
                 try {
                     if (streams == null) {
-                        if (XenonProto.Job.getDefaultInstance().equals(value.getJob())) {
-                            throw Status.INVALID_ARGUMENT.augmentDescription("job value is required").asException();
-                        }
-                        Jobs jobs = singleton.getInstance().jobs();
-                        Job job = getJob(value.getJob());
-                        streams = jobs.getStreams(job);
-                        forwarder = new JobOutputStreamsForwarder(responseObserver, streams.getStderr(), streams.getStdout());
+                        Scheduler scheduler = getScheduler(value.getScheduler());
+                        XenonProto.JobDescription requestDescription = value.getDescription();
+                        JobDescription description = mapJobDescription(requestDescription);
+                        streams = scheduler.submitInteractiveJob(description);
+                        XenonProto.Job job = XenonProto.Job.newBuilder().setScheduler(value.getScheduler()).setId(streams.getJobIdentifier()).build();
+                        forwarder = new JobOutputStreamsForwarder(responseObserver, streams.getStderr(), streams.getStdout(), job);
                     }
                     // write incoming stdin to xenons stdin
                     streams.getStdin().write(value.getStdin().toByteArray());

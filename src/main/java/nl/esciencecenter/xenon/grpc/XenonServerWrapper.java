@@ -1,18 +1,5 @@
 package nl.esciencecenter.xenon.grpc;
 
-import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.net.ssl.SSLException;
-
-import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.grpc.files.FilesService;
-import nl.esciencecenter.xenon.grpc.jobs.JobsService;
-import nl.esciencecenter.xenon.util.Utils;
-
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.netty.GrpcSslContexts;
@@ -24,8 +11,17 @@ import net.sourceforge.argparse4j.inf.ArgumentGroup;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
+import nl.esciencecenter.xenon.grpc.files.FileSystemsService;
+import nl.esciencecenter.xenon.grpc.jobs.SchedulersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.SSLException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
+import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 public class XenonServerWrapper {
     private static final String PROGRAM_NAME = "xenon-grpc-server";
@@ -100,7 +96,6 @@ public class XenonServerWrapper {
     }
 
     private void serverBuilder() throws IOException {
-        XenonSingleton singleton = new XenonSingleton();
         ServerBuilder<?> builder;
         if (useTLS) {
             builder = secureServerBuilder();
@@ -108,9 +103,8 @@ public class XenonServerWrapper {
             builder = insecureServerBuilder();
         }
         server = builder
-                .addService(new GlobalService(singleton))
-                .addService(new JobsService(singleton))
-                .addService(new FilesService(singleton))
+                .addService(new SchedulersService())
+                .addService(new FileSystemsService())
                 .build();
     }
 
@@ -133,7 +127,11 @@ public class XenonServerWrapper {
     private void printProto() {
         InputStream proto = getClass().getResourceAsStream("/xenon.proto");
         try {
-            Utils.copy(proto, System.out, 1000);
+            int data = proto.read();
+            while (data != -1) {
+                System.out.print((char) data);
+                data = proto.read();
+            }
         } catch (IOException e) {
             LOGGER.warn(e.getMessage(), e);
         }
@@ -163,7 +161,6 @@ public class XenonServerWrapper {
         if (server != null) {
             server.shutdown();
         }
-        XenonFactory.endAll();
     }
 
     private File optionalFileArgument(Namespace res, String key) {

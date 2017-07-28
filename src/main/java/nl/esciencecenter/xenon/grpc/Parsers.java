@@ -1,18 +1,12 @@
 package nl.esciencecenter.xenon.grpc;
 
-import nl.esciencecenter.xenon.InvalidCredentialException;
-import nl.esciencecenter.xenon.InvalidLocationException;
-import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.InvalidSchemeException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
-import nl.esciencecenter.xenon.Xenon;
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.credentials.CertificateNotFoundException;
-import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.Credentials;
-
 import io.grpc.Status;
 import io.grpc.StatusException;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.credentials.CertificateCredential;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 
 /**
  * Parse grpc messages to Xenon objects
@@ -21,26 +15,18 @@ public class Parsers {
     private Parsers() {
     }
 
-    public static Credential parseCredential(Xenon xenon, String adaptor, XenonProto.PasswordCredential password, XenonProto.CertificateCredential certificate) throws StatusException, XenonException {
-        Credentials creds = xenon.credentials();
-        try {
-            Credential credential;
-            // if embedded message is not set then the request field will have the default instance,
-            if (!XenonProto.CertificateCredential.getDefaultInstance().equals(certificate)) {
-                // TODO use simpler constructor when Xenon 2.0 is released
-                credential = creds.newCertificateCredential(adaptor, certificate.getCertfile(), certificate.getUsername(), certificate.getPassphrase().toCharArray(), null);
-            } else if (!XenonProto.PasswordCredential.getDefaultInstance().equals(password)) {
-                // TODO use simpler constructor when Xenon 2.0 is released
-                credential = creds.newPasswordCredential(adaptor, password.getUsername(), password.getPassword().toCharArray(), null);
-            } else {
-                // TODO remove when Xenon 2.0 is released
-                credential = creds.getDefaultCredential(adaptor);
-            }
-            return credential;
-        } catch (CertificateNotFoundException e) {
-            throw Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException();
-        } catch (InvalidLocationException | InvalidSchemeException | InvalidCredentialException | InvalidPropertyException | UnknownPropertyException e) {
-            throw Status.INVALID_ARGUMENT.withDescription(e.getMessage()).withCause(e).asException();
+    public static Credential parseCredential(XenonProto.DefaultCredential defaultCred, XenonProto.PasswordCredential password, XenonProto.CertificateCredential certificate) throws StatusException, XenonException {
+        Credential credential;
+        // if embedded message is not set then the request field will have the default instance,
+        if (!XenonProto.CertificateCredential.getDefaultInstance().equals(certificate)) {
+            credential = new CertificateCredential(certificate.getUsername(), certificate.getCertfile(), certificate.getPassphrase().toCharArray());
+        } else if (!XenonProto.PasswordCredential.getDefaultInstance().equals(password)) {
+            credential = new PasswordCredential(password.getUsername(), password.getPassword().toCharArray());
+        } else if (!XenonProto.DefaultCredential.getDefaultInstance().equals(defaultCred)) {
+            credential = new DefaultCredential(defaultCred.getUsername());
+        } else {
+            throw Status.INVALID_ARGUMENT.withDescription("defaultCred, password or certicate should be filled").asException();
         }
+        return credential;
     }
 }

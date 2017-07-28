@@ -1,22 +1,14 @@
 package nl.esciencecenter.xenon.grpc.files;
 
+import nl.esciencecenter.xenon.filesystems.*;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import nl.esciencecenter.xenon.AdaptorStatus;
-import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
-import nl.esciencecenter.xenon.files.CopyStatus;
-import nl.esciencecenter.xenon.files.FileAttributes;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.files.PosixFilePermission;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
 
@@ -29,38 +21,38 @@ class Writers {
     private Writers() {
     }
 
-    static XenonProto.FileAttributes writeFileAttributes(FileAttributes a) {
-        XenonProto.FileAttributes.Builder builder = XenonProto.FileAttributes.newBuilder()
-            .setCreationTime(a.creationTime())
+    static XenonProto.PathAttributes writeFileAttributes(PathAttributes a) {
+        XenonProto.PathAttributes.Builder builder = XenonProto.PathAttributes.newBuilder()
+            .setCreationTime(a.getCreationTime())
             .setIsDirectory(a.isDirectory())
             .setIsExecutable(a.isExecutable())
             .setIsHidden(a.isHidden())
             .setIsOther(a.isOther())
             .setIsReadable(a.isReadable())
-            .setIsRegularFile(a.isRegularFile())
+            .setIsRegularFile(a.isRegular())
             .setIsSymbolicLink(a.isSymbolicLink())
             .setIsWritable(a.isWritable())
-            .setLastAccessTime(a.lastAccessTime())
-            .setLastModifiedTime(a.lastModifiedTime())
+            .setLastAccessTime(a.getLastAccessTime())
+            .setLastModifiedTime(a.getLastModifiedTime())
             .addAllPermissions(writePermissions(a))
-            .setSize(a.size());
+            .setSize(a.getSize());
         try {
-            builder.setOwner(a.owner());
+            builder.setOwner(a.getOwner());
         } catch (AttributeNotSupportedException e) {
             LOGGER.warn("Skipping owner, not supported for this path", e);
         }
         try {
-            builder.setGroup(a.group());
+            builder.setGroup(a.getGroup());
         } catch (AttributeNotSupportedException e) {
             LOGGER.warn("Skipping group, not supported for this path", e);
         }
         return builder.build();
     }
 
-    private static Set<XenonProto.PosixFilePermission> writePermissions(FileAttributes attribs) {
+    private static Set<XenonProto.PosixFilePermission> writePermissions(PathAttributes attribs) {
         Set<XenonProto.PosixFilePermission> permissions = new HashSet<>();
         try {
-            for (PosixFilePermission permission : attribs.permissions()) {
+            for (PosixFilePermission permission : attribs.getPermissions()) {
                 switch (permission) {
                     case GROUP_EXECUTE:
                         permissions.add(XenonProto.PosixFilePermission.GROUP_EXECUTE);
@@ -101,19 +93,18 @@ class Writers {
         return XenonProto.Path.newBuilder().setFilesystem(fs).setPath(path.getRelativePath().getAbsolutePath()).build();
     }
 
-    static String getFileSystemId(FileSystem fileSystem) {
-        // TODO use more unique id, maybe use new label/alias field from request or a uuid
-        return fileSystem.getAdaptorName() + ":" + fileSystem.getLocation();
+    static String getFileSystemId(FileSystem fileSystem, String username) {
+        return fileSystem.getAdaptorName() + "://" + username + "@" + fileSystem.getLocation();
     }
 
     private static XenonProto.FileSystem writeFileSystem(FileSystem fs) {
-        XenonProto.NewFileSystemRequest request = XenonProto.NewFileSystemRequest.newBuilder()
+        XenonProto.CreateFileSystemRequest request = XenonProto.CreateFileSystemRequest.newBuilder()
             .setAdaptor(fs.getAdaptorName())
             .setLocation(fs.getLocation())
             .putAllProperties(fs.getProperties())
             .build();
         return XenonProto.FileSystem.newBuilder()
-            .setId(getFileSystemId(fs))
+            .setId(getFileSystemId(fs, username))
             .setRequest(request)
             .build();
     }
@@ -126,7 +117,7 @@ class Writers {
         return builder.build();
     }
 
-    static XenonProto.CopyStatus writeCopyStatus(CopyStatus status, XenonProto.Copy copy) {
+    static XenonProto.CopyStatus writeCopyStatus(CopyStatus status, XenonProto.CopyResponse copy) {
         XenonProto.CopyStatus.Builder builder = XenonProto.CopyStatus.newBuilder()
             .setBytesCopied(status.bytesCopied())
             .setBytesToCopy(status.bytesToCopy())
@@ -140,9 +131,9 @@ class Writers {
         return builder.build();
     }
 
-    static XenonProto.FileAdaptorDescription mapFileAdaptorDescription(AdaptorStatus status) {
-        List<XenonProto.PropertyDescription> supportedProperties = mapPropertyDescriptions(status, XenonPropertyDescription.Component.FILESYSTEM);
-        return XenonProto.FileAdaptorDescription.newBuilder()
+    static XenonProto.FileSystemAdaptorDescription mapFileAdaptorDescription(FileSystemAdaptorDescription status) {
+        List<XenonProto.PropertyDescription> supportedProperties = mapPropertyDescriptions(status.getSupportedProperties());
+        return XenonProto.FileSystemAdaptorDescription.newBuilder()
             .setName(status.getName())
             .setDescription(status.getDescription())
             .addAllSupportedLocations(Arrays.asList(status.getSupportedLocations()))

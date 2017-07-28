@@ -1,21 +1,14 @@
 package nl.esciencecenter.xenon.grpc.jobs;
 
-import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+import nl.esciencecenter.xenon.schedulers.*;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.AdaptorStatus;
-import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.jobs.Job;
-import nl.esciencecenter.xenon.jobs.JobCanceledException;
-import nl.esciencecenter.xenon.jobs.JobDescription;
-import nl.esciencecenter.xenon.jobs.JobStatus;
-import nl.esciencecenter.xenon.jobs.NoSuchJobException;
-import nl.esciencecenter.xenon.jobs.NoSuchSchedulerException;
-import nl.esciencecenter.xenon.jobs.QueueStatus;
+import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
 
 class MapUtils {
     private MapUtils() {
@@ -42,8 +35,7 @@ class MapUtils {
         return value;
     }
 
-    static JobDescription mapJobDescription(XenonProto.SubmitJobRequest request) {
-        XenonProto.JobDescription d = request.getDescription();
+    static JobDescription mapJobDescription(XenonProto.JobDescription d) {
         JobDescription description = new JobDescription();
         description.setExecutable(d.getExecutable());
         description.setArguments(d.getArgumentsList().toArray(new String[0]));
@@ -52,7 +44,6 @@ class MapUtils {
         }
         description.setEnvironment(d.getEnvironmentMap());
         description.setQueueName(defaultValue(d.getQueueName()));
-        description.setInteractive(d.getInteractive());
         if (d.getMaxTime() != 0) {
             description.setMaxTime(d.getMaxTime());
         }
@@ -63,17 +54,15 @@ class MapUtils {
             description.setProcessesPerNode(d.getProcessesPerNode());
         }
         description.setStartSingleProcess(d.getStartSingleProcess());
-        description.setStderr(defaultValue(d.getStdErr()));
-        description.setStdin(defaultValue(d.getStdIn()));
-        description.setStdout(defaultValue(d.getStdOut()));
+        description.setStderr(defaultValue(d.getStderr()));
+        description.setStdin(defaultValue(d.getStdin()));
+        description.setStdout(defaultValue(d.getStdout()));
         description.setJobOptions(d.getOptionsMap());
         return description;
     }
 
-    static XenonProto.JobDescription mapJobDescription(Job job, XenonProto.Scheduler scheduler) {
+    static XenonProto.JobDescription mapJobDescription(JobDescription description) {
         XenonProto.JobDescription.Builder builder = XenonProto.JobDescription.newBuilder()
-                .setScheduler(scheduler);
-        JobDescription description = job.getJobDescription();
         if (description != null) {
             builder
                     .setExecutable(description.getExecutable())
@@ -81,28 +70,27 @@ class MapUtils {
                     .setWorkingDirectory(description.getWorkingDirectory())
                     .putAllEnvironment(description.getEnvironment())
                     .setQueueName(description.getQueueName())
-                    .setInteractive(description.isInteractive())
                     .setMaxTime(description.getMaxTime())
                     .setNodeCount(description.getNodeCount())
                     .setProcessesPerNode(description.getProcessesPerNode())
                     .setStartSingleProcess(description.isStartSingleProcess())
-                    .setStdErr(description.getStderr())
-                    .setStdIn(description.getStdin())
-                    .setStdOut(description.getStdout())
+                    .setStderr(description.getStderr())
+                    .setStdin(description.getStdin())
+                    .setStdout(description.getStdout())
                     .putAllOptions(description.getJobOptions())
             ;
         }
         return builder.build();
     }
 
-    static XenonProto.JobStatus mapJobStatus(JobStatus status, XenonProto.JobDescription description) {
+    static XenonProto.JobStatus mapJobStatus(JobStatus status, XenonProto.Scheduler scheduler) {
         XenonProto.JobStatus.Builder builder = XenonProto.JobStatus.newBuilder()
             .setState(status.getState())
             .setRunning(status.isRunning())
             .setDone(status.isDone())
             .setJob(XenonProto.Job.newBuilder()
-                .setId(status.getJob().getIdentifier())
-                .setDescription(description)
+                .setId(status.getJobIdentifier())
+                .setScheduler(scheduler)
                 .build())
             ;
         Integer exitCode = status.getExitCode();
@@ -138,12 +126,12 @@ class MapUtils {
         return XenonProto.Job.newBuilder().setId(key).setDescription(description).build();
     }
 
-    static XenonProto.JobAdaptorDescription mapJobAdaptorDescription(AdaptorStatus status) {
-        List<XenonProto.PropertyDescription> supportedProperties = mapPropertyDescriptions(status, XenonPropertyDescription.Component.SCHEDULER);
-        return XenonProto.JobAdaptorDescription.newBuilder()
-                .setName(status.getName())
-                .setDescription(status.getDescription())
-                .addAllSupportedLocations(Arrays.asList(status.getSupportedLocations()))
+    static XenonProto.SchedulerAdaptorDescription mapJobAdaptorDescription(SchedulerAdaptorDescription desc) {
+        List<XenonProto.PropertyDescription> supportedProperties = mapPropertyDescriptions(desc.getSupportedProperties());
+        return XenonProto.SchedulerAdaptorDescription.newBuilder()
+                .setName(desc.getName())
+                .setDescription(desc.getDescription())
+                .addAllSupportedLocations(Arrays.asList(desc.getSupportedLocations()))
                 .addAllSupportedProperties(supportedProperties)
                 .build();
     }

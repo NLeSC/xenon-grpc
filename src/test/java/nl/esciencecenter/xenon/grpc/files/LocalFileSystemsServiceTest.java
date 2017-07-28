@@ -29,7 +29,7 @@ import org.junit.Test;
  * Tests files service using local adaptor.
  * The service is wrapped in a InProcessServer so it can be called using a client stub instead of using observers directly
  */
-public class LocalFilesServiceTest extends LocalFilesTestBase {
+public class LocalFileSystemsServiceTest extends LocalFilesTestBase {
     @Test
     public void getAdaptorDescription() {
         XenonProto.AdaptorName request = XenonProto.AdaptorName.newBuilder().setName("local").build();

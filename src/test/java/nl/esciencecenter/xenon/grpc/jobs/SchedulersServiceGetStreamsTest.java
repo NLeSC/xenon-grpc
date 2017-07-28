@@ -4,12 +4,8 @@ import static java.lang.Thread.sleep;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
-import io.grpc.Status;
-import io.grpc.StatusException;
 import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.grpc.XenonSingleton;
 
 import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
@@ -18,23 +14,22 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.ArgumentCaptor;
 
 /**
- * The LocalJobsServiceTestBase uses in-process server which added even more a-synchronicity
+ * The LocalSchedulersServiceTestBase uses in-process server which added even more a-synchronicity
  * This caused unpredictable behavior, so getStreams is tested directly against the service class.
  */
-public class JobsServiceGetStreamsTest {
+public class SchedulersServiceGetStreamsTest {
     @Rule
     public TemporaryFolder myfolder = new TemporaryFolder();
     private XenonSingleton singleton;
-    private JobsService service;
+    private SchedulersService service;
     private XenonProto.Scheduler scheduler;
 
     @Before
     public void setUp() {
         singleton = new XenonSingleton();
-        service = new JobsService(singleton);
+        service = new SchedulersService(singleton);
         scheduler = getScheduler(service);
     }
 
@@ -155,7 +150,7 @@ public class JobsServiceGetStreamsTest {
         assertFalse(responseObserver.completed);
     }
 
-    private XenonProto.Job submit(JobsService service, XenonProto.Scheduler scheduler, XenonProto.JobDescription description) {
+    private XenonProto.Job submit(SchedulersService service, XenonProto.Scheduler scheduler, XenonProto.JobDescription description) {
         XenonProto.SubmitJobRequest jobRequest = XenonProto.SubmitJobRequest.newBuilder()
             .setDescription(description)
             .setScheduler(scheduler)
@@ -166,7 +161,7 @@ public class JobsServiceGetStreamsTest {
         return jobResponseObserver.job;
     }
 
-    private XenonProto.Scheduler getScheduler(JobsService service) {
+    private XenonProto.Scheduler getScheduler(SchedulersService service) {
         // scheduler
         XenonProto.Empty empty = XenonProto.Empty.getDefaultInstance();
         LocalSchedulerObserver localSchedulerObserver = new LocalSchedulerObserver();

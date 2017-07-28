@@ -5,7 +5,6 @@ import java.io.IOException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.grpc.XenonJobsGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.grpc.XenonSingleton;
 
 import io.grpc.ManagedChannel;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -17,7 +16,7 @@ import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-abstract public class LocalJobsServiceTestBase {
+abstract public class LocalSchedulersServiceTestBase {
     @Rule
     public TemporaryFolder myfolder = new TemporaryFolder();
     @Rule
@@ -30,7 +29,7 @@ abstract public class LocalJobsServiceTestBase {
     @Before
     public void setUp() throws IOException {
         singleton = new XenonSingleton();
-        JobsService service = new JobsService(singleton);
+        SchedulersService service = new SchedulersService(singleton);
         String uniqueServerName = "in-process server for " + getClass();
         server = InProcessServerBuilder.forName(uniqueServerName).directExecutor().addService(service).build();
         server.start();
