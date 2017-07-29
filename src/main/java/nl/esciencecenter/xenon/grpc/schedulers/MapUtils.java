@@ -1,9 +1,11 @@
-package nl.esciencecenter.xenon.grpc.jobs;
+package nl.esciencecenter.xenon.grpc.schedulers;
 
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.schedulers.*;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -61,28 +63,6 @@ class MapUtils {
         return description;
     }
 
-    static XenonProto.JobDescription mapJobDescription(JobDescription description) {
-        XenonProto.JobDescription.Builder builder = XenonProto.JobDescription.newBuilder()
-        if (description != null) {
-            builder
-                    .setExecutable(description.getExecutable())
-                    .addAllArguments(description.getArguments())
-                    .setWorkingDirectory(description.getWorkingDirectory())
-                    .putAllEnvironment(description.getEnvironment())
-                    .setQueueName(description.getQueueName())
-                    .setMaxTime(description.getMaxTime())
-                    .setNodeCount(description.getNodeCount())
-                    .setProcessesPerNode(description.getProcessesPerNode())
-                    .setStartSingleProcess(description.isStartSingleProcess())
-                    .setStderr(description.getStderr())
-                    .setStdin(description.getStdin())
-                    .setStdout(description.getStdout())
-                    .putAllOptions(description.getJobOptions())
-            ;
-        }
-        return builder.build();
-    }
-
     static XenonProto.JobStatus mapJobStatus(JobStatus status, XenonProto.Scheduler scheduler) {
         XenonProto.JobStatus.Builder builder = XenonProto.JobStatus.newBuilder()
             .setState(status.getState())
@@ -115,15 +95,12 @@ class MapUtils {
             return XenonProto.JobStatus.ErrorType.CANCELLED;
         } else if (exception instanceof NoSuchJobException) {
             return XenonProto.JobStatus.ErrorType.NOT_FOUND;
-        } else if (exception instanceof NoSuchSchedulerException) {
-            return XenonProto.JobStatus.ErrorType.SCHEDULER_NOT_FOUND;
+        } else if (exception instanceof XenonException) {
+            return XenonProto.JobStatus.ErrorType.XENON;
+        } else if (exception instanceof IOException) {
+            return XenonProto.JobStatus.ErrorType.IO;
         }
-        // map other (Xenon) exceptions to own type
         return XenonProto.JobStatus.ErrorType.OTHER;
-    }
-
-    static XenonProto.Job mapJob(String key, XenonProto.JobDescription description) {
-        return XenonProto.Job.newBuilder().setId(key).setDescription(description).build();
     }
 
     static XenonProto.SchedulerAdaptorDescription mapJobAdaptorDescription(SchedulerAdaptorDescription desc) {
@@ -134,5 +111,15 @@ class MapUtils {
                 .addAllSupportedLocations(Arrays.asList(desc.getSupportedLocations()))
                 .addAllSupportedProperties(supportedProperties)
                 .build();
+    }
+
+    static XenonProto.Jobs mapJobs(XenonProto.Scheduler scheduler, String[] jobIdentifiers) {
+        XenonProto.Jobs.Builder builder = XenonProto.Jobs.newBuilder();
+        XenonProto.Job.Builder jobBuilder = XenonProto.Job.newBuilder().setScheduler(scheduler);
+        for (String jobId : jobIdentifiers) {
+            XenonProto.Job job = jobBuilder.setId(jobId).build();
+            builder.addJobs(job);
+        }
+        return builder.build();
     }
 }

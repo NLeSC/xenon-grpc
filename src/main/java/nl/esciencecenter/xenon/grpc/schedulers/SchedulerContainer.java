@@ -1,4 +1,4 @@
-package nl.esciencecenter.xenon.grpc.jobs;
+package nl.esciencecenter.xenon.grpc.schedulers;
 
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.schedulers.Scheduler;

@@ -87,8 +87,8 @@ message CreateFileSystemRequest {
     string location = 2;
     map<string, string> properties = 3;
     oneof credential {
-        CertificateCredential certificate = 4;
-        PasswordCredential password = 5;
+        CertificateCredential certificateCred = 4;
+        PasswordCredential passwordCred = 5;
         DefaultCredential defaultCred = 6;
     }
 }
@@ -114,30 +114,38 @@ message DeleteRequest {
     bool recursive = 2;
 }
 
+enum CopyMode {
+    CREATE = 0;
+    REPLACE = 1;
+    IGNORE = 2;
+}
+
 message CopyRequest {
     Path source = 1;
     Path target = 2;
-    enum CopyOption {
-        CREATE = 0;
-        REPLACE = 1;
-        IGNORE = 2;
-    }
-    repeated CopyOption options = 3;
+    CopyMode mode = 3;
     bool recursive = 4;
 }
 
-message SourceTarget {
-    Path source = 1;
-    string target = 2;
+message RenameRequest {
+    FileSystem filesystem = 1;
+    string source = 2;
+    string target = 3;
 }
 
-message CopyResponse {
+message CopyOperation {
     string id = 1;
-    CopyRequest request = 2;
+    FileSystem filesystem = 2;
+}
+
+message CopyOperationWithTimeout {
+    string id = 1;
+    FileSystem filesystem = 2;
+    uint64 timeout = 3;
 }
 
 message CopyStatus {
-    CopyResponse copy = 1;
+    CopyOperation copyOperation = 1;
     uint64 bytesCopied = 2;
     uint64 bytesToCopy = 3;
     bool done = 4;
@@ -208,8 +216,8 @@ message CreateSchedulerRequest {
     string location = 2;
     map<string, string> properties = 3;
     oneof credential {
-        CertificateCredential certificate = 4;
-        PasswordCredential password = 5;
+        CertificateCredential certificateCred = 4;
+        PasswordCredential passwordCred = 5;
         DefaultCredential defaultCred = 6;
     }
 }
@@ -261,6 +269,12 @@ message Jobs {
     repeated Job jobs = 1;
 }
 
+message JobWithTimeout {
+    string id = 1;
+    Scheduler scheduler = 2;
+    uint64 timeout = 3;
+}
+
 message Queue {
     string name = 1;
 }
@@ -288,10 +302,14 @@ message JobStatus {
     string errorMessage = 7;
     enum ErrorType {
         EMPTY = 0;
+        // NoSuchJobException
         NOT_FOUND = 1;
+        // JobCanceledException
         CANCELLED = 2;
-        SCHEDULER_ERROR = 3;
-        SCHEDULER_NOT_FOUND = 4;
+        // XenonException
+        XENON = 3;
+        // IOException
+        IO = 4;
         OTHER = 5;
     }
     ErrorType errorType = 8;
@@ -334,10 +352,10 @@ service XenonFileSystems {
     rpc createDirectories(Path) returns (Empty) {}
     rpc createDirectory(Path) returns (Empty) {}
     rpc createFile(Path) returns (Empty) {}
-    rpc Copy(CopyRequest) returns (CopyResponse) {}
-    rpc cancel(CopyResponse) returns (CopyStatus) {}
-    rpc getStatus(CopyResponse) returns (CopyStatus) {}
-    rpc rename(SourceTarget) returns (Empty) {}
+    rpc Copy(CopyRequest) returns (CopyOperation) {}
+    rpc cancel(CopyOperation) returns (CopyStatus) {}
+    rpc getStatus(CopyOperation) returns (CopyStatus) {}
+    rpc rename(RenameRequest) returns (Empty) {}
     rpc delete(DeleteRequest) returns (Empty) {}
     rpc exists(Path) returns (Is) {}
     rpc readFromFile(Path) returns (stream ReadFromFileResponse) {}
@@ -350,8 +368,9 @@ service XenonFileSystems {
     rpc readSymbolicLink(Path) returns (Path) {}
     rpc isOpen(FileSystem) returns (Is) {}
     // Closes a filestem, any actions running it with this filestystem will be terminated, will also forget the filesystem
+    // Any pending/running copy operations will be killed
     rpc close(FileSystem) returns (Empty) {}
-    rpc waitUntilDone(CopyResponse) returns (CopyStatus) {}
+    rpc waitUntilDone(CopyOperationWithTimeout) returns (CopyStatus) {}
     // List currently created filesystems
     // Specific to grpc, not part of Xenon library
     rpc listFileSystems(Empty) returns (FileSystems) {}
@@ -374,17 +393,17 @@ service XenonSchedulers {
     rpc getJobStatuses(Jobs) returns (JobStatuses) {}
     rpc getQueueStatus(SchedulerAndQueue) returns (QueueStatus) {}
     rpc getQueueStatuses(SchedulerAndQueues) returns (QueueStatuses) {}
-    rpc waitUntilDone(Job) returns (JobStatus) {}
-    rpc waitUntilRunning(Job) returns (JobStatus) {}
+    rpc waitUntilDone(JobWithTimeout) returns (JobStatus) {}
+    rpc waitUntilRunning(JobWithTimeout) returns (JobStatus) {}
     rpc isOpen(Scheduler) returns (Is) {}
     rpc cancelJob(Job) returns (JobStatus) {}
     // Close scheduler and forget it
-    // If scheduler is online then any jobs pending/running will become invalid
+    // If scheduler is embedded then any pending/running jobs will be killed
     rpc close(Scheduler) returns (Empty) {}
+    // List current created schedulers
     // Specific to grpc, not part of Xenon library
     rpc listSchedulers(Empty) returns (Schedulers) {}
     rpc localScheduler(Empty) returns (Scheduler) {}
 }
 
-// Xenon jobs methods not implemented in grpc
-// timeout argument of waitUntilDone() and waitUntilRunning(), grpc client has timeout argument
+

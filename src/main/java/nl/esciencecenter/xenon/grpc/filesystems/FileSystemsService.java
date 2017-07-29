@@ -1,14 +1,14 @@
-package nl.esciencecenter.xenon.grpc.files;
+package nl.esciencecenter.xenon.grpc.filesystems;
 
 import com.google.protobuf.ByteString;
 import io.grpc.Status;
 import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
-import nl.esciencecenter.xenon.UnknownAdaptorException;
-import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.*;
+import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.*;
-import nl.esciencecenter.xenon.grpc.Parsers;
 import nl.esciencecenter.xenon.grpc.XenonFileSystemsGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import org.slf4j.Logger;
@@ -20,22 +20,20 @@ import java.io.OutputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.util.UUID.randomUUID;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
-import static nl.esciencecenter.xenon.grpc.files.Parsers.*;
-import static nl.esciencecenter.xenon.grpc.files.Writers.*;
-import static nl.esciencecenter.xenon.grpc.files.Writers.writeFileAttributes;
+import static nl.esciencecenter.xenon.grpc.MapUtils.mapCredential;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.*;
+import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.getLocalFileSystems;
 
 public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImplBase {
     private static final int BUFFER_SIZE = 8192;
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemsService.class);
     private Map<String, FileSystemContainer> fileSystems = new ConcurrentHashMap<>();
-    private Map<String, CopyBackgroundTask> copyBackgroundTasks = new ConcurrentHashMap<>();
 
     @Override
     public void createFileSystem(XenonProto.CreateFileSystemRequest request, StreamObserver<XenonProto.FileSystem> responseObserver) {
         try {
-            Credential credential = Parsers.parseCredential(request.getDefaultCred(), request.getPassword(), request.getCertificate());
+            Credential credential = mapCredential(request);
             FileSystem fileSystem = FileSystem.create(
                     request.getAdaptor(),
                     request.getLocation(),
@@ -43,8 +41,7 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
                     request.getPropertiesMap()
             );
 
-            String fileSystemId = getFileSystemId(fileSystem, username);
-            fileSystems.put(fileSystemId, new FileSystemContainer(request, fileSystem));
+            String fileSystemId = putFileSystem(request, credential.getUsername(), fileSystem);
 
             XenonProto.FileSystem value = XenonProto.FileSystem.newBuilder()
                     .setId(fileSystemId)
@@ -52,11 +49,17 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
                     .build();
             responseObserver.onNext(value);
             responseObserver.onCompleted();
-        } catch (XenonException e) {
+        } catch (UnknownPropertyException | InvalidPropertyException | UnknownAdaptorException | InvalidLocationException | InvalidCredentialException e) {
             responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (XenonException e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         }
+    }
+
+    String putFileSystem(XenonProto.CreateFileSystemRequest request, String username, FileSystem fileSystem) {
+        String fileSystemId = getFileSystemId(fileSystem, username);
+        fileSystems.put(fileSystemId, new FileSystemContainer(request, fileSystem));
+        return fileSystemId;
     }
 
     @Override
@@ -78,13 +81,12 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
     public void close(XenonProto.FileSystem request, StreamObserver<XenonProto.Empty> responseObserver) {
         try {
             FileSystem filesystem = getFileSystem(request);
-            // TODO cancel+delete any background copy tasks running on this filesystem
             filesystem.close();
             fileSystems.remove(request.getId());
             responseObserver.onNext(empty());
             responseObserver.onCompleted();
         } catch (XenonException e) {
-            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
             responseObserver.onError(e);
         }
@@ -98,8 +100,6 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             boolean value = filesystem.exists(path);
             responseObserver.onNext(XenonProto.Is.newBuilder().setValue(value).build());
             responseObserver.onCompleted();
-        } catch (NoSuchPathException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
@@ -212,6 +212,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             responseObserver.onError(e);
         } catch (NoSuchPathException e) {
             responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (InvalidPathException e) {
+            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
         } catch (XenonException | IOException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } finally {
@@ -244,8 +246,62 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
                         }
                     }
                     pipe.write(value.getBuffer().toByteArray());
+                } catch (InvalidPathException e) {
+                    responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
+                } catch (XenonException | IOException e) {
+                    responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+                } catch (StatusException e) {
+                    responseObserver.onError(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                if (pipe != null) {
+                    try {
+                        LOGGER.warn("Error from client", t);
+                        pipe.close();
+                    } catch (IOException e) {
+                        LOGGER.warn("Error from server", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onCompleted() {
+                if (pipe != null) {
+                    try {
+                        pipe.close();
+                    } catch (IOException e) {
+                        LOGGER.warn("Error from server", e);
+                    }
+                }
+                responseObserver.onNext(empty());
+                responseObserver.onCompleted();
+            }
+        };
+    }
+
+
+    @Override
+    public StreamObserver<XenonProto.AppendToFileRequest> appendToFile(StreamObserver<XenonProto.Empty> responseObserver) {
+        return new StreamObserver<XenonProto.AppendToFileRequest>() {
+            private OutputStream pipe;
+
+            @Override
+            public void onNext(XenonProto.AppendToFileRequest value) {
+                try {
+                    // open pip to write to on first incoming chunk
+                    if (pipe == null) {
+                        FileSystem filesystem = getFileSystem(value.getPath().getFilesystem());
+                        Path path = getPath(value.getPath());
+                        pipe = filesystem.appendToFile(path);
+                    }
+                    pipe.write(value.getBuffer().toByteArray());
                 } catch (NoSuchPathException e) {
                     responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
+                } catch (InvalidPathException e) {
+                    responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
                 } catch (XenonException | IOException e) {
                     responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
                 } catch (StatusException e) {
@@ -308,6 +364,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             responseObserver.onCompleted();
         } catch (NoSuchPathException e) {
             responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (UnsupportedOperationException e) {
+            responseObserver.onError(Status.UNIMPLEMENTED.withDescription(e.getMessage()).withCause(e).asException());
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
@@ -325,6 +383,10 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             responseObserver.onCompleted();
         } catch (NoSuchPathException e) {
             responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (InvalidPathException e) {
+            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (UnsupportedOperationException e) {
+            responseObserver.onError(Status.UNIMPLEMENTED.withDescription(e.getMessage()).withCause(e).asException());
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
@@ -348,17 +410,18 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
 
     @Override
     public void localFileSystems(XenonProto.Empty request, StreamObserver<XenonProto.FileSystems> responseObserver) {
-        Files files = singleton.getInstance().files();
         try {
-            FileSystem[] xenonFilesystems = Utils.getLocalFileSystems(files);
-            XenonProto.NewFileSystemRequest.Builder builder = XenonProto.NewFileSystemRequest.newBuilder();
+            FileSystem[] xenonFilesystems = getLocalFileSystems();
+            XenonProto.CreateFileSystemRequest.Builder builder = XenonProto.CreateFileSystemRequest.newBuilder();
 
+            DefaultCredential cred = new DefaultCredential();
             // Store file systems for later use
             for (FileSystem xenonFilesystem : xenonFilesystems) {
-                String fileSystemId = getFileSystemId(xenonFilesystem, username);
-                XenonProto.NewFileSystemRequest fsRequest = builder
+                String fileSystemId = getFileSystemId(xenonFilesystem, cred.getUsername());
+                XenonProto.CreateFileSystemRequest fsRequest = builder
                     .setAdaptor(xenonFilesystem.getAdaptorName())
                     .setLocation(xenonFilesystem.getLocation())
+                    .setDefaultCred(XenonProto.DefaultCredential.getDefaultInstance())
                     .putAllProperties(xenonFilesystem.getProperties())
                     .build();
                 fileSystems.put(fileSystemId, new FileSystemContainer(fsRequest, xenonFilesystem));
@@ -373,16 +436,22 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
     }
 
     @Override
-    public void rename(XenonProto.SourceTarget request, StreamObserver<XenonProto.Empty> responseObserver) {
+    public void rename(XenonProto.RenameRequest request, StreamObserver<XenonProto.Empty> responseObserver) {
         try {
-            FileSystem filesystem = getFileSystem(request.getSource().getFilesystem());
-            Path source = getPath(request.getSource());
-            Path target = getPath(request.getTarget());
+            FileSystem filesystem = getFileSystem(request.getFilesystem());
+            Path source = new Path(request.getSource());
+            Path target = new Path(request.getTarget());
+
             filesystem.rename(source, target);
+
             responseObserver.onNext(empty());
             responseObserver.onCompleted();
         } catch (NoSuchPathException e) {
             responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (PathAlreadyExistsException e) {
+            responseObserver.onError(Status.ALREADY_EXISTS.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (UnsupportedOperationException e) {
+            responseObserver.onError(Status.UNIMPLEMENTED.withDescription(e.getMessage()).withCause(e).asException());
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
@@ -391,44 +460,20 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
     }
 
     @Override
-    public void copy(XenonProto.CopyRequest request, StreamObserver<XenonProto.Empty> responseObserver) {
-        Files files = singleton.getInstance().files();
+    public void copy(XenonProto.CopyRequest request, StreamObserver<XenonProto.CopyOperation> responseObserver) {
         try {
-            Path source = getPath(request.getSource());
-            Path target = getPath(request.getTarget());
-            CopyOption[] options = parseCopyOptions(request.getOptionsList());
+            FileSystem sourceFS = getFileSystem(request.getSource().getFilesystem());
+            Path sourcePath = getPath(request.getSource());
+            FileSystem targetFS = getFileSystem(request.getTarget().getFilesystem());
+            Path targetPath = getPath(request.getTarget());
+            CopyMode mode = mapCopyMode(request.getMode());
 
-            Utils.recursiveCopy(files, source, target, options);
+            String copyId = sourceFS.copy(sourcePath, targetFS, targetPath, mode, request.getRecursive());
 
-            responseObserver.onNext(empty());
-            responseObserver.onCompleted();
-        } catch (NoSuchPathException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
-        }
-    }
-
-    @Override
-    public void backgroundCopy(XenonProto.CopyRequest request, StreamObserver<XenonProto.Copy> responseObserver) {
-        Files files = singleton.getInstance().files();
-        try {
-            Path source = getPath(request.getSource());
-            Path target = getPath(request.getTarget());
-            CopyOption[] options = parseCopyOptions(request.getOptionsList());
-            // Mark ASYNCHRONOUS
-            List<CopyOption> asyncOptions = new ArrayList<>();
-            asyncOptions.addAll(Arrays.asList(options));
-            asyncOptions.add(CopyOption.ASYNCHRONOUS);
-
-            Copy copy = files.copy(source, target, asyncOptions.toArray(new CopyOption[0]));
-            String copyId = getCopyId(copy);
-
-            copyBackgroundTasks.put(copyId, new CopyBackgroundTask(request, copy));
-
-            XenonProto.Copy response = XenonProto.Copy.newBuilder().setId(copyId).setRequest(request).build();
+            XenonProto.CopyOperation response = XenonProto.CopyOperation.newBuilder()
+                    .setId(copyId)
+                    .setFilesystem(request.getSource().getFilesystem())
+                    .build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (XenonException e) {
@@ -438,22 +483,17 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
         }
     }
 
-    private String getCopyId(Copy copy) {
-        return randomUUID().toString();
-    }
-
     @Override
-    public void cancel(XenonProto.CopyResponse request, StreamObserver<XenonProto.CopyStatus> responseObserver) {
-        Files files = singleton.getInstance().files();
+    public void cancel(XenonProto.CopyOperation request, StreamObserver<XenonProto.CopyStatus> responseObserver) {
         try {
-            Copy copy = getBackgroundCopyTask(request);
+            FileSystem filesystem = getFileSystem(request.getFilesystem());
 
-            CopyStatus status = files.cancelCopy(copy);
+            CopyStatus status = filesystem.cancel(request.getId());
 
-            copyBackgroundTasks.remove(request.getId());
-
-            responseObserver.onNext(writeCopyStatus(status, request));
+            responseObserver.onNext(mapCopyStatus(status, request));
             responseObserver.onCompleted();
+        } catch (NoSuchCopyException e) {
+            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
@@ -462,47 +502,20 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
     }
 
     @Override
-    public void getStatus(XenonProto.CopyResponse request, StreamObserver<XenonProto.CopyStatus> responseObserver) {
-        Files files = singleton.getInstance().files();
+    public void getStatus(XenonProto.CopyOperation request, StreamObserver<XenonProto.CopyStatus> responseObserver) {
         try {
-            Copy copy = getBackgroundCopyTask(request);
+            FileSystem filesystem = getFileSystem(request.getFilesystem());
 
-            CopyStatus status = files.getCopyStatus(copy);
+            CopyStatus status = filesystem.getStatus(request.getId());
 
-            responseObserver.onNext(writeCopyStatus(status, request));
+            responseObserver.onNext(mapCopyStatus(status, request));
             responseObserver.onCompleted();
+        } catch (NoSuchCopyException e) {
+            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
             responseObserver.onError(e);
-        }
-    }
-
-    private Copy getBackgroundCopyTask(XenonProto.Copy request) throws StatusException {
-        String id = request.getId();
-        if (!copyBackgroundTasks.containsKey(id)) {
-            throw Status.NOT_FOUND.augmentDescription(id).asException();
-        }
-        return copyBackgroundTasks.get(id).getCopy();
-    }
-
-    @Override
-    public void listBackgroundCopyStatuses(XenonProto.Empty request, StreamObserver<XenonProto.CopyStatuses> responseObserver) {
-        Files files = singleton.getInstance().files();
-        XenonProto.CopyStatuses.Builder builder = XenonProto.CopyStatuses.newBuilder();
-        try {
-            for (Map.Entry<String, CopyBackgroundTask> entry : copyBackgroundTasks.entrySet()) {
-                CopyStatus status = files.getCopyStatus(entry.getValue().getCopy());
-                XenonProto.Copy copy = XenonProto.Copy.newBuilder()
-                    .setId(entry.getKey())
-                    .setRequest(entry.getValue().getRequest())
-                    .build();
-                builder.addStatuses(writeCopyStatus(status, copy));
-            }
-            responseObserver.onNext(builder.build());
-            responseObserver.onCompleted();
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         }
     }
 
@@ -532,25 +545,6 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
     }
 
     @Override
-    public void deleteBackgroundCopy(XenonProto.Copy request, StreamObserver<XenonProto.Empty> responseObserver) {
-        Files files = singleton.getInstance().files();
-        try {
-            Copy copy = getBackgroundCopyTask(request);
-            CopyStatus status = files.getCopyStatus(copy);
-            if (!status.isDone()) {
-                files.cancelCopy(copy);
-            }
-            copyBackgroundTasks.remove(request.getId());
-            responseObserver.onNext(empty());
-            responseObserver.onCompleted();
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
-        }
-    }
-
-    @Override
     public void list(XenonProto.ListRequest request, StreamObserver<XenonProto.PathAttributes> responseObserver) {
         try {
             FileSystem filesystem = getFileSystem(request.getDir().getFilesystem());
@@ -563,10 +557,46 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             responseObserver.onCompleted();
         } catch (NoSuchPathException e) {
             responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (InvalidPathException e) {
+            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
         } catch (XenonException e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         } catch (StatusException e) {
             responseObserver.onError(e);
+        }
+    }
+
+    @Override
+    public void getEntryPath(XenonProto.FileSystem request, StreamObserver<XenonProto.Path> responseObserver) {
+        try {
+            FileSystem filesystem = getFileSystem(request);
+
+            Path path = filesystem.getEntryPath();
+
+            XenonProto.Path pathResponse = XenonProto.Path.newBuilder().setPath(path.getAbsolutePath()).setFilesystem(request).build();
+            responseObserver.onNext(pathResponse);
+            responseObserver.onCompleted();
+        } catch (StatusException e) {
+            responseObserver.onError(e);
+        }
+    }
+
+    @Override
+    public void waitUntilDone(XenonProto.CopyOperationWithTimeout request, StreamObserver<XenonProto.CopyStatus> responseObserver) {
+        try {
+            FileSystem filesystem = getFileSystem(request.getFilesystem());
+
+            CopyStatus status = filesystem.waitUntilDone(request.getId(), request.getTimeout());
+
+            XenonProto.CopyOperation operation = XenonProto.CopyOperation.newBuilder().setFilesystem(request.getFilesystem()).setId(request.getId()).build();
+            responseObserver.onNext(mapCopyStatus(status, operation));
+            responseObserver.onCompleted();
+        } catch (StatusException e) {
+            responseObserver.onError(e);
+        } catch (NoSuchPathException e) {
+            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (XenonException e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
         }
     }
 }

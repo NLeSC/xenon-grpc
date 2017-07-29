@@ -1,5 +1,8 @@
-package nl.esciencecenter.xenon.grpc.files;
+package nl.esciencecenter.xenon.grpc.filesystems;
 
+import io.grpc.Status;
+import io.grpc.StatusException;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.*;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import org.slf4j.Logger;
@@ -13,12 +16,66 @@ import java.util.Set;
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
 
 /*
-    Writers to convert Xenon objects to gRPC response fields
+    MapUtils to convert Xenon objects to gRPC response fields
  */
-class Writers {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Writers.class);
+class MapUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MapUtils.class);
 
-    private Writers() {
+    private MapUtils() {
+    }
+
+    static Set<PosixFilePermission> parsePermissions(List<XenonProto.PosixFilePermission> permissionsValueList) throws StatusException {
+        Set<PosixFilePermission> permissions = new HashSet<>();
+        for (XenonProto.PosixFilePermission permission:  permissionsValueList) {
+            switch (permission) {
+                case NONE:
+                    // Do nothing with NONE, this allows for a file with no permission
+                    break;
+                case OWNER_READ:
+                    permissions.add(PosixFilePermission.OWNER_READ);
+                    break;
+                case OWNER_WRITE:
+                    permissions.add(PosixFilePermission.OWNER_WRITE);
+                    break;
+                case OWNER_EXECUTE:
+                    permissions.add(PosixFilePermission.OWNER_EXECUTE);
+                    break;
+                case GROUP_READ:
+                    permissions.add(PosixFilePermission.GROUP_READ);
+                    break;
+                case GROUP_WRITE:
+                    permissions.add(PosixFilePermission.GROUP_WRITE);
+                    break;
+                case GROUP_EXECUTE:
+                    permissions.add(PosixFilePermission.GROUP_EXECUTE);
+                    break;
+                case OTHERS_READ:
+                    permissions.add(PosixFilePermission.OTHERS_READ);
+                    break;
+                case OTHERS_WRITE:
+                    permissions.add(PosixFilePermission.OTHERS_WRITE);
+                    break;
+                case OTHERS_EXECUTE:
+                    permissions.add(PosixFilePermission.OTHERS_EXECUTE);
+                    break;
+                case UNRECOGNIZED:
+                    throw Status.INVALID_ARGUMENT.withDescription("Unrecognized posix file permission").asException();
+            }
+        }
+        return permissions;
+    }
+
+    static CopyMode mapCopyMode(XenonProto.CopyMode mode) {
+        switch (mode) {
+            case CREATE:
+                return CopyMode.CREATE;
+            case REPLACE:
+                return CopyMode.REPLACE;
+            case IGNORE:
+                return CopyMode.IGNORE;
+        }
+        // the default
+        return CopyMode.CREATE;
     }
 
     static XenonProto.PathAttributes writeFileAttributes(PathAttributes a) {
@@ -90,7 +147,7 @@ class Writers {
     }
 
     static XenonProto.Path writePath(Path path, XenonProto.FileSystem fs) {
-        return XenonProto.Path.newBuilder().setFilesystem(fs).setPath(path.getRelativePath().getAbsolutePath()).build();
+        return XenonProto.Path.newBuilder().setFilesystem(fs).setPath(path.getAbsolutePath()).build();
     }
 
     static String getFileSystemId(FileSystem fileSystem, String username) {
@@ -104,7 +161,7 @@ class Writers {
             .putAllProperties(fs.getProperties())
             .build();
         return XenonProto.FileSystem.newBuilder()
-            .setId(getFileSystemId(fs, username))
+            .setId(getFileSystemId(fs, new DefaultCredential().getUsername()))
             .setRequest(request)
             .build();
     }
@@ -117,11 +174,11 @@ class Writers {
         return builder.build();
     }
 
-    static XenonProto.CopyStatus writeCopyStatus(CopyStatus status, XenonProto.CopyResponse copy) {
+    static XenonProto.CopyStatus mapCopyStatus(CopyStatus status, XenonProto.CopyOperation operation) {
         XenonProto.CopyStatus.Builder builder = XenonProto.CopyStatus.newBuilder()
             .setBytesCopied(status.bytesCopied())
             .setBytesToCopy(status.bytesToCopy())
-            .setCopy(copy)
+            .setCopyOperation(operation)
             .setState(status.getState())
             .setDone(status.isDone())
             .setRunning(status.isRunning());

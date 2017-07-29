@@ -11,8 +11,8 @@ import net.sourceforge.argparse4j.inf.ArgumentGroup;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
-import nl.esciencecenter.xenon.grpc.files.FileSystemsService;
-import nl.esciencecenter.xenon.grpc.jobs.SchedulersService;
+import nl.esciencecenter.xenon.grpc.filesystems.FileSystemsService;
+import nl.esciencecenter.xenon.grpc.schedulers.SchedulersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

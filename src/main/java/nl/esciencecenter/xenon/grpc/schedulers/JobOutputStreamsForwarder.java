@@ -1,4 +1,4 @@
-package nl.esciencecenter.xenon.grpc.jobs;
+package nl.esciencecenter.xenon.grpc.schedulers;
 
 import java.io.IOException;
 import java.io.InputStream;

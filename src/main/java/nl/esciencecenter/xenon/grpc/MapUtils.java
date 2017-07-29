@@ -1,6 +1,10 @@
 package nl.esciencecenter.xenon.grpc;
 
 import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.credentials.CertificateCredential;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,5 +57,28 @@ public class MapUtils {
 
     public static XenonProto.Empty empty() {
         return XenonProto.Empty.getDefaultInstance();
+    }
+
+    public static Credential mapCredential(XenonProto.CreateSchedulerRequest request) {
+        return mapCredential(request.getDefaultCred(), request.getPasswordCred(), request.getCertificateCred());
+    }
+
+    public static Credential mapCredential(XenonProto.CreateFileSystemRequest request) {
+        return mapCredential(request.getDefaultCred(), request.getPasswordCred(), request.getCertificateCred());
+    }
+
+    private static Credential mapCredential(XenonProto.DefaultCredential defaultCred, XenonProto.PasswordCredential passwordCred, XenonProto.CertificateCredential certificateCred) {
+        Credential credential;
+        // if embedded message is not set then the request field will have the default instance,
+        if (!XenonProto.CertificateCredential.getDefaultInstance().equals(certificateCred)) {
+            credential = new CertificateCredential(certificateCred.getUsername(), certificateCred.getCertfile(), certificateCred.getPassphrase().toCharArray());
+        } else if (!XenonProto.PasswordCredential.getDefaultInstance().equals(passwordCred)) {
+            credential = new PasswordCredential(passwordCred.getUsername(), passwordCred.getPassword().toCharArray());
+        } else if (!XenonProto.DefaultCredential.getDefaultInstance().equals(defaultCred)) {
+            credential = new DefaultCredential(defaultCred.getUsername());
+        } else {
+            credential = new DefaultCredential();
+        }
+        return credential;
     }
 }
