@@ -114,6 +114,13 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
         responseObserver.onCompleted();
     }
 
+    public void closeAllSchedulers() throws XenonException {
+        for (Map.Entry<String, SchedulerContainer> entry : schedulers.entrySet()) {
+            entry.getValue().getScheduler().close();
+            schedulers.remove(entry.getKey());
+        }
+    }
+
     @Override
     public void localScheduler(XenonProto.Empty request, StreamObserver<XenonProto.Scheduler> responseObserver) {
         XenonProto.CreateSchedulerRequest schedulerRequest = XenonProto.CreateSchedulerRequest.newBuilder().setAdaptor("local").build();

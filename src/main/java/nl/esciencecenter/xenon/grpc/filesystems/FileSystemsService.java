@@ -92,6 +92,13 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
         }
     }
 
+    public void closeAllFileSystems() throws XenonException {
+        for (Map.Entry<String, FileSystemContainer> entry : fileSystems.entrySet()) {
+            entry.getValue().getFileSystem().close();
+            fileSystems.remove(entry.getKey());
+        }
+    }
+
     @Override
     public void exists(XenonProto.Path request, StreamObserver<XenonProto.Is> responseObserver) {
         try {

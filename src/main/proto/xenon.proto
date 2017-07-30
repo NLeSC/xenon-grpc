@@ -347,7 +347,7 @@ message Is {
 service XenonFileSystems {
     rpc getAdaptorDescriptions(Empty) returns (FileSystemAdaptorDescriptions) {}
     rpc getAdaptorDescription(AdaptorName) returns (FileSystemAdaptorDescription) {}
-    // In Xenon its named FileSystem.create
+    // In Xenon its named FileSystem.create()
     rpc createFileSystem(CreateFileSystemRequest) returns (FileSystem) {}
     rpc createDirectories(Path) returns (Empty) {}
     rpc createDirectory(Path) returns (Empty) {}
@@ -371,11 +371,11 @@ service XenonFileSystems {
     // Any pending/running copy operations will be killed
     rpc close(FileSystem) returns (Empty) {}
     rpc waitUntilDone(CopyOperationWithTimeout) returns (CopyStatus) {}
-    // List currently created filesystems
-    // Specific to grpc, not part of Xenon library
-    rpc listFileSystems(Empty) returns (FileSystems) {}
     // Returns filesystems for all local drives
     rpc localFileSystems(Empty) returns (FileSystems) {}
+    // List the created filesystems
+    // Specific to grpc, not part of Xenon library
+    rpc listFileSystems(Empty) returns (FileSystems) {}
 }
 
 // The Jobs API of Xenon. This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about schedulers and jobs.
@@ -400,10 +400,10 @@ service XenonSchedulers {
     // Close scheduler and forget it
     // If scheduler is embedded then any pending/running jobs will be killed
     rpc close(Scheduler) returns (Empty) {}
-    // List current created schedulers
+    rpc localScheduler(Empty) returns (Scheduler) {}
+    // List the created schedulers
     // Specific to grpc, not part of Xenon library
     rpc listSchedulers(Empty) returns (Schedulers) {}
-    rpc localScheduler(Empty) returns (Scheduler) {}
 }
 
 

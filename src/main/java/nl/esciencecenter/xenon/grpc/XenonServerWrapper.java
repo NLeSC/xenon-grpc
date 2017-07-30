@@ -11,6 +11,7 @@ import net.sourceforge.argparse4j.inf.ArgumentGroup;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.grpc.filesystems.FileSystemsService;
 import nl.esciencecenter.xenon.grpc.schedulers.SchedulersService;
 import org.slf4j.Logger;
@@ -32,10 +33,11 @@ public class XenonServerWrapper {
     private File clientCertChain = null;
     private File serverCertChain = null;
     private Integer port = DEFAULT_PORT;
-
-    private Server server;
     private boolean useTLS = false;
 
+    private Server server;
+    private FileSystemsService filesystemsService;
+    private SchedulersService schedulersService;
 
     public static void main(String[] args) throws InterruptedException, IOException {
         final XenonServerWrapper server;
@@ -89,9 +91,9 @@ public class XenonServerWrapper {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-            LOGGER.info("*** shutting down gRPC server since JVM is shutting down");
+            System.err.println("*** shutting down gRPC server since JVM is shutting down");
             XenonServerWrapper.this.stop();
-            LOGGER.info("*** server shut down");
+            System.err.println("*** server shut down");
         }));
     }
 
@@ -102,9 +104,11 @@ public class XenonServerWrapper {
         } else {
             builder = insecureServerBuilder();
         }
+        filesystemsService = new FileSystemsService();
+        schedulersService = new SchedulersService();
         server = builder
-                .addService(new SchedulersService())
-                .addService(new FileSystemsService())
+                .addService(filesystemsService)
+                .addService(schedulersService)
                 .build();
     }
 
@@ -160,6 +164,13 @@ public class XenonServerWrapper {
     private void stop() {
         if (server != null) {
             server.shutdown();
+            try {
+                filesystemsService.closeAllFileSystems();
+                schedulersService.closeAllSchedulers();
+            } catch (XenonException e) {
+                System.err.println("Unable to close all filesystems and schedulers");
+                System.err.println(e.getMessage());
+            }
         }
     }
 
