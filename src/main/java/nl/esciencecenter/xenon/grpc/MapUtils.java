@@ -1,13 +1,13 @@
 package nl.esciencecenter.xenon.grpc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MapUtils {
     private MapUtils() {
@@ -41,6 +41,9 @@ public class MapUtils {
                     break;
                 case SIZE:
                     type = XenonProto.PropertyDescription.Type.SIZE;
+                    break;
+                case NATURAL:
+                    type = XenonProto.PropertyDescription.Type.NATURAL;
                     break;
             }
             supportedProperties.add(

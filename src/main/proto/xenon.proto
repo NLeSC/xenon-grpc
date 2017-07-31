@@ -24,6 +24,7 @@ message PropertyDescription {
         DOUBLE = 3;
         LONG = 4;
         SIZE = 5;
+        NATURAL = 6;
     }
     Type type = 4;
 }
