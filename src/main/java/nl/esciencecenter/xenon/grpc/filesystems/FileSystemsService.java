@@ -201,7 +201,6 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
                 buffer = ByteString.readFrom(pipe, BUFFER_SIZE);
                 responseObserver.onNext(builder.setBuffer(buffer).build());
             } while (!buffer.isEmpty());
-            pipe.close();
             responseObserver.onCompleted();
         } catch (Exception e) {
             responseObserver.onError(mapException(e));

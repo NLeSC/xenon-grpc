@@ -13,19 +13,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 import nl.esciencecenter.xenon.grpc.XenonFileSystemsGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.MessageOrBuilder;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
+import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import org.junit.After;
@@ -99,6 +105,16 @@ public class FileSystemsServiceTest {
     }
 
     @Test
+    public void closeAllFileSystems() throws XenonException {
+        FileSystemsService service = new FileSystemsService();
+        service.putFileSystem(createFileSystemRequest(), "someone", filesystem);
+
+        service.closeAllFileSystems();
+
+        verify(filesystem).close();
+    }
+
+    @Test
     public void exists() throws XenonException {
         XenonProto.Path request = buildPath("/etc/passwd");
         when(filesystem.exists(new Path("/etc/passwd"))).thenReturn(true);
@@ -106,6 +122,14 @@ public class FileSystemsServiceTest {
         XenonProto.Is response = client.exists(request);
 
         assertTrue(response.getValue());
+    }
+
+    @Test(expected = StatusRuntimeException.class)
+    public void exists_throwsUp() throws XenonException {
+        XenonProto.Path request = buildPath("/etc/passwd");
+        when(filesystem.exists(new Path("/etc/passwd"))).thenThrow(new XenonException("file", "throw up"));
+
+        client.exists(request);
     }
 
     @Test
@@ -256,5 +280,39 @@ public class FileSystemsServiceTest {
         client.createSymbolicLink(request);
 
         verify(filesystem).createSymbolicLink(new Path("/var/run"), new Path("/run"));
+    }
+
+    @Test
+    public void setPosixFilePermissions() throws XenonException {
+        XenonProto.Path path = buildPath("/etc/passwd");
+        XenonProto.SetPosixFilePermissionsRequest request = XenonProto.SetPosixFilePermissionsRequest.newBuilder()
+            .setPath(path)
+            .addPermissions(XenonProto.PosixFilePermission.GROUP_EXECUTE)
+            .build();
+
+        client.setPosixFilePermissions(request);
+
+        Set<PosixFilePermission> expected = new HashSet<>();
+        expected.add(PosixFilePermission.GROUP_EXECUTE);
+        verify(filesystem).setPosixFilePermissions(new Path("/etc/passwd"), expected);
+    }
+
+    @Test
+    public void copy() throws XenonException {
+        String source = "/etc/passwd";
+        String target = "/etc/passwd.bak";
+        XenonProto.CopyRequest request = XenonProto.CopyRequest.newBuilder()
+            .setSource(buildPath(source))
+            .setTarget(buildPath(target))
+            .build();
+        when(filesystem.copy(new Path(source), filesystem, new Path(target), CopyMode.CREATE, false)).thenReturn("COPY-1");
+
+        XenonProto.CopyOperation response = client.copy(request);
+
+        MessageOrBuilder expected = XenonProto.CopyOperation.newBuilder()
+            .setFilesystem(createFileSystem())
+            .setId("COPY-1")
+            .build();
+        assertEquals(expected, response);
     }
 }
