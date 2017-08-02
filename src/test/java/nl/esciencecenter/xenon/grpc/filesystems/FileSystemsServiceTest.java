@@ -23,12 +23,12 @@ import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation
 import nl.esciencecenter.xenon.filesystems.CopyMode;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 import nl.esciencecenter.xenon.grpc.XenonFileSystemsGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 
 import com.google.protobuf.ByteString;
-import com.google.protobuf.MessageOrBuilder;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.StatusRuntimeException;
@@ -190,11 +190,10 @@ public class FileSystemsServiceTest {
 
     @Test
     public void getAttributes() throws XenonException {
-        XenonProto.Path request = buildPath("/etc/passwd");
-        PathAttributesImplementation attribs = new PathAttributesImplementation();
-        attribs.setPath(new Path("/etc/passwd"));
-        attribs.setRegular(true);
-        when(filesystem.getAttributes(new Path("/etc/passwd"))).thenReturn(attribs);
+        String filename = "/etc/passwd";
+        XenonProto.Path request = buildPath(filename);
+        PathAttributesImplementation attribs = buildPathAttributesOfRegularFile(filename);
+        when(filesystem.getAttributes(new Path(filename))).thenReturn(attribs);
 
         XenonProto.PathAttributes response = client.getAttributes(request);
 
@@ -203,6 +202,13 @@ public class FileSystemsServiceTest {
                 .setIsRegularFile(true)
                 .build();
         assertEquals(expected, response);
+    }
+
+    private PathAttributesImplementation buildPathAttributesOfRegularFile(String filename) {
+        PathAttributesImplementation attribs = new PathAttributesImplementation();
+        attribs.setPath(new Path(filename));
+        attribs.setRegular(true);
+        return attribs;
     }
 
     @Test
@@ -309,10 +315,81 @@ public class FileSystemsServiceTest {
 
         XenonProto.CopyOperation response = client.copy(request);
 
-        MessageOrBuilder expected = XenonProto.CopyOperation.newBuilder()
+        XenonProto.CopyOperation expected = XenonProto.CopyOperation.newBuilder()
             .setFilesystem(createFileSystem())
             .setId("COPY-1")
             .build();
+        assertEquals(expected, response);
+    }
+
+    // TODO wait for PR https://github.com/NLeSC/Xenon/pull/508 is merged
+//    @Test
+//    public void cancel() throws XenonException {
+//        XenonProto.CopyOperation request = XenonProto.CopyOperation.newBuilder()
+//            .setFilesystem(createFileSystem())
+//            .setId("COPY-1")
+//            .build();
+//        CopyStatus status = mock(CopyStatus.class);
+//        when(status.isDone()).thenReturn(true);
+//        when(status.isRunning()).thenReturn(false);
+//        when(status.bytesCopied()).thenReturn(1024L);
+//        when(status.bytesToCopy()).thenReturn(1024L);
+//        when(status.getCopyIdentifier()).thenReturn("COPY-1");
+//        when(status.hasException()).thenReturn(true);
+//        when(status.getException()).thenReturn(new CopyCancelledException("file"));
+//        when(filesystem.cancel("COPY-1")).thenReturn(status);
+//
+//        XenonProto.CopyStatus response = client.cancel(request);
+//
+//        XenonProto.CopyStatus expected = XenonProto.CopyStatus.newBuilder()
+//            .build();
+//        assertEquals(expected, response);
+//    }
+
+    @Test
+    public void getAdaptorDescription() throws XenonException {
+        XenonProto.AdaptorName request = XenonProto.AdaptorName.newBuilder()
+            .setName("file")
+            .build();
+
+        XenonProto.FileSystemAdaptorDescription response = client.getAdaptorDescription(request);
+
+        assertEquals("file", response.getName());
+    }
+
+    @Test
+    public void getAdaptorDescriptions() throws XenonException {
+        XenonProto.FileSystemAdaptorDescriptions response = client.getAdaptorDescriptions(empty());
+
+        assertTrue("Some descriptions", response.getDescriptionsCount() > 0);
+    }
+
+    @Test
+    public void list() throws XenonException {
+        XenonProto.ListRequest request = XenonProto.ListRequest.newBuilder()
+            .setDir(buildPath("/etc"))
+            .build();
+        Iterable<PathAttributes> listing = Arrays.asList(
+            buildPathAttributesOfRegularFile("/etc/passwd"),
+            buildPathAttributesOfRegularFile("/etc/group")
+        );
+        when(filesystem.list(new Path("/etc"), false)).thenReturn(listing);
+
+        Iterator<XenonProto.PathAttributes> iterator = client.list(request);
+
+        List<XenonProto.PathAttributes> response = new ArrayList<>();
+        iterator.forEachRemaining(response::add);
+
+        List<XenonProto.PathAttributes> expected = Arrays.asList(
+            XenonProto.PathAttributes.newBuilder()
+                .setPath(buildPath("/etc/passwd"))
+                .setIsRegularFile(true)
+                .build(),
+            XenonProto.PathAttributes.newBuilder()
+                .setPath(buildPath("/etc/group"))
+                .setIsRegularFile(true)
+                .build()
+        );
         assertEquals(expected, response);
     }
 }
