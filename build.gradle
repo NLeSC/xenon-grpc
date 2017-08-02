@@ -13,7 +13,7 @@ plugins {
     id 'org.sonarqube' version '2.5'
 }
 
-version = '0.0.1'
+version = '1.0.0'
 applicationName = 'xenon-grpc'
 group = 'nlesc'
 mainClassName = 'nl.esciencecenter.xenon.grpc.XenonServerWrapper'
@@ -71,9 +71,10 @@ idea {
     }
 }
 
-// use shadow dists everywhere
+// use shadow tasks everywhere
 distZip.enabled = false
 distTar.enabled = false
+installDist.enabled = false
 
 jacocoTestReport {
     // Exclude classes of generated source code by protoc
