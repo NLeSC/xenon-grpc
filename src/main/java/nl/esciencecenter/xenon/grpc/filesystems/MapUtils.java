@@ -1,19 +1,27 @@
 package nl.esciencecenter.xenon.grpc.filesystems;
 
-import io.grpc.Status;
-import io.grpc.StatusException;
-import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.filesystems.*;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.filesystems.AttributeNotSupportedException;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.CopyStatus;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
+import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+
+import io.grpc.Status;
+import io.grpc.StatusException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
     MapUtils to convert Xenon objects to gRPC response fields
@@ -78,8 +86,9 @@ class MapUtils {
         return CopyMode.CREATE;
     }
 
-    static XenonProto.PathAttributes writeFileAttributes(PathAttributes a) {
+    static XenonProto.PathAttributes writeFileAttributes(XenonProto.FileSystem filesystem, PathAttributes a) {
         XenonProto.PathAttributes.Builder builder = XenonProto.PathAttributes.newBuilder()
+            .setPath(writePath(a.getPath(), filesystem))
             .setCreationTime(a.getCreationTime())
             .setIsDirectory(a.isDirectory())
             .setIsExecutable(a.isExecutable())
@@ -91,57 +100,64 @@ class MapUtils {
             .setIsWritable(a.isWritable())
             .setLastAccessTime(a.getLastAccessTime())
             .setLastModifiedTime(a.getLastModifiedTime())
-            .addAllPermissions(writePermissions(a))
             .setSize(a.getSize());
+
         try {
-            builder.setOwner(a.getOwner());
+            if (a.getPermissions() != null) {
+                builder.addAllPermissions(writePermissions(a.getPermissions()));
+            }
         } catch (AttributeNotSupportedException e) {
-            LOGGER.warn("Skipping owner, not supported for this path", e);
+            LOGGER.warn("Skipping permissions, not supported", e);
         }
         try {
-            builder.setGroup(a.getGroup());
+            if (a.getOwner() != null) {
+                builder.setOwner(a.getOwner());
+            }
         } catch (AttributeNotSupportedException e) {
-            LOGGER.warn("Skipping group, not supported for this path", e);
+            LOGGER.warn("Skipping owner, not supported", e);
+        }
+        try {
+            if (a.getGroup() != null) {
+                builder.setGroup(a.getGroup());
+            }
+        } catch (AttributeNotSupportedException e) {
+            LOGGER.warn("Skipping group, not supported", e);
         }
         return builder.build();
     }
 
-    private static Set<XenonProto.PosixFilePermission> writePermissions(PathAttributes attribs) {
+    private static Set<XenonProto.PosixFilePermission> writePermissions(Set<PosixFilePermission> permissionsx) {
         Set<XenonProto.PosixFilePermission> permissions = new HashSet<>();
-        try {
-            for (PosixFilePermission permission : attribs.getPermissions()) {
-                switch (permission) {
-                    case GROUP_EXECUTE:
-                        permissions.add(XenonProto.PosixFilePermission.GROUP_EXECUTE);
-                        break;
-                    case GROUP_READ:
-                        permissions.add(XenonProto.PosixFilePermission.GROUP_READ);
-                        break;
-                    case GROUP_WRITE:
-                        permissions.add(XenonProto.PosixFilePermission.GROUP_WRITE);
-                        break;
-                    case OTHERS_EXECUTE:
-                        permissions.add(XenonProto.PosixFilePermission.OTHERS_EXECUTE);
-                        break;
-                    case OTHERS_READ:
-                        permissions.add(XenonProto.PosixFilePermission.OTHERS_READ);
-                        break;
-                    case OTHERS_WRITE:
-                        permissions.add(XenonProto.PosixFilePermission.OTHERS_WRITE);
-                        break;
-                    case OWNER_EXECUTE:
-                        permissions.add(XenonProto.PosixFilePermission.OWNER_EXECUTE);
-                        break;
-                    case OWNER_READ:
-                        permissions.add(XenonProto.PosixFilePermission.OWNER_READ);
-                        break;
-                    case OWNER_WRITE:
-                        permissions.add(XenonProto.PosixFilePermission.OWNER_WRITE);
-                        break;
-                }
+        for (PosixFilePermission permission : permissionsx) {
+            switch (permission) {
+                case GROUP_EXECUTE:
+                    permissions.add(XenonProto.PosixFilePermission.GROUP_EXECUTE);
+                    break;
+                case GROUP_READ:
+                    permissions.add(XenonProto.PosixFilePermission.GROUP_READ);
+                    break;
+                case GROUP_WRITE:
+                    permissions.add(XenonProto.PosixFilePermission.GROUP_WRITE);
+                    break;
+                case OTHERS_EXECUTE:
+                    permissions.add(XenonProto.PosixFilePermission.OTHERS_EXECUTE);
+                    break;
+                case OTHERS_READ:
+                    permissions.add(XenonProto.PosixFilePermission.OTHERS_READ);
+                    break;
+                case OTHERS_WRITE:
+                    permissions.add(XenonProto.PosixFilePermission.OTHERS_WRITE);
+                    break;
+                case OWNER_EXECUTE:
+                    permissions.add(XenonProto.PosixFilePermission.OWNER_EXECUTE);
+                    break;
+                case OWNER_READ:
+                    permissions.add(XenonProto.PosixFilePermission.OWNER_READ);
+                    break;
+                case OWNER_WRITE:
+                    permissions.add(XenonProto.PosixFilePermission.OWNER_WRITE);
+                    break;
             }
-        } catch (AttributeNotSupportedException e) {
-            LOGGER.warn("Skipping posix file permissions, not supported for this path", e);
         }
         return permissions;
     }

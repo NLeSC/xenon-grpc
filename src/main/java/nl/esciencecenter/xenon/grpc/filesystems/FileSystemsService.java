@@ -1,29 +1,44 @@
 package nl.esciencecenter.xenon.grpc.filesystems;
 
-import com.google.protobuf.ByteString;
-import io.grpc.Status;
-import io.grpc.StatusException;
-import io.grpc.stub.StreamObserver;
-import nl.esciencecenter.xenon.*;
-import nl.esciencecenter.xenon.UnsupportedOperationException;
-import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.filesystems.*;
-import nl.esciencecenter.xenon.grpc.XenonFileSystemsGrpc;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
+import static nl.esciencecenter.xenon.grpc.MapUtils.mapCredential;
+import static nl.esciencecenter.xenon.grpc.MapUtils.mapException;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.getFileSystemId;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.mapCopyMode;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.mapCopyStatus;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.mapFileAdaptorDescription;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.parsePermissions;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writeFileAttributes;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writeFileSystems;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writePath;
+import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.getLocalFileSystems;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
-import static nl.esciencecenter.xenon.grpc.MapUtils.mapCredential;
-import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.*;
-import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.getLocalFileSystems;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.CopyStatus;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
+import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
+import nl.esciencecenter.xenon.grpc.XenonFileSystemsGrpc;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+
+import com.google.protobuf.ByteString;
+import io.grpc.Status;
+import io.grpc.StatusException;
+import io.grpc.stub.StreamObserver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImplBase {
     private static final int BUFFER_SIZE = 8192;
@@ -49,10 +64,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
                     .build();
             responseObserver.onNext(value);
             responseObserver.onCompleted();
-        } catch (UnknownPropertyException | InvalidPropertyException | UnknownAdaptorException | InvalidLocationException | InvalidCredentialException e) {
-            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -85,10 +98,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             fileSystems.remove(request.getId());
             responseObserver.onNext(empty());
             responseObserver.onCompleted();
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -107,10 +118,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             boolean value = filesystem.exists(path);
             responseObserver.onNext(XenonProto.Is.newBuilder().setValue(value).build());
             responseObserver.onCompleted();
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -134,14 +143,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             filesystem.createDirectory(path);
             responseObserver.onNext(empty());
             responseObserver.onCompleted();
-        } catch (PathAlreadyExistsException e) {
-            responseObserver.onError(Status.ALREADY_EXISTS.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (NoSuchPathException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -153,14 +156,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             filesystem.createDirectories(path);
             responseObserver.onNext(empty());
             responseObserver.onCompleted();
-        } catch (PathAlreadyExistsException e) {
-            responseObserver.onError(Status.ALREADY_EXISTS.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (NoSuchPathException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -172,14 +169,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             filesystem.createFile(path);
             responseObserver.onNext(empty());
             responseObserver.onCompleted();
-        } catch (PathAlreadyExistsException e) {
-            responseObserver.onError(Status.ALREADY_EXISTS.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (NoSuchPathException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -191,12 +182,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             filesystem.delete(path, request.getRecursive());
             responseObserver.onNext(empty());
             responseObserver.onCompleted();
-        } catch (StatusException e) {
-            responseObserver.onError(e);
-        } catch (NoSuchPathException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -214,22 +201,17 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
                 buffer = ByteString.readFrom(pipe, BUFFER_SIZE);
                 responseObserver.onNext(builder.setBuffer(buffer).build());
             } while (!buffer.isEmpty());
+            pipe.close();
             responseObserver.onCompleted();
-        } catch (StatusException e) {
-            responseObserver.onError(e);
-        } catch (NoSuchPathException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (InvalidPathException e) {
-            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException | IOException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         } finally {
             try {
                 if (pipe != null) {
                     pipe.close();
                 }
-            } catch (IOException e) {
-                responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+            } catch (Exception e) {
+                responseObserver.onError(mapException(e));
             }
         }
     }
@@ -253,12 +235,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
                         }
                     }
                     pipe.write(value.getBuffer().toByteArray());
-                } catch (InvalidPathException e) {
-                    responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
-                } catch (XenonException | IOException e) {
-                    responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-                } catch (StatusException e) {
-                    responseObserver.onError(e);
+                } catch (Exception e) {
+                    responseObserver.onError(mapException(e));
                 }
             }
 
@@ -305,14 +283,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
                         pipe = filesystem.appendToFile(path);
                     }
                     pipe.write(value.getBuffer().toByteArray());
-                } catch (NoSuchPathException e) {
-                    responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-                } catch (InvalidPathException e) {
-                    responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
-                } catch (XenonException | IOException e) {
-                    responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-                } catch (StatusException e) {
-                    responseObserver.onError(e);
+                } catch (Exception e) {
+                    responseObserver.onError(mapException(e));
                 }
             }
 
@@ -349,14 +321,10 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             FileSystem filesystem = getFileSystem(request.getFilesystem());
             Path path = getPath(request);
             PathAttributes attributes = filesystem.getAttributes(path);
-            responseObserver.onNext(writeFileAttributes(attributes));
+            responseObserver.onNext(writeFileAttributes(request.getFilesystem(), attributes));
             responseObserver.onCompleted();
-        } catch (NoSuchPathException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -369,14 +337,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             filesystem.setPosixFilePermissions(path, permissions);
             responseObserver.onNext(empty());
             responseObserver.onCompleted();
-        } catch (NoSuchPathException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (UnsupportedOperationException e) {
-            responseObserver.onError(Status.UNIMPLEMENTED.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -388,16 +350,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             Path target = filesystem.readSymbolicLink(source);
             responseObserver.onNext(writePath(target, request.getFilesystem()));
             responseObserver.onCompleted();
-        } catch (NoSuchPathException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (InvalidPathException e) {
-            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (UnsupportedOperationException e) {
-            responseObserver.onError(Status.UNIMPLEMENTED.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -407,10 +361,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             FileSystem filesystem = getFileSystem(request);
             boolean open = filesystem.isOpen();
             responseObserver.onNext(XenonProto.Is.newBuilder().setValue(open).build());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
         responseObserver.onCompleted();
     }
@@ -437,8 +389,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             XenonProto.FileSystems filesystems = writeFileSystems(xenonFilesystems);
             responseObserver.onNext(filesystems);
             responseObserver.onCompleted();
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -483,10 +435,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
                     .build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -499,12 +449,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
 
             responseObserver.onNext(mapCopyStatus(status, request));
             responseObserver.onCompleted();
-        } catch (NoSuchCopyException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -517,12 +463,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
 
             responseObserver.onNext(mapCopyStatus(status, request));
             responseObserver.onCompleted();
-        } catch (NoSuchCopyException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -533,8 +475,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             XenonProto.FileSystemAdaptorDescription description = mapFileAdaptorDescription(descIn);
             responseObserver.onNext(description);
             responseObserver.onCompleted();
-        } catch (UnknownAdaptorException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -559,17 +501,11 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
 
             Iterable<PathAttributes> items = filesystem.list(dir, request.getRecursive());
             for (PathAttributes item : items) {
-                responseObserver.onNext(writeFileAttributes(item));
+                responseObserver.onNext(writeFileAttributes(request.getDir().getFilesystem(), item));
             }
             responseObserver.onCompleted();
-        } catch (NoSuchPathException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (InvalidPathException e) {
-            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -598,12 +534,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             XenonProto.CopyOperation operation = XenonProto.CopyOperation.newBuilder().setFilesystem(request.getFilesystem()).setId(request.getId()).build();
             responseObserver.onNext(mapCopyStatus(status, operation));
             responseObserver.onCompleted();
-        } catch (StatusException e) {
-            responseObserver.onError(e);
-        } catch (NoSuchPathException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 }

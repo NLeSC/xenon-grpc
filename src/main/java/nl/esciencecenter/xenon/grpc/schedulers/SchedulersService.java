@@ -1,24 +1,37 @@
 package nl.esciencecenter.xenon.grpc.schedulers;
 
-import io.grpc.Status;
-import io.grpc.StatusException;
-import io.grpc.stub.StreamObserver;
-import nl.esciencecenter.xenon.*;
-import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.grpc.XenonSchedulersGrpc;
-import nl.esciencecenter.xenon.schedulers.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
+import static nl.esciencecenter.xenon.grpc.MapUtils.mapCredential;
+import static nl.esciencecenter.xenon.grpc.MapUtils.mapException;
+import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobAdaptorDescription;
+import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobDescription;
+import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobStatus;
+import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobs;
+import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapQueueStatus;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
-import static nl.esciencecenter.xenon.grpc.MapUtils.mapCredential;
-import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.*;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+import nl.esciencecenter.xenon.grpc.XenonSchedulersGrpc;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.QueueStatus;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
+import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
+import nl.esciencecenter.xenon.schedulers.Streams;
+
+import io.grpc.Status;
+import io.grpc.StatusException;
+import io.grpc.stub.StreamObserver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulersService.class);
@@ -44,10 +57,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
                     .build();
             responseObserver.onNext(value);
             responseObserver.onCompleted();
-        } catch (UnknownPropertyException | InvalidPropertyException | UnknownAdaptorException | InvalidLocationException | InvalidCredentialException e) {
-            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -64,8 +75,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             XenonProto.SchedulerAdaptorDescription description = mapJobAdaptorDescription(descIn);
             responseObserver.onNext(description);
             responseObserver.onCompleted();
-        } catch (UnknownAdaptorException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -105,10 +116,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             Scheduler scheduler = getScheduler(request);
             scheduler.close();
             schedulers.remove(request.getId());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
         responseObserver.onNext(empty());
         responseObserver.onCompleted();
@@ -134,10 +143,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             String queue = scheduler.getDefaultQueueName();
             responseObserver.onNext(XenonProto.Queue.newBuilder().setName(queue).build());
             responseObserver.onCompleted();
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -156,10 +163,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             String[] queues = scheduler.getQueueNames();
             responseObserver.onNext(XenonProto.Queues.newBuilder().addAllName(Arrays.asList(queues)).build());
             responseObserver.onCompleted();
-        } catch (StatusException e) {
-            responseObserver.onError(e);
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -170,10 +175,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             boolean open = scheduler.isOpen();
             responseObserver.onNext(XenonProto.Is.newBuilder().setValue(open).build());
             responseObserver.onCompleted();
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -185,12 +188,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             XenonProto.QueueStatus response = mapQueueStatus(status, request.getScheduler());
             responseObserver.onNext(response);
             responseObserver.onCompleted();
-        } catch (NoSuchQueueException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -206,10 +205,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             }
             responseObserver.onNext(builder.build());
             responseObserver.onCompleted();
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -230,12 +227,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
-        } catch (IncompleteJobDescriptionException | InvalidJobDescriptionException | UnsupportedJobDescriptionException e) {
-            responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -249,12 +242,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             XenonProto.JobStatus response = mapJobStatus(status, request.getScheduler());
             responseObserver.onNext(response);
             responseObserver.onCompleted();
-        } catch (NoSuchJobException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -268,12 +257,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             XenonProto.JobStatus response = mapJobStatus(status, request.getScheduler());
             responseObserver.onNext(response);
             responseObserver.onCompleted();
-        } catch (NoSuchJobException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -301,10 +286,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             XenonProto.JobStatuses response = builder.build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -318,12 +301,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             XenonProto.JobStatus response = mapJobStatus(status, request.getScheduler());
             responseObserver.onNext(response);
             responseObserver.onCompleted();
-        } catch (NoSuchJobException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -337,12 +316,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             XenonProto.JobStatus response = mapJobStatus(status, request.getScheduler());
             responseObserver.onNext(response);
             responseObserver.onCompleted();
-        } catch (NoSuchJobException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -358,12 +333,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             XenonProto.Jobs response = mapJobs(schedulerRequest, jobIdentifiers);
             responseObserver.onNext(response);
             responseObserver.onCompleted();
-        } catch (NoSuchQueueException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 
@@ -387,12 +358,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
                     // write incoming stdin to xenons stdin
                     streams.getStdin().write(value.getStdin().toByteArray());
                     streams.getStdin().flush();
-                } catch (IncompleteJobDescriptionException | InvalidJobDescriptionException | UnsupportedJobDescriptionException e) {
-                    responseObserver.onError(Status.FAILED_PRECONDITION.withDescription(e.getMessage()).withCause(e).asException());
-                } catch (XenonException | IOException e) {
-                    responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-                } catch (StatusException e) {
-                    responseObserver.onError(e);
+                } catch (Exception e) {
+                    responseObserver.onError(mapException(e));
                 }
             }
 
