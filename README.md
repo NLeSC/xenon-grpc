@@ -8,7 +8,36 @@ For example pyxenon (https://github.com/NLeSC/pyxenon) will use the Xenon gRPC s
 [![SonarCloud Gate](https://sonarcloud.io/api/badges/gate?key=nlesc:xenon-grpc)](https://sonarcloud.io/dashboard?id=nlesc:xenon-grpc)
 [![SonarCloud Coverage](https://sonarcloud.io/api/badges/measure?key=nlesc:xenon-grpc&metric=coverage)](https://sonarcloud.io/component_measures/domain/Coverage?id=nlesc:xenon-grpc)
 
-# Develop
+# Install
+
+On [releases page](https://github.com/NLeSC/xenon-grpc/releases) download a tarball (or zipfile).
+
+The tarball can be installed with:
+```bash
+tar -xf xenon-grpc-shadow*.tar
+```
+Add `xenon-grpc*/bin` to your PATH environment variable for easy usage.
+
+# Usage
+
+To start the grpc server with default arguments run
+
+```bash
+./xenon-grpc*/bin/xenon-grpc
+```
+
+To get help run
+
+```bash
+./xenon-grpc*/bin/xenon-grpc --help
+```
+
+Or call the jar directly with
+```bash
+
+```
+
+# Development
 
 ## Run server
 
@@ -27,21 +56,16 @@ java -jar polyglot.jar --command=list_services  --proto_discovery_root=src/main/
 echo {} | java -jar polyglot.jar --endpoint=localhost:50051 --proto_discovery_root=src/main/proto --full_method=xenon.XenonJobs/getAdaptorDescriptions --command=call
 ```
 
-## grpc gateway
-
-JSON REST api around server with https://github.com/grpc-ecosystem/grpc-gateway
-
-TODO
-
 ## Python client
 
+Compile proto into python stubs
 ```
-cd src/main/python
-pip install -r requirements.txt
-# compile proto into python stubs
-python -m grpc_tools.protoc -I../proto --python_out=. --grpc_python_out=. ../proto/xenon.proto
-python client.py
+pip install grpcio grpcio-tools
+xenon-grpc --proto > xenon.proto
+python -m grpc_tools.protoc -I../proto --python_out=. --grpc_python_out=. xenon.proto
 ```
+
+Now use the generated stubs, see https://grpc.io/docs/tutorials/basic/python.html#creating-the-client
 
 ## Mutual TLS
 
@@ -55,7 +79,7 @@ openssl req -new -x509 -nodes -out server.crt -keyout server.key
 ./build/install/xenon-grpc/bin/xenon-grpc --server-cert-chain server.crt --server-private-key server.key --client-cert-chain server.crt
 ```
 
-In a ipython shell in src/main/python dir
+In a ipython shell with generated stubs in working directory:
 ```python
 import grpc
 import xenon_pb2
@@ -72,3 +96,15 @@ stub = xenon_pb2_grpc.XenonJobsStub(channel)
 response = stub.getAdaptorDescriptions(xenon_pb2.Empty())
 print(response)
 ```
+
+## New release
+
+```
+./gradlew build
+```
+
+Generates application tar/zip in `build/distributions/` directory.
+
+1. Create a new GitHub release
+2. Upload the files in `build/distributions/` directory to that release
+3. Publish release
