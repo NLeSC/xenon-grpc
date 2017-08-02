@@ -405,16 +405,24 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
 
             responseObserver.onNext(empty());
             responseObserver.onCompleted();
-        } catch (NoSuchPathException e) {
-            responseObserver.onError(Status.NOT_FOUND.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (PathAlreadyExistsException e) {
-            responseObserver.onError(Status.ALREADY_EXISTS.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (UnsupportedOperationException e) {
-            responseObserver.onError(Status.UNIMPLEMENTED.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (XenonException e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).withCause(e).asException());
-        } catch (StatusException e) {
-            responseObserver.onError(e);
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
+        }
+    }
+
+    @Override
+    public void createSymbolicLink(XenonProto.CreateSymbolicLinkRequest request, StreamObserver<XenonProto.Empty> responseObserver) {
+        try {
+            FileSystem filesystem = getFileSystem(request.getFilesystem());
+            Path link = new Path(request.getLink());
+            Path target = new Path(request.getTarget());
+
+            filesystem.createSymbolicLink(link, target);
+
+            responseObserver.onNext(empty());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
         }
     }
 

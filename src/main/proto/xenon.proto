@@ -134,6 +134,12 @@ message RenameRequest {
     string target = 3;
 }
 
+message CreateSymbolicLinkRequest {
+    FileSystem filesystem = 1;
+    string link = 2;
+    string target = 3;
+}
+
 message CopyOperation {
     string id = 1;
     FileSystem filesystem = 2;
@@ -353,6 +359,7 @@ service XenonFileSystems {
     rpc createDirectories(Path) returns (Empty) {}
     rpc createDirectory(Path) returns (Empty) {}
     rpc createFile(Path) returns (Empty) {}
+    rpc createSymbolicLink(CreateSymbolicLinkRequest) returns (Empty) {}
     rpc Copy(CopyRequest) returns (CopyOperation) {}
     rpc cancel(CopyOperation) returns (CopyStatus) {}
     rpc getStatus(CopyOperation) returns (CopyStatus) {}
