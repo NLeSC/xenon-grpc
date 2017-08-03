@@ -360,7 +360,7 @@ service XenonFileSystems {
     rpc createDirectory(Path) returns (Empty) {}
     rpc createFile(Path) returns (Empty) {}
     rpc createSymbolicLink(CreateSymbolicLinkRequest) returns (Empty) {}
-    rpc Copy(CopyRequest) returns (CopyOperation) {}
+    rpc copy(CopyRequest) returns (CopyOperation) {}
     rpc cancel(CopyOperation) returns (CopyStatus) {}
     rpc getStatus(CopyOperation) returns (CopyStatus) {}
     rpc rename(RenameRequest) returns (Empty) {}
