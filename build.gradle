@@ -3,7 +3,7 @@ plugins {
     id 'com.google.protobuf' version '0.8.1'
     // distribution
     id 'application'
-    id 'com.github.johnrengelman.shadow' version '2.0.0'
+    id 'com.github.johnrengelman.shadow' version '2.0.1'
     // ide
     id 'idea'
     id 'eclipse'
@@ -11,11 +11,13 @@ plugins {
     id 'jacoco'
     // quality
     id 'org.sonarqube' version '2.5'
+    // xenon --version reads version from this file
+    id 'de.fuerstenau.buildconfig' version '1.1.8'
 }
 
 version = '1.0.0'
 applicationName = 'xenon-grpc'
-group = 'nlesc'
+group = 'nl.esciencecenter.xenon.grpc'
 mainClassName = 'nl.esciencecenter.xenon.grpc.XenonServerWrapper'
 ext.grpcVersion = '1.4.0'
 sourceCompatibility = 1.8
@@ -27,12 +29,14 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+ext.xenonLibVersion = '2.0.0-rc2'
+
 dependencies {
     compile "io.grpc:grpc-netty:${grpcVersion}"
     compile "io.grpc:grpc-protobuf:${grpcVersion}"
     compile "io.grpc:grpc-stub:${grpcVersion}"
     compile 'org.slf4j:slf4j-api:1.7.25'
-    // compile 'nl.esciencecenter.xenon:xenon:1.2.2'
+    // compile "nl.esciencecenter.xenon:xenon:${xenonLibVersion}"
     compile 'com.github.NLeSC:Xenon:master-SNAPSHOT'
     compile 'net.sourceforge.argparse4j:argparse4j:0.7.0'
     compile 'io.netty:netty-tcnative-boringssl-static:2.0.5.Final'
@@ -98,4 +102,9 @@ sonarqube {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '4.0'
+}
+
+buildConfig {
+    appName = project.applicationName
+    buildConfigField 'String', 'XENON_LIB_VERSION', "${xenonLibVersion}"
 }

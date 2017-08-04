@@ -47,9 +47,11 @@ public class XenonServerWrapper {
     }
 
     ArgumentParser buildArgumentParser() {
-        ArgumentParser myparser = ArgumentParsers.newArgumentParser(PROGRAM_NAME)
+        ArgumentParser myparser = ArgumentParsers.newArgumentParser(BuildConfig.NAME)
                 .defaultHelp(true)
-                .description("gRPC (http://www.grpc.io/) server for Xenon (https://nlesc.github.io/Xenon/)");
+                .description("gRPC (http://www.grpc.io/) server for Xenon (https://nlesc.github.io/Xenon/)")
+                .version("Xenon gRPC v" + BuildConfig.VERSION + ", Xenon Library v" + BuildConfig.XENON_LIB_VERSION);
+        myparser.addArgument("--version").action(Arguments.version()).help("Prints version and exists");
         myparser.addArgument("--port", "-p")
                 .type(Integer.class).setDefault(DEFAULT_PORT)
                 .help("Port to bind to");
