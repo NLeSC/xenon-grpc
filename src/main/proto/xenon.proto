@@ -354,8 +354,7 @@ message Is {
 service XenonFileSystems {
     rpc getAdaptorDescriptions(Empty) returns (FileSystemAdaptorDescriptions) {}
     rpc getAdaptorDescription(AdaptorName) returns (FileSystemAdaptorDescription) {}
-    // In Xenon its named FileSystem.create()
-    rpc createFileSystem(CreateFileSystemRequest) returns (FileSystem) {}
+    rpc create(CreateFileSystemRequest) returns (FileSystem) {}
     rpc createDirectories(Path) returns (Empty) {}
     rpc createDirectory(Path) returns (Empty) {}
     rpc createFile(Path) returns (Empty) {}
@@ -390,8 +389,7 @@ service XenonFileSystems {
 service XenonSchedulers {
     rpc getAdaptorDescriptions(Empty) returns (SchedulerAdaptorDescriptions) {}
     rpc getAdaptorDescription(AdaptorName) returns (SchedulerAdaptorDescription) {}
-    // In Xenon its named Scheduler.create()
-    rpc createScheduler(CreateSchedulerRequest) returns (Scheduler) {}
+    rpc create(CreateSchedulerRequest) returns (Scheduler) {}
     rpc submitBatchJob(SubmitBatchJobRequest) returns (Job) {}
     rpc submitInteractiveJob(stream SubmitInteractiveJobRequest) returns (stream SubmitInteractiveJobResponse) {}
     rpc getQueues(Scheduler) returns (Queues) {}

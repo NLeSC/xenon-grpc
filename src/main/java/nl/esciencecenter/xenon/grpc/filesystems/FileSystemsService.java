@@ -46,7 +46,7 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
     private Map<String, FileSystemContainer> fileSystems = new ConcurrentHashMap<>();
 
     @Override
-    public void createFileSystem(XenonProto.CreateFileSystemRequest request, StreamObserver<XenonProto.FileSystem> responseObserver) {
+    public void create(XenonProto.CreateFileSystemRequest request, StreamObserver<XenonProto.FileSystem> responseObserver) {
         try {
             Credential credential = mapCredential(request);
             FileSystem fileSystem = FileSystem.create(

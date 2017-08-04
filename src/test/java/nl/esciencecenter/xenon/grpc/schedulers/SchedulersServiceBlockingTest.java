@@ -343,7 +343,7 @@ public class SchedulersServiceBlockingTest {
                 .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
                 .build();
 
-        XenonProto.Scheduler response = client.createScheduler(request);
+        XenonProto.Scheduler response = client.create(request);
 
         String schedId = "local://user1@local://";
         XenonProto.Scheduler expected = XenonProto.Scheduler.newBuilder()

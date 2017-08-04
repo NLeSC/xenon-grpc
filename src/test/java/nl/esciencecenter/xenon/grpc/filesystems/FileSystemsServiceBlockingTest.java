@@ -467,7 +467,7 @@ public class FileSystemsServiceBlockingTest {
                 .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
                 .build();
 
-        XenonProto.FileSystem response = client.createFileSystem(request);
+        XenonProto.FileSystem response = client.create(request);
 
         String fsId = "file://user1@";
         XenonProto.FileSystem expected = XenonProto.FileSystem.newBuilder()

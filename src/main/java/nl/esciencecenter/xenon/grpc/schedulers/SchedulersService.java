@@ -39,7 +39,7 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
     private final Map<String, SchedulerContainer> schedulers = new ConcurrentHashMap<>();
 
     @Override
-    public void createScheduler(XenonProto.CreateSchedulerRequest request, StreamObserver<XenonProto.Scheduler> responseObserver) {
+    public void create(XenonProto.CreateSchedulerRequest request, StreamObserver<XenonProto.Scheduler> responseObserver) {
         try {
             Credential credential = mapCredential(request);
             Scheduler scheduler = Scheduler.create(
@@ -133,7 +133,7 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
     @Override
     public void localScheduler(XenonProto.Empty request, StreamObserver<XenonProto.Scheduler> responseObserver) {
         XenonProto.CreateSchedulerRequest schedulerRequest = XenonProto.CreateSchedulerRequest.newBuilder().setAdaptor("local").build();
-        createScheduler(schedulerRequest, responseObserver);
+        create(schedulerRequest, responseObserver);
     }
 
     @Override
