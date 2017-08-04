@@ -130,7 +130,7 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
     private FileSystem getFileSystem(XenonProto.FileSystem fileSystemRequest) throws StatusException {
         String id = fileSystemRequest.getId();
         if (!fileSystems.containsKey(id)) {
-            throw Status.NOT_FOUND.augmentDescription(id).asException();
+            throw Status.NOT_FOUND.withDescription("File system with id: " + id).asException();
         }
         return fileSystems.get(id).getFileSystem();
     }
