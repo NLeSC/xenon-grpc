@@ -29,9 +29,6 @@ import org.slf4j.LoggerFactory;
 class MapUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapUtils.class);
 
-    private MapUtils() {
-    }
-
     static Set<PosixFilePermission> parsePermissions(List<XenonProto.PosixFilePermission> permissionsValueList) throws StatusException {
         Set<PosixFilePermission> permissions = new HashSet<>();
         for (XenonProto.PosixFilePermission permission:  permissionsValueList) {
@@ -73,7 +70,7 @@ class MapUtils {
         return permissions;
     }
 
-    static CopyMode mapCopyMode(XenonProto.CopyMode mode) {
+    static CopyMode mapCopyMode(XenonProto.CopyMode mode) throws StatusException {
         switch (mode) {
             case CREATE:
                 return CopyMode.CREATE;
@@ -81,9 +78,9 @@ class MapUtils {
                 return CopyMode.REPLACE;
             case IGNORE:
                 return CopyMode.IGNORE;
+            default:
+                throw Status.INVALID_ARGUMENT.withDescription("Unrecognized copy mode").asException();
         }
-        // the default
-        return CopyMode.CREATE;
     }
 
     static XenonProto.PathAttributes writeFileAttributes(XenonProto.FileSystem filesystem, PathAttributes a) {
@@ -126,7 +123,7 @@ class MapUtils {
         return builder.build();
     }
 
-    private static Set<XenonProto.PosixFilePermission> writePermissions(Set<PosixFilePermission> permissionsx) {
+    static Set<XenonProto.PosixFilePermission> writePermissions(Set<PosixFilePermission> permissionsx) {
         Set<XenonProto.PosixFilePermission> permissions = new HashSet<>();
         for (PosixFilePermission permission : permissionsx) {
             switch (permission) {

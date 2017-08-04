@@ -12,10 +12,7 @@ import java.util.Map;
 
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
 
-class MapUtils {
-    private MapUtils() {
-    }
-
+public class MapUtils {
     static XenonProto.QueueStatus mapQueueStatus(QueueStatus status, XenonProto.Scheduler scheduler) {
         XenonProto.QueueStatus.Builder builder = XenonProto.QueueStatus.newBuilder()
                 .setName(status.getQueueName())
@@ -90,7 +87,7 @@ class MapUtils {
         return builder.build();
     }
 
-    private static XenonProto.JobStatus.ErrorType mapErrorType(Exception exception) {
+    public static XenonProto.JobStatus.ErrorType mapErrorType(Exception exception) {
         if (exception instanceof JobCanceledException) {
             return XenonProto.JobStatus.ErrorType.CANCELLED;
         } else if (exception instanceof NoSuchJobException) {

@@ -107,4 +107,6 @@ public class MapUtilsTest {
         DefaultCredential expected = new DefaultCredential();
         assertEquals(expected, result);
     }
+
+
 }
