@@ -25,7 +25,6 @@ import java.io.InputStream;
 import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 public class XenonServerWrapper {
-    private static final String PROGRAM_NAME = "xenon-grpc-server";
     private static final Logger LOGGER = LoggerFactory.getLogger(XenonServerWrapper.class);
     static final Integer DEFAULT_PORT = 50051;
     private final ArgumentParser parser = buildArgumentParser();
