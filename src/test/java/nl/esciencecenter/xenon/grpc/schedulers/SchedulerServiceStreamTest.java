@@ -1,32 +1,36 @@
 package nl.esciencecenter.xenon.grpc.schedulers;
 
-import com.google.protobuf.ByteString;
-import io.grpc.StatusException;
-import io.grpc.stub.StreamObserver;
+import static java.lang.Thread.sleep;
+import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
+import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobDescription;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.Streams;
+
+import com.google.protobuf.ByteString;
+import io.grpc.StatusException;
+import io.grpc.stub.StreamObserver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
-import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobDescription;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class SchedulerServiceStreamTest {
     private SchedulersService service;
@@ -133,5 +137,89 @@ public class SchedulerServiceStreamTest {
         assertEquals("INVALID_ARGUMENT: file adaptor: No executable", error.getMessage());
         verify(responseObserver, never()).onNext(any(XenonProto.SubmitInteractiveJobResponse.class));
         verify(responseObserver, never()).onCompleted();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void submitInteractiveJob_submitSendReceiveSendReceive() throws Exception {
+        final XenonProto.Scheduler[] scheduler = new XenonProto.Scheduler[1];
+        StreamObserver<XenonProto.Scheduler> responseSchedulerObserver = new StreamObserver<XenonProto.Scheduler>() {
+            @Override
+            public void onNext(XenonProto.Scheduler value) {
+                scheduler[0] = value;
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onCompleted() {
+
+            }
+        };
+        service.localScheduler(empty(), responseSchedulerObserver);
+        StreamObserver<XenonProto.SubmitInteractiveJobResponse> responseObserver = (StreamObserver<XenonProto.SubmitInteractiveJobResponse>) mock(StreamObserver.class);
+        StreamObserver<XenonProto.SubmitInteractiveJobRequest> requestBroadcaster = service.submitInteractiveJob(responseObserver);
+
+        // submit job
+        XenonProto.SubmitInteractiveJobRequest.Builder requestBuilder = XenonProto.SubmitInteractiveJobRequest.newBuilder()
+            .setDescription(
+                XenonProto.JobDescription.newBuilder()
+                    .setExecutable("cat")
+                    .setQueueName("multi")
+            ).setScheduler(scheduler[0]);
+        XenonProto.SubmitInteractiveJobRequest request1 = requestBuilder.build();
+        requestBroadcaster.onNext(request1);
+
+        // send first line to stdIn
+        ByteString line1 = ByteString.copyFromUtf8("first line\n");
+        XenonProto.SubmitInteractiveJobRequest request2 = requestBuilder.setStdin(line1).build();
+        requestBroadcaster.onNext(request2);
+
+        // allow cat and xenon to work
+        sleep(100);
+
+        // receive first line on stdOut
+        XenonProto.SubmitInteractiveJobResponse.Builder responseBuilder = XenonProto.SubmitInteractiveJobResponse.newBuilder()
+            .setJob(
+                XenonProto.Job.newBuilder()
+                    .setId("local-0")
+                    .setScheduler(scheduler[0])
+            );
+        XenonProto.SubmitInteractiveJobResponse expected1 = responseBuilder.setStdout(line1).build();
+        verify(responseObserver).onNext(expected1);
+        reset(responseObserver);
+
+        // send second line to stdIn
+        ByteString line2 = ByteString.copyFromUtf8("second line\n");
+        XenonProto.SubmitInteractiveJobRequest request3 = requestBuilder.setStdin(line2).build();
+        requestBroadcaster.onNext(request3);
+        requestBroadcaster.onCompleted();
+
+        // allow cat and xenon to work
+        sleep(100);
+
+        // receive second line on stdOut
+        XenonProto.SubmitInteractiveJobResponse expected2 = responseBuilder.setStdout(line2).build();
+        verify(responseObserver).onNext(expected2);
+        verify(responseObserver).onCompleted();
+        verify(responseObserver, never()).onError(any());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void submitInteractiveJob_cancelNothingSubmitted() {
+        StreamObserver<XenonProto.SubmitInteractiveJobResponse> responseObserver = (StreamObserver<XenonProto.SubmitInteractiveJobResponse>) mock(StreamObserver.class);
+
+        StreamObserver<XenonProto.SubmitInteractiveJobRequest> requestBroadcaster = service.submitInteractiveJob(responseObserver);
+
+        Exception error = new Exception("Client cancelled");
+        requestBroadcaster.onError(error);
+
+        String expected = "CANCELLED: Client cancelled";
+        verify(responseObserver).onError(captor.capture());
+        assertEquals(expected, captor.getValue().getMessage());
     }
 }

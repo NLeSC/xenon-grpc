@@ -107,7 +107,7 @@ public class MapUtils {
         return credential;
     }
 
-    public static StatusException mapException(Exception e) {
+    public static StatusException mapException(Throwable e) {
         Status s;
         if (e instanceof StatusException) {
             return (StatusException) e;

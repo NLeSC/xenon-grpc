@@ -8,6 +8,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
@@ -28,10 +32,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SchedulersServiceBlockingTest {
     private SchedulersService service;
@@ -101,6 +101,17 @@ public class SchedulersServiceBlockingTest {
     }
 
     @Test
+    public void getAdaptorDescription_unknown() throws XenonException {
+        thrown.expectMessage("NOT_FOUND: Scheduler adaptor: Adaptor 'bigcompute' not found");
+
+        XenonProto.AdaptorName request = XenonProto.AdaptorName.newBuilder()
+            .setName("bigcompute")
+            .build();
+
+        client.getAdaptorDescription(request);
+    }
+
+    @Test
     public void getAdaptorDescriptions() throws Exception {
         XenonProto.SchedulerAdaptorDescriptions response = client.getAdaptorDescriptions(empty());
 
@@ -153,6 +164,16 @@ public class SchedulersServiceBlockingTest {
 
     @Test
     public void localScheduler() throws Exception {
+        XenonProto.Scheduler response = client.localScheduler(empty());
+
+        String currentUser = System.getProperty("user.name");
+        XenonProto.Scheduler expected = XenonProto.Scheduler.newBuilder()
+            .setId("local://" + currentUser + "@local://")
+            .setRequest(XenonProto.CreateSchedulerRequest.newBuilder()
+                .setAdaptor("local")
+            )
+            .build();
+        assertEquals(expected, response);
     }
 
     @Test
@@ -523,5 +544,17 @@ public class SchedulersServiceBlockingTest {
                 .setRequest(request)
                 .build();
         assertEquals(expected, response);
+    }
+
+    @Test
+    public void create_again_alreadyExistError() {
+        thrown.expectMessage("ALREADY_EXISTS: Scheduler with id: local://user1@local://");
+        XenonProto.CreateSchedulerRequest request = XenonProto.CreateSchedulerRequest.newBuilder()
+            .setAdaptor("local")
+            .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
+            .build();
+        client.create(request);
+
+        client.create(request);
     }
 }

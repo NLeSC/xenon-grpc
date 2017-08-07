@@ -1,23 +1,25 @@
 package nl.esciencecenter.xenon.grpc.filesystems;
 
-import com.google.protobuf.ByteString;
-import io.grpc.stub.StreamObserver;
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.filesystems.Path;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.io.OutputStream;
-
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.io.OutputStream;
+
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+
+import com.google.protobuf.ByteString;
+import io.grpc.StatusException;
+import io.grpc.stub.StreamObserver;
+import org.junit.Before;
+import org.junit.Test;
 
 public class FileSystemServiceStreamTest {
     private FileSystem filesystem;
@@ -45,7 +47,7 @@ public class FileSystemServiceStreamTest {
     }
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws IOException, StatusException {
         service = new FileSystemsService();
         // register mocked filesystem to service
         filesystem = mock(FileSystem.class);

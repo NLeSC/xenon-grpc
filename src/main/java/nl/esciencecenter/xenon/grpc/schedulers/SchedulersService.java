@@ -62,9 +62,13 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
         }
     }
 
-    String putScheduler(XenonProto.CreateSchedulerRequest request, Scheduler scheduler, String username) {
+    String putScheduler(XenonProto.CreateSchedulerRequest request, Scheduler scheduler, String username) throws StatusException {
         String id = scheduler.getAdaptorName() + "://" + username + "@" + scheduler.getLocation();
-        schedulers.put(id, new SchedulerContainer(request, scheduler));
+        if (schedulers.containsKey(id)) {
+            throw Status.ALREADY_EXISTS.augmentDescription("Scheduler with id: " + id).asException();
+        } else {
+            schedulers.put(id, new SchedulerContainer(request, scheduler));
+        }
         return id;
     }
 
@@ -371,9 +375,10 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
                         streams.getStdin().close();
                         forwarder.close();
                     } catch (IOException e) {
-                        LOGGER.warn("Error from server", e);
+                        responseObserver.onError(mapException(e));
                     }
                 }
+                responseObserver.onError(Status.CANCELLED.withCause(t).withDescription(t.getMessage()).asException());
             }
 
             @Override

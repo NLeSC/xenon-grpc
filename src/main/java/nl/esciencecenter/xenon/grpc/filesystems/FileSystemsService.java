@@ -69,9 +69,13 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
         }
     }
 
-    String putFileSystem(XenonProto.CreateFileSystemRequest request, String username, FileSystem fileSystem) {
+    String putFileSystem(XenonProto.CreateFileSystemRequest request, String username, FileSystem fileSystem) throws StatusException {
         String fileSystemId = getFileSystemId(fileSystem, username);
-        fileSystems.put(fileSystemId, new FileSystemContainer(request, fileSystem));
+        if (fileSystems.containsKey(fileSystemId)) {
+            throw Status.ALREADY_EXISTS.augmentDescription("File system with id: " + fileSystemId).asException();
+        } else {
+            fileSystems.put(fileSystemId, new FileSystemContainer(request, fileSystem));
+        }
         return fileSystemId;
     }
 
@@ -123,7 +127,7 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
         }
     }
 
-    private Path getPath(XenonProto.Path request) throws XenonException, StatusException {
+    private Path getPath(XenonProto.Path request) {
         return new Path(request.getPath());
     }
 
@@ -243,12 +247,12 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             public void onError(Throwable t) {
                 if (pipe != null) {
                     try {
-                        LOGGER.warn("Error from client", t);
                         pipe.close();
                     } catch (IOException e) {
-                        LOGGER.warn("Error from server", e);
+                        responseObserver.onError(mapException(e));
                     }
                 }
+                responseObserver.onError(mapException(t));
             }
 
             @Override
@@ -294,9 +298,10 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
                         LOGGER.warn("Error from client", t);
                         pipe.close();
                     } catch (IOException e) {
-                        LOGGER.warn("Error from server", e);
+                        responseObserver.onError(mapException(e));
                     }
                 }
+                responseObserver.onError(mapException(t));
             }
 
             @Override

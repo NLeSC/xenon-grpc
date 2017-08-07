@@ -1,19 +1,23 @@
 package nl.esciencecenter.xenon.grpc.schedulers;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.schedulers.*;
+import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
+import nl.esciencecenter.xenon.schedulers.QueueStatus;
+import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 
 public class MapUtils {
-    static XenonProto.QueueStatus mapQueueStatus(QueueStatus status, XenonProto.Scheduler scheduler) {
+    public static XenonProto.QueueStatus mapQueueStatus(QueueStatus status, XenonProto.Scheduler scheduler) {
         XenonProto.QueueStatus.Builder builder = XenonProto.QueueStatus.newBuilder()
                 .setName(status.getQueueName())
                 .setScheduler(scheduler);
@@ -34,7 +38,7 @@ public class MapUtils {
         return value;
     }
 
-    static JobDescription mapJobDescription(XenonProto.JobDescription d) {
+    public static JobDescription mapJobDescription(XenonProto.JobDescription d) {
         JobDescription description = new JobDescription();
         description.setExecutable(d.getExecutable());
         description.setArguments(d.getArgumentsList().toArray(new String[0]));
@@ -60,7 +64,7 @@ public class MapUtils {
         return description;
     }
 
-    static XenonProto.JobStatus mapJobStatus(JobStatus status, XenonProto.Scheduler scheduler) {
+    public static XenonProto.JobStatus mapJobStatus(JobStatus status, XenonProto.Scheduler scheduler) {
         XenonProto.JobStatus.Builder builder = XenonProto.JobStatus.newBuilder()
             .setState(status.getState())
             .setRunning(status.isRunning())
