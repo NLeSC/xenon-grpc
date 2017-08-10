@@ -13,12 +13,17 @@ import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writeFileSystems
 import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writePath;
 import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.getLocalFileSystems;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.google.protobuf.ByteString;
+import io.grpc.Status;
+import io.grpc.StatusException;
+import io.grpc.stub.StreamObserver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -32,13 +37,6 @@ import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 import nl.esciencecenter.xenon.grpc.XenonFileSystemsGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
-
-import com.google.protobuf.ByteString;
-import io.grpc.Status;
-import io.grpc.StatusException;
-import io.grpc.stub.StreamObserver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImplBase {
     private static final int BUFFER_SIZE = 8192;
@@ -218,102 +216,12 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
 
     @Override
     public StreamObserver<XenonProto.WriteToFileRequest> writeToFile(StreamObserver<XenonProto.Empty> responseObserver) {
-        return new StreamObserver<XenonProto.WriteToFileRequest>() {
-            private OutputStream pipe;
-
-            @Override
-            public void onNext(XenonProto.WriteToFileRequest value) {
-                try {
-                    // open pip to write to on first incoming chunk
-                    if (pipe == null) {
-                        FileSystem filesystem = getFileSystem(value.getPath().getFilesystem());
-                        Path path = getPath(value.getPath());
-                        if (XenonProto.WriteToFileRequest.getDefaultInstance().getSize() == value.getSize()) {
-                            pipe = filesystem.writeToFile(path);
-                        } else {
-                            pipe = filesystem.writeToFile(path, value.getSize());
-                        }
-                    }
-                    pipe.write(value.getBuffer().toByteArray());
-                } catch (Exception e) {
-                    responseObserver.onError(mapException(e));
-                }
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                if (pipe != null) {
-                    try {
-                        pipe.close();
-                    } catch (IOException e) {
-                        responseObserver.onError(mapException(e));
-                    }
-                }
-                responseObserver.onError(mapException(t));
-            }
-
-            @Override
-            public void onCompleted() {
-                if (pipe != null) {
-                    try {
-                        pipe.close();
-                    } catch (IOException e) {
-                        LOGGER.warn("Error from server", e);
-                    }
-                }
-                responseObserver.onNext(empty());
-                responseObserver.onCompleted();
-            }
-        };
+        return new WriteToFileBroadcaster(fileSystems, responseObserver);
     }
-
 
     @Override
     public StreamObserver<XenonProto.AppendToFileRequest> appendToFile(StreamObserver<XenonProto.Empty> responseObserver) {
-        return new StreamObserver<XenonProto.AppendToFileRequest>() {
-            private OutputStream pipe;
-
-            @Override
-            public void onNext(XenonProto.AppendToFileRequest value) {
-                try {
-                    // open pip to write to on first incoming chunk
-                    if (pipe == null) {
-                        FileSystem filesystem = getFileSystem(value.getPath().getFilesystem());
-                        Path path = getPath(value.getPath());
-                        pipe = filesystem.appendToFile(path);
-                    }
-                    pipe.write(value.getBuffer().toByteArray());
-                } catch (Exception e) {
-                    responseObserver.onError(mapException(e));
-                }
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                if (pipe != null) {
-                    try {
-                        LOGGER.warn("Error from client", t);
-                        pipe.close();
-                    } catch (IOException e) {
-                        responseObserver.onError(mapException(e));
-                    }
-                }
-                responseObserver.onError(mapException(t));
-            }
-
-            @Override
-            public void onCompleted() {
-                if (pipe != null) {
-                    try {
-                        pipe.close();
-                    } catch (IOException e) {
-                        LOGGER.warn("Error from server", e);
-                    }
-                }
-                responseObserver.onNext(empty());
-                responseObserver.onCompleted();
-            }
-        };
+        return new AppendToFileBroadcaster(fileSystems, responseObserver);
     }
 
     @Override
