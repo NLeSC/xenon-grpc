@@ -5,7 +5,7 @@ addons:
     organization: nlesc
 script:
   - ./gradlew check 
-  - ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN --info
+  - ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/

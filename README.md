@@ -5,8 +5,8 @@ For example pyxenon (https://github.com/NLeSC/pyxenon) will use the Xenon gRPC s
 
 [![Build Status](https://travis-ci.org/NLeSC/xenon-grpc.svg?branch=master)](https://travis-ci.org/NLeSC/xenon-grpc)
 [![Build status](https://ci.appveyor.com/api/projects/status/tep8bad05e76a69w/branch/master?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon-grpc/branch/master)
-[![SonarCloud Gate](https://sonarcloud.io/api/badges/gate?key=nlesc:xenon-grpc)](https://sonarcloud.io/dashboard?id=nlesc:xenon-grpc)
-[![SonarCloud Coverage](https://sonarcloud.io/api/badges/measure?key=nlesc:xenon-grpc&metric=coverage)](https://sonarcloud.io/component_measures/domain/Coverage?id=nlesc:xenon-grpc)
+[![SonarCloud Gate](https://sonarcloud.io/api/badges/gate?key=nl.esciencecenter.xenon.grpc:xenon-grpc)](https://sonarcloud.io/dashboard?id=nl.esciencecenter.xenon.grpc:xenon-grpc)
+[![SonarCloud Coverage](https://sonarcloud.io/api/badges/measure?key=nl.esciencecenter.xenon.grpc:xenon-grpc&metric=coverage)](https://sonarcloud.io/component_measures/domain/Coverage?id=nl.esciencecenter.xenon.grpc:xenon-grpc)
 
 # Install
 
