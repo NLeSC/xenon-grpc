@@ -126,7 +126,7 @@ public class MapUtilsTest {
     @Test
     public void test_writeFileSystems() throws XenonException {
         String username = System.getProperty("user.name");
-        FileSystem fs = FileSystem.create("file", "/");
+        FileSystem fs = FileSystem.create("file");
         FileSystem[] request = new FileSystem[] { fs };
 
         XenonProto.FileSystems response = writeFileSystems(request);

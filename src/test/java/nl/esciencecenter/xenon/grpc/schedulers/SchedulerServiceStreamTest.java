@@ -3,6 +3,7 @@ package nl.esciencecenter.xenon.grpc.schedulers;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobDescription;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.grpc.XenonProto;
@@ -132,6 +134,8 @@ public class SchedulerServiceStreamTest {
     @SuppressWarnings("unchecked")
     @Test
     public void submitInteractiveJob_submitSendReceiveSendReceive() throws Exception {
+        String command = "/bin/cat";
+        assumeTrue(new File(command).canExecute());
         final XenonProto.Scheduler[] scheduler = new XenonProto.Scheduler[1];
         StreamObserver<XenonProto.Scheduler> responseSchedulerObserver = new StreamObserver<XenonProto.Scheduler>() {
             @Override
@@ -157,7 +161,7 @@ public class SchedulerServiceStreamTest {
         XenonProto.SubmitInteractiveJobRequest.Builder requestBuilder = XenonProto.SubmitInteractiveJobRequest.newBuilder()
             .setDescription(
                 XenonProto.JobDescription.newBuilder()
-                    .setExecutable("cat")
+                    .setExecutable(command)
                     .setQueueName("multi")
             ).setScheduler(scheduler[0]);
         XenonProto.SubmitInteractiveJobRequest request1 = requestBuilder.build();
@@ -168,13 +172,17 @@ public class SchedulerServiceStreamTest {
         XenonProto.SubmitInteractiveJobRequest request2 = requestBuilder.setStdin(line1).build();
         requestBroadcaster.onNext(request2);
 
-        // receive first line on stdOut
+        // recieve job id witout stdOut or stdErr
         XenonProto.SubmitInteractiveJobResponse.Builder responseBuilder = XenonProto.SubmitInteractiveJobResponse.newBuilder()
             .setJob(
                 XenonProto.Job.newBuilder()
                     .setId("local-0")
                     .setScheduler(scheduler[0])
             );
+        XenonProto.SubmitInteractiveJobResponse expected0 = responseBuilder.build();
+        verify(responseObserver, timeout(1000)).onNext(expected0);
+
+        // receive first line on stdOut
         XenonProto.SubmitInteractiveJobResponse expected1 = responseBuilder.setStdout(line1).build();
         verify(responseObserver, timeout(1000)).onNext(expected1);
         reset(responseObserver);
