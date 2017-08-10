@@ -666,7 +666,7 @@ public class FileSystemsServiceBlockingTest {
         for (File root : File.listRoots()) {
             String xroot = root.getAbsolutePath();
             if (isWindows()) {
-                xroot = xroot.substring(0, 2).toLowerCase();
+                xroot = xroot.substring(0, 2);
             }
             fsb.setId("file://" + username + "@" + xroot);
             fssb.addFilesystems(fsb.build());
