@@ -3,12 +3,11 @@ package nl.esciencecenter.xenon.grpc.schedulers;
 import java.io.IOException;
 import java.io.InputStream;
 
-import nl.esciencecenter.xenon.grpc.XenonProto;
-
 import com.google.protobuf.ByteString;
-
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+
+import nl.esciencecenter.xenon.grpc.XenonProto;
 
 class JobOutputStreamsForwarder {
     
@@ -64,13 +63,14 @@ class JobOutputStreamsForwarder {
     JobOutputStreamsForwarder(StreamObserver<XenonProto.SubmitInteractiveJobResponse> responseWriter, InputStream stderr, InputStream stdout, XenonProto.Job job) {
         this.observer = responseWriter;
         builder = XenonProto.SubmitInteractiveJobResponse.newBuilder().setJob(job);
+        writeOut(builder.build());
         // We should fully read the in and output streams here (non blocking and in parallel) and forward the data to the responseWriter.
         new StreamForwarder(stdout, true).start();
         new StreamForwarder(stderr, false).start();
     }
 
     private synchronized void writeOut(XenonProto.SubmitInteractiveJobResponse response) {
-    	observer.onNext(response);
+        observer.onNext(response);
     }
 
     public synchronized void close() {
