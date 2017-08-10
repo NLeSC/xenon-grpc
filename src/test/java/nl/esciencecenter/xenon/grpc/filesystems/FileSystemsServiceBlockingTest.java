@@ -69,7 +69,8 @@ public class FileSystemsServiceBlockingTest {
         // register mocked filesystem to service
         filesystem = mock(FileSystem.class);
         when(filesystem.getAdaptorName()).thenReturn("file");
-        when(filesystem.getLocation()).thenReturn("/");
+        String root = File.listRoots()[0].getAbsolutePath();
+        when(filesystem.getLocation()).thenReturn(root);
         service.putFileSystem(filesystem, "someone");
         // setup server
         String name = service.getClass().getName() + "-" + randomUUID().toString();

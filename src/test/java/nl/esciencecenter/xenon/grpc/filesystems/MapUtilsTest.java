@@ -5,8 +5,10 @@ import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.parsePermissions
 import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writeFileAttributes;
 import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writeFileSystems;
 import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writePermissions;
+import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.isWindows;
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -143,8 +145,9 @@ public class MapUtilsTest {
     }
 
     private XenonProto.FileSystem createFileSystem(String username) {
+        String root = File.listRoots()[0].getAbsolutePath();
         return XenonProto.FileSystem.newBuilder()
-                .setId("file://" + username + "@/")
+                .setId("file://" + username + "@" + root)
                 .build();
     }
 
