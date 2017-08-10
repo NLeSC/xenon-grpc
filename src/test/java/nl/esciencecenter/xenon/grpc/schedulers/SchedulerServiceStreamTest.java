@@ -188,8 +188,8 @@ public class SchedulerServiceStreamTest {
         // receive second line on stdOut
         XenonProto.SubmitInteractiveJobResponse expected2 = responseBuilder.setStdout(line2).build();
         verify(responseObserver, timeout(1000)).onNext(expected2);
-        verify(responseObserver).onCompleted();
-        verify(responseObserver, never()).onError(any());
+        verify(responseObserver, timeout(1000)).onCompleted();
+        verify(responseObserver, timeout(1000).times(0)).onError(any());
     }
 
     @SuppressWarnings("unchecked")
