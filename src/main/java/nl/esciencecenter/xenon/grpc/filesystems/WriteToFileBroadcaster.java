@@ -1,30 +1,19 @@
 package nl.esciencecenter.xenon.grpc.filesystems;
 
-import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapException;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Map;
 
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 
-public class WriteToFileBroadcaster implements StreamObserver<XenonProto.WriteToFileRequest> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WriteToFileBroadcaster.class);
-    private OutputStream pipe;
-    private final Map<String, FileSystem> fileSystems;
-    private final StreamObserver<XenonProto.Empty> responseObserver;
-
+public class WriteToFileBroadcaster extends Broadcaster implements StreamObserver<XenonProto.WriteToFileRequest> {
     WriteToFileBroadcaster(Map<String, FileSystem> fileSystems, StreamObserver<XenonProto.Empty> responseObserver) {
-        this.fileSystems = fileSystems;
-        this.responseObserver = responseObserver;
+        super(fileSystems, responseObserver);
     }
 
     @Override
@@ -48,30 +37,5 @@ public class WriteToFileBroadcaster implements StreamObserver<XenonProto.WriteTo
         } catch (Exception e) {
             responseObserver.onError(mapException(e));
         }
-    }
-
-    @Override
-    public void onError(Throwable t) {
-        if (pipe != null) {
-            try {
-                pipe.close();
-            } catch (IOException e) {
-                responseObserver.onError(mapException(e));
-            }
-        }
-        responseObserver.onError(mapException(t));
-    }
-
-    @Override
-    public void onCompleted() {
-        if (pipe != null) {
-            try {
-                pipe.close();
-            } catch (IOException e) {
-                LOGGER.warn("Error from server", e);
-            }
-        }
-        responseObserver.onNext(empty());
-        responseObserver.onCompleted();
     }
 }

@@ -22,8 +22,6 @@ import com.google.protobuf.ByteString;
 import io.grpc.Status;
 import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -40,7 +38,6 @@ import nl.esciencecenter.xenon.grpc.XenonProto;
 
 public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImplBase {
     private static final int BUFFER_SIZE = 8192;
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemsService.class);
     private Map<String, FileSystem> fileSystems = new ConcurrentHashMap<>();
 
     @Override
