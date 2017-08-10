@@ -528,7 +528,7 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
 
             Path path = filesystem.getEntryPath();
 
-            XenonProto.Path pathResponse = XenonProto.Path.newBuilder().setPath(path.getAbsolutePath()).setFilesystem(request).build();
+            XenonProto.Path pathResponse = XenonProto.Path.newBuilder().setPath(path.toString()).setFilesystem(request).build();
             responseObserver.onNext(pathResponse);
             responseObserver.onCompleted();
         } catch (StatusException e) {
