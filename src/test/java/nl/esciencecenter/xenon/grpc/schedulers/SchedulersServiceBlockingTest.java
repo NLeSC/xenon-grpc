@@ -43,17 +43,8 @@ public class SchedulersServiceBlockingTest {
     @Rule
     public ExpectedException thrown= ExpectedException.none();
 
-    private XenonProto.CreateSchedulerRequest createSchedulerRequest() {
-        return XenonProto.CreateSchedulerRequest.newBuilder()
-                .setAdaptor("local")
-                .setLocation("local://")
-                .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("someone").build())
-                .build();
-    }
-
     private XenonProto.Scheduler createScheduler() {
         return XenonProto.Scheduler.newBuilder()
-                .setRequest(createSchedulerRequest())
                 .setId("local://someone@local://")
                 .build();
     }
@@ -72,7 +63,7 @@ public class SchedulersServiceBlockingTest {
         scheduler = mock(Scheduler.class);
         when(scheduler.getAdaptorName()).thenReturn("local");
         when(scheduler.getLocation()).thenReturn("local://");
-        service.putScheduler(createSchedulerRequest(), scheduler, "someone");
+        service.putScheduler(scheduler, "someone");
         // setup server
         String name = service.getClass().getName() + "-" + randomUUID().toString();
         server = InProcessServerBuilder.forName(name).directExecutor().addService(service).build();
@@ -146,11 +137,6 @@ public class SchedulersServiceBlockingTest {
 
         XenonProto.Scheduler request = XenonProto.Scheduler.newBuilder()
                 .setId("ssh://someone@localhost")
-                .setRequest(XenonProto.CreateSchedulerRequest.newBuilder()
-                        .setAdaptor("ssh")
-                        .setLocation("localhost")
-                        .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("someone").build())
-                )
                 .build();
 
         client.close(request);
@@ -159,7 +145,11 @@ public class SchedulersServiceBlockingTest {
     @Test
     public void closeAllSchedulers() throws Exception {
         service = new SchedulersService();
-        service.putScheduler(createSchedulerRequest(), scheduler, "someone");
+        service.putScheduler(scheduler, "someone");
+
+        service.closeAllSchedulers();
+
+        verify(scheduler).close();
     }
 
     @Test
@@ -169,9 +159,6 @@ public class SchedulersServiceBlockingTest {
         String currentUser = System.getProperty("user.name");
         XenonProto.Scheduler expected = XenonProto.Scheduler.newBuilder()
             .setId("local://" + currentUser + "@local://")
-            .setRequest(XenonProto.CreateSchedulerRequest.newBuilder()
-                .setAdaptor("local")
-            )
             .build();
         assertEquals(expected, response);
     }
@@ -541,7 +528,6 @@ public class SchedulersServiceBlockingTest {
         String schedId = "local://user1@local://";
         XenonProto.Scheduler expected = XenonProto.Scheduler.newBuilder()
                 .setId(schedId)
-                .setRequest(request)
                 .build();
         assertEquals(expected, response);
     }

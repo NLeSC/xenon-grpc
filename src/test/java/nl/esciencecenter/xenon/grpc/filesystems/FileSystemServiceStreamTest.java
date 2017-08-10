@@ -25,16 +25,8 @@ public class FileSystemServiceStreamTest {
     private FileSystem filesystem;
     private FileSystemsService service;
 
-    private XenonProto.CreateFileSystemRequest createFileSystemRequest() {
-        return XenonProto.CreateFileSystemRequest.newBuilder()
-                .setAdaptor("file")
-                .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("someone").build())
-                .build();
-    }
-
     private XenonProto.FileSystem createFileSystem() {
         return XenonProto.FileSystem.newBuilder()
-                .setRequest(createFileSystemRequest())
                 .setId("file://someone@/")
                 .build();
     }
@@ -53,7 +45,7 @@ public class FileSystemServiceStreamTest {
         filesystem = mock(FileSystem.class);
         when(filesystem.getAdaptorName()).thenReturn("file");
         when(filesystem.getLocation()).thenReturn("/");
-        service.putFileSystem(createFileSystemRequest(), "someone", filesystem);
+        service.putFileSystem(filesystem, "someone");
     }
 
     @SuppressWarnings("unchecked")

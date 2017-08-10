@@ -1,15 +1,11 @@
 package nl.esciencecenter.xenon.grpc.filesystems;
 
-import io.grpc.StatusException;
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
-import nl.esciencecenter.xenon.filesystems.CopyMode;
-import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.filesystems.Path;
-import nl.esciencecenter.xenon.filesystems.PathAttributes;
-import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-import org.junit.Test;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.mapCopyMode;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.parsePermissions;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writeFileAttributes;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writeFileSystems;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writePermissions;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,12 +13,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.mapCopyMode;
-import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.parsePermissions;
-import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writeFileAttributes;
-import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writeFileSystems;
-import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writePermissions;
-import static org.junit.Assert.assertEquals;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+
+import io.grpc.StatusException;
+import org.junit.Test;
 
 public class MapUtilsTest {
     @Test
@@ -143,12 +143,7 @@ public class MapUtilsTest {
     }
 
     private XenonProto.FileSystem createFileSystem(String username) {
-        XenonProto.CreateFileSystemRequest pfsr = XenonProto.CreateFileSystemRequest.newBuilder()
-                .setAdaptor("file")
-                .setLocation("/")
-                .build();
         return XenonProto.FileSystem.newBuilder()
-                .setRequest(pfsr)
                 .setId("file://" + username + "@/")
                 .build();
     }

@@ -168,14 +168,8 @@ class MapUtils {
     }
 
     private static XenonProto.FileSystem writeFileSystem(FileSystem fs) {
-        XenonProto.CreateFileSystemRequest request = XenonProto.CreateFileSystemRequest.newBuilder()
-            .setAdaptor(fs.getAdaptorName())
-            .setLocation(fs.getLocation())
-            .putAllProperties(fs.getProperties())
-            .build();
         return XenonProto.FileSystem.newBuilder()
             .setId(getFileSystemId(fs, new DefaultCredential().getUsername()))
-            .setRequest(request)
             .build();
     }
 

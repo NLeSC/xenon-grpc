@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulersService.class);
 
-    private final Map<String, SchedulerContainer> schedulers = new ConcurrentHashMap<>();
+    private final Map<String, Scheduler> schedulers = new ConcurrentHashMap<>();
 
     @Override
     public void create(XenonProto.CreateSchedulerRequest request, StreamObserver<XenonProto.Scheduler> responseObserver) {
@@ -49,11 +49,10 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
                     request.getPropertiesMap()
             );
 
-            String id = putScheduler(request, scheduler, credential.getUsername());
+            String id = putScheduler(scheduler, credential.getUsername());
 
             XenonProto.Scheduler value = XenonProto.Scheduler.newBuilder()
                     .setId(id)
-                    .setRequest(request)
                     .build();
             responseObserver.onNext(value);
             responseObserver.onCompleted();
@@ -62,12 +61,12 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
         }
     }
 
-    String putScheduler(XenonProto.CreateSchedulerRequest request, Scheduler scheduler, String username) throws StatusException {
+    String putScheduler(Scheduler scheduler, String username) throws StatusException {
         String id = scheduler.getAdaptorName() + "://" + username + "@" + scheduler.getLocation();
         if (schedulers.containsKey(id)) {
             throw Status.ALREADY_EXISTS.augmentDescription("Scheduler with id: " + id).asException();
         } else {
-            schedulers.put(id, new SchedulerContainer(request, scheduler));
+            schedulers.put(id, scheduler);
         }
         return id;
     }
@@ -102,11 +101,9 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
         XenonProto.Schedulers.Builder setBuilder = XenonProto.Schedulers.newBuilder();
         XenonProto.Scheduler.Builder builder = XenonProto.Scheduler.newBuilder();
 
-        for (Map.Entry<String, SchedulerContainer> entry : schedulers.entrySet()) {
-            XenonProto.CreateSchedulerRequest schedulerRequest = entry.getValue().getRequest();
+        for (String schedulerId : schedulers.keySet()) {
             setBuilder.addSchedulers(builder
-                .setId(entry.getKey())
-                .setRequest(schedulerRequest)
+                .setId(schedulerId)
             );
         }
 
@@ -128,8 +125,8 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
     }
 
     public void closeAllSchedulers() throws XenonException {
-        for (Map.Entry<String, SchedulerContainer> entry : schedulers.entrySet()) {
-            entry.getValue().getScheduler().close();
+        for (Map.Entry<String, Scheduler> entry : schedulers.entrySet()) {
+            entry.getValue().close();
             schedulers.remove(entry.getKey());
         }
     }
@@ -157,7 +154,7 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
         if (!schedulers.containsKey(id)) {
             throw Status.NOT_FOUND.augmentDescription("Scheduler with id: " + id).asException();
         }
-        return schedulers.get(id).getScheduler();
+        return schedulers.get(id);
     }
 
     @Override

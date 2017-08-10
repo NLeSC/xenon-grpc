@@ -38,17 +38,8 @@ public class SchedulerServiceStreamTest {
     @Captor
     private ArgumentCaptor<StatusException> captor;
 
-    private XenonProto.CreateSchedulerRequest createSchedulerRequest() {
-        return XenonProto.CreateSchedulerRequest.newBuilder()
-                .setAdaptor("local")
-                .setLocation("local://")
-                .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("someone").build())
-                .build();
-    }
-
     private XenonProto.Scheduler createScheduler() {
         return XenonProto.Scheduler.newBuilder()
-                .setRequest(createSchedulerRequest())
                 .setId("local://someone@local://")
                 .build();
     }
@@ -67,7 +58,7 @@ public class SchedulerServiceStreamTest {
         scheduler = mock(Scheduler.class);
         when(scheduler.getAdaptorName()).thenReturn("local");
         when(scheduler.getLocation()).thenReturn("local://");
-        service.putScheduler(createSchedulerRequest(), scheduler, "someone");
+        service.putScheduler(scheduler, "someone");
         MockitoAnnotations.initMocks(this);
     }
 

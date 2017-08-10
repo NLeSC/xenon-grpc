@@ -57,16 +57,8 @@ public class FileSystemsServiceBlockingTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private XenonProto.CreateFileSystemRequest createFileSystemRequest() {
-        return XenonProto.CreateFileSystemRequest.newBuilder()
-            .setAdaptor("file")
-            .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("someone").build())
-            .build();
-    }
-
     private XenonProto.FileSystem createFileSystem() {
         return XenonProto.FileSystem.newBuilder()
-            .setRequest(createFileSystemRequest())
             .setId("file://someone@/")
             .build();
     }
@@ -78,7 +70,7 @@ public class FileSystemsServiceBlockingTest {
         filesystem = mock(FileSystem.class);
         when(filesystem.getAdaptorName()).thenReturn("file");
         when(filesystem.getLocation()).thenReturn("/");
-        service.putFileSystem(createFileSystemRequest(), "someone", filesystem);
+        service.putFileSystem(filesystem, "someone");
         // setup server
         String name = service.getClass().getName() + "-" + randomUUID().toString();
         server = InProcessServerBuilder.forName(name).directExecutor().addService(service).build();
@@ -129,18 +121,13 @@ public class FileSystemsServiceBlockingTest {
     private XenonProto.FileSystem createUnknownFileSystem() {
         return XenonProto.FileSystem.newBuilder()
             .setId("sftp://someone@localhost/")
-            .setRequest(XenonProto.CreateFileSystemRequest.newBuilder()
-                .setAdaptor("sftp")
-                .setLocation("localhost")
-                .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("someone").build())
-            )
             .build();
     }
 
     @Test
     public void closeAllFileSystems() throws XenonException, StatusException {
         FileSystemsService service = new FileSystemsService();
-        service.putFileSystem(createFileSystemRequest(), "someone", filesystem);
+        service.putFileSystem(filesystem, "someone");
 
         service.closeAllFileSystems();
 
@@ -673,12 +660,9 @@ public class FileSystemsServiceBlockingTest {
         XenonProto.FileSystems response = client.localFileSystems(empty());
 
         String username = System.getProperty("user.name");
-        XenonProto.CreateFileSystemRequest.Builder fsrb = XenonProto.CreateFileSystemRequest.newBuilder().setAdaptor("file");
         XenonProto.FileSystem.Builder fsb = XenonProto.FileSystem.newBuilder();
         XenonProto.FileSystems.Builder fssb = XenonProto.FileSystems.newBuilder();
         for (File root : File.listRoots()) {
-            fsrb.setLocation(root.getAbsolutePath());
-            fsb.setRequest(fsrb.build());
             fsb.setId("file://" + username + "@" + root.getAbsolutePath());
             fssb.addFilesystems(fsb.build());
         }
@@ -697,7 +681,6 @@ public class FileSystemsServiceBlockingTest {
 
         String fsId = "file://user1@";
         XenonProto.FileSystem expected = XenonProto.FileSystem.newBuilder()
-            .setRequest(request)
             .setId(fsId)
             .build();
         assertEquals(expected, response);

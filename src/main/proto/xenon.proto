@@ -97,7 +97,6 @@ message CreateFileSystemRequest {
 // Handle for Xenon FileSystem object
 message FileSystem {
     string id = 1;
-    CreateFileSystemRequest request = 2;
 }
 
 message FileSystems {
@@ -232,7 +231,6 @@ message CreateSchedulerRequest {
 // Handle for Xenon Scheduler object
 message Scheduler {
     string id = 1;
-    CreateSchedulerRequest request = 2;
 }
 
 message Schedulers {

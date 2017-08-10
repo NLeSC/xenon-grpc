@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImplBase {
     private static final int BUFFER_SIZE = 8192;
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemsService.class);
-    private Map<String, FileSystemContainer> fileSystems = new ConcurrentHashMap<>();
+    private Map<String, FileSystem> fileSystems = new ConcurrentHashMap<>();
 
     @Override
     public void create(XenonProto.CreateFileSystemRequest request, StreamObserver<XenonProto.FileSystem> responseObserver) {
@@ -56,11 +56,10 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
                     request.getPropertiesMap()
             );
 
-            String fileSystemId = putFileSystem(request, credential.getUsername(), fileSystem);
+            String fileSystemId = putFileSystem(fileSystem, credential.getUsername());
 
             XenonProto.FileSystem value = XenonProto.FileSystem.newBuilder()
                     .setId(fileSystemId)
-                    .setRequest(request)
                     .build();
             responseObserver.onNext(value);
             responseObserver.onCompleted();
@@ -69,12 +68,12 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
         }
     }
 
-    String putFileSystem(XenonProto.CreateFileSystemRequest request, String username, FileSystem fileSystem) throws StatusException {
+    String putFileSystem(FileSystem fileSystem, String username) throws StatusException {
         String fileSystemId = getFileSystemId(fileSystem, username);
         if (fileSystems.containsKey(fileSystemId)) {
             throw Status.ALREADY_EXISTS.augmentDescription("File system with id: " + fileSystemId).asException();
         } else {
-            fileSystems.put(fileSystemId, new FileSystemContainer(request, fileSystem));
+            fileSystems.put(fileSystemId, fileSystem);
         }
         return fileSystemId;
     }
@@ -83,11 +82,9 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
     public void listFileSystems(XenonProto.Empty request, StreamObserver<XenonProto.FileSystems> responseObserver) {
         XenonProto.FileSystems.Builder setBuilder = XenonProto.FileSystems.newBuilder();
         XenonProto.FileSystem.Builder builder = XenonProto.FileSystem.newBuilder();
-        for (Map.Entry<String, FileSystemContainer> entry : fileSystems.entrySet()) {
-            XenonProto.CreateFileSystemRequest fileSystemRequest = entry.getValue().getRequest();
+        for (String fsId : fileSystems.keySet()) {
             setBuilder.addFilesystems(builder
-                    .setId(entry.getKey())
-                    .setRequest(fileSystemRequest)
+                    .setId(fsId)
             );
         }
         responseObserver.onNext(setBuilder.build());
@@ -108,8 +105,8 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
     }
 
     public void closeAllFileSystems() throws XenonException {
-        for (Map.Entry<String, FileSystemContainer> entry : fileSystems.entrySet()) {
-            entry.getValue().getFileSystem().close();
+        for (Map.Entry<String, FileSystem> entry : fileSystems.entrySet()) {
+            entry.getValue().close();
             fileSystems.remove(entry.getKey());
         }
     }
@@ -136,7 +133,7 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
         if (!fileSystems.containsKey(id)) {
             throw Status.NOT_FOUND.withDescription("File system with id: " + id).asException();
         }
-        return fileSystems.get(id).getFileSystem();
+        return fileSystems.get(id);
     }
 
     @Override
@@ -375,19 +372,12 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
     public void localFileSystems(XenonProto.Empty request, StreamObserver<XenonProto.FileSystems> responseObserver) {
         try {
             FileSystem[] xenonFilesystems = getLocalFileSystems();
-            XenonProto.CreateFileSystemRequest.Builder builder = XenonProto.CreateFileSystemRequest.newBuilder();
 
             DefaultCredential cred = new DefaultCredential();
             // Store file systems for later use
             for (FileSystem xenonFilesystem : xenonFilesystems) {
                 String fileSystemId = getFileSystemId(xenonFilesystem, cred.getUsername());
-                XenonProto.CreateFileSystemRequest fsRequest = builder
-                    .setAdaptor(xenonFilesystem.getAdaptorName())
-                    .setLocation(xenonFilesystem.getLocation())
-                    .setDefaultCred(XenonProto.DefaultCredential.getDefaultInstance())
-                    .putAllProperties(xenonFilesystem.getProperties())
-                    .build();
-                fileSystems.put(fileSystemId, new FileSystemContainer(fsRequest, xenonFilesystem));
+                fileSystems.put(fileSystemId, xenonFilesystem);
             }
 
             XenonProto.FileSystems filesystems = writeFileSystems(xenonFilesystems);
