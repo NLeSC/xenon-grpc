@@ -15,7 +15,7 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 
 public class Broadcaster {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WriteToFileBroadcaster.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Broadcaster.class);
     OutputStream pipe;
     final Map<String, FileSystem> fileSystems;
     final StreamObserver<XenonProto.Empty> responseObserver;
