@@ -160,7 +160,7 @@ class MapUtils {
     }
 
     static XenonProto.Path writePath(Path path, XenonProto.FileSystem fs) {
-        return XenonProto.Path.newBuilder().setFilesystem(fs).setPath(path.getAbsolutePath()).build();
+        return XenonProto.Path.newBuilder().setFilesystem(fs).setPath(path.toString()).build();
     }
 
     static String getFileSystemId(FileSystem fileSystem, String username) {
