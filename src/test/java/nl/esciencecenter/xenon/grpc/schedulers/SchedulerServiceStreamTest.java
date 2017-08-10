@@ -1,6 +1,5 @@
 package nl.esciencecenter.xenon.grpc.schedulers;
 
-import static java.lang.Thread.sleep;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobDescription;
 import static org.junit.Assert.assertEquals;
@@ -169,9 +168,6 @@ public class SchedulerServiceStreamTest {
         XenonProto.SubmitInteractiveJobRequest request2 = requestBuilder.setStdin(line1).build();
         requestBroadcaster.onNext(request2);
 
-        // allow cat and xenon to work
-        sleep(100);
-
         // receive first line on stdOut
         XenonProto.SubmitInteractiveJobResponse.Builder responseBuilder = XenonProto.SubmitInteractiveJobResponse.newBuilder()
             .setJob(
@@ -180,7 +176,7 @@ public class SchedulerServiceStreamTest {
                     .setScheduler(scheduler[0])
             );
         XenonProto.SubmitInteractiveJobResponse expected1 = responseBuilder.setStdout(line1).build();
-        verify(responseObserver).onNext(expected1);
+        verify(responseObserver, timeout(1000)).onNext(expected1);
         reset(responseObserver);
 
         // send second line to stdIn
@@ -189,12 +185,9 @@ public class SchedulerServiceStreamTest {
         requestBroadcaster.onNext(request3);
         requestBroadcaster.onCompleted();
 
-        // allow cat and xenon to work
-        sleep(100);
-
         // receive second line on stdOut
         XenonProto.SubmitInteractiveJobResponse expected2 = responseBuilder.setStdout(line2).build();
-        verify(responseObserver).onNext(expected2);
+        verify(responseObserver, timeout(1000)).onNext(expected2);
         verify(responseObserver).onCompleted();
         verify(responseObserver, never()).onError(any());
     }
