@@ -17,6 +17,10 @@ import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 
 public class MapUtils {
+    private MapUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static XenonProto.QueueStatus mapQueueStatus(QueueStatus status, XenonProto.Scheduler scheduler) {
         XenonProto.QueueStatus.Builder builder = XenonProto.QueueStatus.newBuilder()
                 .setName(status.getQueueName())

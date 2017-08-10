@@ -29,9 +29,13 @@ import org.slf4j.LoggerFactory;
 class MapUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapUtils.class);
 
+    private MapUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     static Set<PosixFilePermission> parsePermissions(List<XenonProto.PosixFilePermission> permissionsValueList) throws StatusException {
         Set<PosixFilePermission> permissions = new HashSet<>();
-        for (XenonProto.PosixFilePermission permission:  permissionsValueList) {
+        for (XenonProto.PosixFilePermission permission : permissionsValueList) {
             switch (permission) {
                 case NONE:
                     // Do nothing with NONE, this allows for a file with no permission

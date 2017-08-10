@@ -1,19 +1,23 @@
 package nl.esciencecenter.xenon.grpc;
 
+import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
+import static nl.esciencecenter.xenon.grpc.MapUtils.mapCredential;
+import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Collections;
+import java.util.List;
+
+import org.junit.Test;
+
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
-import org.junit.Test;
-
-import java.util.Collections;
-import java.util.List;
-
-import static nl.esciencecenter.xenon.grpc.MapUtils.*;
-import static org.junit.Assert.assertEquals;
 
 public class MapUtilsTest {
+
     @Test
     public void mapPropertyDescriptions_booltype() throws Exception {
         XenonPropertyDescription[] input = new XenonPropertyDescription[] {
