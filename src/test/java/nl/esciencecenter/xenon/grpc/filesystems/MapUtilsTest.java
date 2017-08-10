@@ -146,6 +146,9 @@ public class MapUtilsTest {
 
     private XenonProto.FileSystem createFileSystem(String username) {
         String root = File.listRoots()[0].getAbsolutePath();
+        if (isWindows()) {
+            root = root.substring(0, 2).toLowerCase();
+        }
         return XenonProto.FileSystem.newBuilder()
                 .setId("file://" + username + "@" + root)
                 .build();

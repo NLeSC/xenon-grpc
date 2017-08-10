@@ -2,6 +2,7 @@ package nl.esciencecenter.xenon.grpc.filesystems;
 
 import static java.util.UUID.randomUUID;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
+import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.isWindows;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doThrow;
@@ -69,8 +70,7 @@ public class FileSystemsServiceBlockingTest {
         // register mocked filesystem to service
         filesystem = mock(FileSystem.class);
         when(filesystem.getAdaptorName()).thenReturn("file");
-        String root = File.listRoots()[0].getAbsolutePath();
-        when(filesystem.getLocation()).thenReturn(root);
+        when(filesystem.getLocation()).thenReturn("/");
         service.putFileSystem(filesystem, "someone");
         // setup server
         String name = service.getClass().getName() + "-" + randomUUID().toString();
@@ -664,7 +664,11 @@ public class FileSystemsServiceBlockingTest {
         XenonProto.FileSystem.Builder fsb = XenonProto.FileSystem.newBuilder();
         XenonProto.FileSystems.Builder fssb = XenonProto.FileSystems.newBuilder();
         for (File root : File.listRoots()) {
-            fsb.setId("file://" + username + "@" + root.getAbsolutePath());
+            String xroot = root.getAbsolutePath();
+            if (isWindows()) {
+                xroot = xroot.substring(0, 2).toLowerCase();
+            }
+            fsb.setId("file://" + username + "@" + xroot);
             fssb.addFilesystems(fsb.build());
         }
         XenonProto.FileSystems expected = fssb.build();
