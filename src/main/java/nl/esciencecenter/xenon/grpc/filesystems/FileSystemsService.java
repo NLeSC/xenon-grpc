@@ -235,6 +235,35 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
     }
 
     @Override
+    public void getWorkingDirectory(XenonProto.FileSystem request, StreamObserver<XenonProto.Path> responseObserver) {
+        try {
+            FileSystem filesystem = getFileSystem(request);
+
+            Path path = filesystem.getWorkingDirectory();
+
+            XenonProto.Path pathResponse = XenonProto.Path.newBuilder().setPath(path.toString()).setFilesystem(request).build();
+            responseObserver.onNext(pathResponse);
+            responseObserver.onCompleted();
+        } catch (StatusException e) {
+            responseObserver.onError(e);
+        }
+    }
+
+    @Override
+    public void setWorkingDirectory(XenonProto.Path request, StreamObserver<XenonProto.Empty> responseObserver) {
+        try {
+            FileSystem filesystem = getFileSystem(request.getFilesystem());
+
+            filesystem.setWorkingDirectory(getPath(request));
+
+            responseObserver.onNext(XenonProto.Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(e);
+        }
+    }
+
+    @Override
     public void setPosixFilePermissions(XenonProto.SetPosixFilePermissionsRequest request, StreamObserver<XenonProto.Empty> responseObserver) {
         try {
             FileSystem filesystem = getFileSystem(request.getPath().getFilesystem());
@@ -413,21 +442,6 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             responseObserver.onCompleted();
         } catch (Exception e) {
             responseObserver.onError(mapException(e));
-        }
-    }
-
-    @Override
-    public void getEntryPath(XenonProto.FileSystem request, StreamObserver<XenonProto.Path> responseObserver) {
-        try {
-            FileSystem filesystem = getFileSystem(request);
-
-            Path path = filesystem.getEntryPath();
-
-            XenonProto.Path pathResponse = XenonProto.Path.newBuilder().setPath(path.toString()).setFilesystem(request).build();
-            responseObserver.onNext(pathResponse);
-            responseObserver.onCompleted();
-        } catch (StatusException e) {
-            responseObserver.onError(e);
         }
     }
 

@@ -637,23 +637,45 @@ public class FileSystemsServiceBlockingTest {
     }
 
     @Test
-    public void getEntryPath() {
+    public void getWorkingDirectory() {
         XenonProto.FileSystem request = createFileSystem();
-        when(filesystem.getEntryPath()).thenReturn(new Path("/home/someone"));
+        when(filesystem.getWorkingDirectory()).thenReturn(new Path("/home/someone"));
 
-        XenonProto.Path response = client.getEntryPath(request);
+        XenonProto.Path response = client.getWorkingDirectory(request);
 
         XenonProto.Path expected = buildPath("/home/someone");
         assertEquals(expected, response);
     }
 
     @Test
-    public void getEntryPath_unknownFilesystem() {
+    public void getWorkingDirectory_unknownFilesystem() {
         thrown.expectMessage("NOT_FOUND: File system with id: sftp://someone@localhost/");
 
         XenonProto.FileSystem request = createUnknownFileSystem();
 
-        client.getEntryPath(request);
+        client.getWorkingDirectory(request);
+    }
+
+    @Test
+    public void setWorkingDirectory() throws XenonException {
+        XenonProto.Path request = buildPath("/tmp");
+
+        client.setWorkingDirectory(request);
+
+        verify(filesystem).setWorkingDirectory(new Path("/tmp"));
+    }
+
+    @Test
+    public void setWorkingDirectory_unknownFilesystem() {
+        thrown.expectMessage("NOT_FOUND: File system with id: sftp://someone@localhost/");
+
+        XenonProto.FileSystem fs = createUnknownFileSystem();
+        XenonProto.Path request = XenonProto.Path.newBuilder()
+                .setFilesystem(fs)
+                .setPath("/tmp")
+                .build();
+
+        client.setWorkingDirectory(request);
     }
 
     @Test
