@@ -701,13 +701,12 @@ public class FileSystemsServiceBlockingTest {
     public void create() {
         XenonProto.CreateFileSystemRequest request = XenonProto.CreateFileSystemRequest.newBuilder()
             .setAdaptor("file")
-            .setLocation("/")
             .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
             .build();
 
         XenonProto.FileSystem response = client.create(request);
 
-        String expectedFilesystemId = "file://user1@/#";
+        String expectedFilesystemId = "file://user1@";
         assertTrue("Received an id", response.getId().startsWith(expectedFilesystemId));
         Stream<XenonProto.FileSystem> registeredFss = client.listFileSystems(empty()).getFilesystemsList().stream();
         assertTrue("Registered file system", registeredFss.anyMatch(c -> c.getId().startsWith(expectedFilesystemId)));
@@ -717,7 +716,6 @@ public class FileSystemsServiceBlockingTest {
     public void create_twiceSameRequest_shouldCreate2Filesystems() {
         XenonProto.CreateFileSystemRequest request = XenonProto.CreateFileSystemRequest.newBuilder()
             .setAdaptor("file")
-            .setLocation("/")
             .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
             .build();
         XenonProto.FileSystem response1 = client.create(request);

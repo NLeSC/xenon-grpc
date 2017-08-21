@@ -145,13 +145,18 @@ public class MapUtilsTest {
     }
 
     private XenonProto.FileSystem createFileSystem(String username, String uniqueFsId) {
-        String root = File.listRoots()[0].getAbsolutePath();
-        if (isWindows()) {
-            root = root.substring(0, 2).toLowerCase();
-        }
+        String root = getRoot();
         return XenonProto.FileSystem.newBuilder()
             .setId("file://" + username + "@" + root + "#" + uniqueFsId)
             .build();
+    }
+
+    private static String getRoot() {
+        String root = File.listRoots()[0].getAbsolutePath();
+        if (isWindows()) {
+            root = root.substring(0, 2);
+        }
+        return root;
     }
 
     @Test
