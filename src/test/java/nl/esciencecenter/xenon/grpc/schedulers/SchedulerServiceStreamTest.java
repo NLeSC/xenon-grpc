@@ -16,13 +16,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
-import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.Scheduler;
-import nl.esciencecenter.xenon.schedulers.Streams;
-
 import com.google.protobuf.ByteString;
 import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
@@ -33,15 +26,23 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
 
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
+import nl.esciencecenter.xenon.schedulers.Streams;
+
 public class SchedulerServiceStreamTest {
     private SchedulersService service;
     private Scheduler scheduler;
     @Captor
     private ArgumentCaptor<StatusException> captor;
+    private String schedulerId;
 
     private XenonProto.Scheduler createScheduler() {
         return XenonProto.Scheduler.newBuilder()
-                .setId("local://someone@local://")
+                .setId(schedulerId)
                 .build();
     }
 
@@ -59,7 +60,7 @@ public class SchedulerServiceStreamTest {
         scheduler = mock(Scheduler.class);
         when(scheduler.getAdaptorName()).thenReturn("local");
         when(scheduler.getLocation()).thenReturn("local://");
-        service.putScheduler(scheduler, "someone");
+        schedulerId = service.putScheduler(scheduler, "someone");
         MockitoAnnotations.initMocks(this);
     }
 

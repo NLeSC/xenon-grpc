@@ -4,6 +4,7 @@ import static java.util.UUID.randomUUID;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.isWindows;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -22,19 +23,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.NotConnectedException;
-import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
-import nl.esciencecenter.xenon.filesystems.CopyCancelledException;
-import nl.esciencecenter.xenon.filesystems.CopyMode;
-import nl.esciencecenter.xenon.filesystems.CopyStatus;
-import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.filesystems.Path;
-import nl.esciencecenter.xenon.filesystems.PathAttributes;
-import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
-import nl.esciencecenter.xenon.grpc.XenonFileSystemsGrpc;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
@@ -48,11 +36,25 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.MockitoAnnotations;
 
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.NotConnectedException;
+import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
+import nl.esciencecenter.xenon.filesystems.CopyCancelledException;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.CopyStatus;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
+import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
+import nl.esciencecenter.xenon.grpc.XenonFileSystemsGrpc;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+
 public class FileSystemsServiceBlockingTest {
     private Server server;
     private ManagedChannel channel;
     private XenonFileSystemsGrpc.XenonFileSystemsBlockingStub client;
     private FileSystem filesystem;
+    private String filesystemId;
     private FileSystemsService service;
 
     @Rule
@@ -60,7 +62,7 @@ public class FileSystemsServiceBlockingTest {
 
     private XenonProto.FileSystem createFileSystem() {
         return XenonProto.FileSystem.newBuilder()
-            .setId("file://someone@/")
+            .setId(filesystemId)
             .build();
     }
 
@@ -71,7 +73,7 @@ public class FileSystemsServiceBlockingTest {
         filesystem = mock(FileSystem.class);
         when(filesystem.getAdaptorName()).thenReturn("file");
         when(filesystem.getLocation()).thenReturn("/");
-        service.putFileSystem(filesystem, "someone");
+        filesystemId = service.putFileSystem(filesystem, "someone");
         // setup server
         String name = service.getClass().getName() + "-" + randomUUID().toString();
         server = InProcessServerBuilder.forName(name).directExecutor().addService(service).build();
@@ -683,49 +685,45 @@ public class FileSystemsServiceBlockingTest {
         XenonProto.FileSystems response = client.localFileSystems(empty());
 
         String username = System.getProperty("user.name");
-        XenonProto.FileSystem.Builder fsb = XenonProto.FileSystem.newBuilder();
-        XenonProto.FileSystems.Builder fssb = XenonProto.FileSystems.newBuilder();
+        int i = 0;
         for (File root : File.listRoots()) {
             String xroot = root.getAbsolutePath();
             if (isWindows()) {
                 xroot = xroot.substring(0, 2);
             }
-            fsb.setId("file://" + username + "@" + xroot);
-            fssb.addFilesystems(fsb.build());
+            assertTrue(response.getFilesystems(i).getId().startsWith("file://" + username + "@" + xroot + "#"));
+            i++;
         }
-        XenonProto.FileSystems expected = fssb.build();
-        assertEquals(expected, response);
+        assertEquals(i, response.getFilesystemsCount());
     }
 
     @Test
     public void create() {
         XenonProto.CreateFileSystemRequest request = XenonProto.CreateFileSystemRequest.newBuilder()
             .setAdaptor("file")
+            .setLocation("/")
             .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
             .build();
 
         XenonProto.FileSystem response = client.create(request);
 
-        String fsId = "file://user1@";
-        XenonProto.FileSystem expected = XenonProto.FileSystem.newBuilder()
-            .setId(fsId)
-            .build();
-        assertEquals(expected, response);
+        String expectedFilesystemId = "file://user1@/#";
+        assertTrue("Received an id", response.getId().startsWith(expectedFilesystemId));
         Stream<XenonProto.FileSystem> registeredFss = client.listFileSystems(empty()).getFilesystemsList().stream();
-        assertTrue("Registered file system", registeredFss.anyMatch(c -> c.getId().equals(fsId)));
+        assertTrue("Registered file system", registeredFss.anyMatch(c -> c.getId().startsWith(expectedFilesystemId)));
     }
 
     @Test
-    public void create_again_alreadyExistError() {
-        thrown.expectMessage("ALREADY_EXISTS: File system with id: file://user1@");
-
+    public void create_twiceSameRequest_shouldCreate2Filesystems() {
         XenonProto.CreateFileSystemRequest request = XenonProto.CreateFileSystemRequest.newBuilder()
             .setAdaptor("file")
+            .setLocation("/")
             .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
             .build();
+        XenonProto.FileSystem response1 = client.create(request);
 
-        client.create(request);
+        XenonProto.FileSystem response2 = client.create(request);
 
-        client.create(request);
+        assertNotEquals(response1, response2);
     }
 }

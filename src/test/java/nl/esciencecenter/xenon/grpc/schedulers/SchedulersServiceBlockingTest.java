@@ -3,6 +3,7 @@ package nl.esciencecenter.xenon.grpc.schedulers;
 import static java.util.UUID.randomUUID;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -11,6 +12,17 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
+
+import io.grpc.ManagedChannel;
+import io.grpc.Server;
+import io.grpc.inprocess.InProcessChannelBuilder;
+import io.grpc.inprocess.InProcessServerBuilder;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
@@ -23,16 +35,6 @@ import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 
-import io.grpc.ManagedChannel;
-import io.grpc.Server;
-import io.grpc.inprocess.InProcessChannelBuilder;
-import io.grpc.inprocess.InProcessServerBuilder;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 public class SchedulersServiceBlockingTest {
     private SchedulersService service;
     private Server server;
@@ -42,10 +44,11 @@ public class SchedulersServiceBlockingTest {
 
     @Rule
     public ExpectedException thrown= ExpectedException.none();
+    private String schedulerId;
 
     private XenonProto.Scheduler createScheduler() {
         return XenonProto.Scheduler.newBuilder()
-                .setId("local://someone@local://")
+                .setId(schedulerId)
                 .build();
     }
 
@@ -63,7 +66,7 @@ public class SchedulersServiceBlockingTest {
         scheduler = mock(Scheduler.class);
         when(scheduler.getAdaptorName()).thenReturn("local");
         when(scheduler.getLocation()).thenReturn("local://");
-        service.putScheduler(scheduler, "someone");
+        schedulerId = service.putScheduler(scheduler, "someone");
         // setup server
         String name = service.getClass().getName() + "-" + randomUUID().toString();
         server = InProcessServerBuilder.forName(name).directExecutor().addService(service).build();
@@ -157,10 +160,7 @@ public class SchedulersServiceBlockingTest {
         XenonProto.Scheduler response = client.localScheduler(empty());
 
         String currentUser = System.getProperty("user.name");
-        XenonProto.Scheduler expected = XenonProto.Scheduler.newBuilder()
-            .setId("local://" + currentUser + "@local://")
-            .build();
-        assertEquals(expected, response);
+        assertTrue(response.getId().startsWith("local://" + currentUser + "@local://"));
     }
 
     @Test
@@ -519,28 +519,29 @@ public class SchedulersServiceBlockingTest {
     @Test
     public void create() {
         XenonProto.CreateSchedulerRequest request = XenonProto.CreateSchedulerRequest.newBuilder()
-                .setAdaptor("local")
-                .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
-                .build();
+            .setAdaptor("local")
+            .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
+            .build();
 
         XenonProto.Scheduler response = client.create(request);
 
-        String schedId = "local://user1@local://";
-        XenonProto.Scheduler expected = XenonProto.Scheduler.newBuilder()
-                .setId(schedId)
-                .build();
-        assertEquals(expected, response);
+
+        String expectedSchedulerId = "local://user1@local://#";
+        assertTrue("Received an id", response.getId().startsWith(expectedSchedulerId));
+        Stream<XenonProto.Scheduler> registeredSchedulers = client.listSchedulers(empty()).getSchedulersList().stream();
+        assertTrue("Registered scheduler", registeredSchedulers.anyMatch(c -> c.getId().startsWith(expectedSchedulerId)));
     }
 
     @Test
-    public void create_again_alreadyExistError() {
-        thrown.expectMessage("ALREADY_EXISTS: Scheduler with id: local://user1@local://");
+    public void create_twiceSameRequest_shouldCreate2Schedulers() {
         XenonProto.CreateSchedulerRequest request = XenonProto.CreateSchedulerRequest.newBuilder()
             .setAdaptor("local")
             .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
             .build();
-        client.create(request);
+        XenonProto.Scheduler response1 = client.create(request);
 
-        client.create(request);
+        XenonProto.Scheduler response2 = client.create(request);
+
+        assertNotEquals(response1, response2);
     }
 }

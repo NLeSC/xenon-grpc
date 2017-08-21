@@ -63,13 +63,9 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
         }
     }
 
-    String putFileSystem(FileSystem fileSystem, String username) throws StatusException {
+    String putFileSystem(FileSystem fileSystem, String username) {
         String fileSystemId = getFileSystemId(fileSystem, username);
-        if (fileSystems.containsKey(fileSystemId)) {
-            throw Status.ALREADY_EXISTS.augmentDescription("File system with id: " + fileSystemId).asException();
-        } else {
-            fileSystems.put(fileSystemId, fileSystem);
-        }
+        fileSystems.put(fileSystemId, fileSystem);
         return fileSystemId;
     }
 
@@ -310,8 +306,7 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
             DefaultCredential cred = new DefaultCredential();
             // Store file systems for later use
             for (FileSystem xenonFilesystem : xenonFilesystems) {
-                String fileSystemId = getFileSystemId(xenonFilesystem, cred.getUsername());
-                fileSystems.put(fileSystemId, xenonFilesystem);
+                putFileSystem(xenonFilesystem, cred.getUsername());
             }
 
             XenonProto.FileSystems filesystems = writeFileSystems(xenonFilesystems);

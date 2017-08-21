@@ -16,6 +16,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import io.grpc.Status;
+import io.grpc.StatusException;
+import io.grpc.stub.StreamObserver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.grpc.XenonProto;
@@ -27,15 +33,8 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
-import io.grpc.Status;
-import io.grpc.StatusException;
-import io.grpc.stub.StreamObserver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulersService.class);
-
     private final Map<String, Scheduler> schedulers = new ConcurrentHashMap<>();
 
     @Override
@@ -61,13 +60,9 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
         }
     }
 
-    String putScheduler(Scheduler scheduler, String username) throws StatusException {
-        String id = scheduler.getAdaptorName() + "://" + username + "@" + scheduler.getLocation();
-        if (schedulers.containsKey(id)) {
-            throw Status.ALREADY_EXISTS.augmentDescription("Scheduler with id: " + id).asException();
-        } else {
-            schedulers.put(id, scheduler);
-        }
+    String putScheduler(Scheduler scheduler, String username) {
+        String id = scheduler.getAdaptorName() + "://" + username + "@" + scheduler.getLocation() + "#" + scheduler.hashCode();
+        schedulers.put(id, scheduler);
         return id;
     }
 

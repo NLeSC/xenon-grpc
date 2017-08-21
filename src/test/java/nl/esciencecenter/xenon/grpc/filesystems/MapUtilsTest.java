@@ -15,6 +15,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.grpc.StatusException;
+import org.junit.Test;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
@@ -22,9 +25,6 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 import nl.esciencecenter.xenon.grpc.XenonProto;
-
-import io.grpc.StatusException;
-import org.junit.Test;
 
 public class MapUtilsTest {
     @Test
@@ -133,7 +133,7 @@ public class MapUtilsTest {
 
         XenonProto.FileSystems response = writeFileSystems(request);
 
-        XenonProto.FileSystem pfs = createFileSystem(username);
+        XenonProto.FileSystem pfs = createFileSystem(username, String.valueOf(fs.hashCode()));
         XenonProto.FileSystems expected = XenonProto.FileSystems.newBuilder()
                 .addFilesystems(pfs)
                 .build();
@@ -144,20 +144,20 @@ public class MapUtilsTest {
         }
     }
 
-    private XenonProto.FileSystem createFileSystem(String username) {
+    private XenonProto.FileSystem createFileSystem(String username, String uniqueFsId) {
         String root = File.listRoots()[0].getAbsolutePath();
         if (isWindows()) {
             root = root.substring(0, 2).toLowerCase();
         }
         return XenonProto.FileSystem.newBuilder()
-                .setId("file://" + username + "@" + root)
-                .build();
+            .setId("file://" + username + "@" + root + "#" + uniqueFsId)
+            .build();
     }
 
     @Test
     public void test_writeFileAttributes_minimal() {
 
-        XenonProto.FileSystem filesystem = createFileSystem("someuser");
+        XenonProto.FileSystem filesystem = createFileSystem("someuser", "1234");
         PathAttributesImplementation attribs = new PathAttributesImplementation();
         attribs.setPath(new Path("/somefile"));
         attribs.setCreationTime(1L);
@@ -188,7 +188,7 @@ public class MapUtilsTest {
     @Test
     public void test_writeFileAttributes_complete() {
 
-        XenonProto.FileSystem filesystem = createFileSystem("someuser");
+        XenonProto.FileSystem filesystem = createFileSystem("someuser", "1234");
         PathAttributesImplementation attribs = new PathAttributesImplementation();
         attribs.setPath(new Path("/somefile"));
         attribs.setCreationTime(1L);

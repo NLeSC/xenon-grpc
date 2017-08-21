@@ -7,6 +7,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.grpc.Status;
+import io.grpc.StatusException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.AttributeNotSupportedException;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
@@ -17,11 +22,6 @@ import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 import nl.esciencecenter.xenon.grpc.XenonProto;
-
-import io.grpc.Status;
-import io.grpc.StatusException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /*
     MapUtils to convert Xenon objects to gRPC response fields
@@ -168,7 +168,7 @@ class MapUtils {
     }
 
     static String getFileSystemId(FileSystem fileSystem, String username) {
-        return fileSystem.getAdaptorName() + "://" + username + "@" + fileSystem.getLocation();
+        return fileSystem.getAdaptorName() + "://" + username + "@" + fileSystem.getLocation() + "#" + fileSystem.hashCode();
     }
 
     private static XenonProto.FileSystem writeFileSystem(FileSystem fs) {
