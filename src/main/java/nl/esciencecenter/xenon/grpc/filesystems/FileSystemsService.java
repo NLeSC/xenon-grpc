@@ -63,9 +63,15 @@ public class FileSystemsService extends XenonFileSystemsGrpc.XenonFileSystemsImp
         }
     }
 
-    String putFileSystem(FileSystem fileSystem, String username) {
+    String putFileSystem(FileSystem fileSystem, String username) throws XenonException {
         String fileSystemId = getFileSystemId(fileSystem, username);
-        fileSystems.put(fileSystemId, fileSystem);
+        if (fileSystems.containsKey(fileSystemId)) {
+            // file system to add already exists
+            // close new fs and return id of already existing fs
+            fileSystem.close();
+        } else {
+            fileSystems.put(fileSystemId, fileSystem);
+        }
         return fileSystemId;
     }
 

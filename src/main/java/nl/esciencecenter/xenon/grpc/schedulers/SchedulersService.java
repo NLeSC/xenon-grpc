@@ -60,9 +60,15 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
         }
     }
 
-    String putScheduler(Scheduler scheduler, String username) {
+    String putScheduler(Scheduler scheduler, String username) throws XenonException {
         String id = scheduler.getAdaptorName() + "://" + username + "@" + scheduler.getLocation() + "#" + scheduler.hashCode();
-        schedulers.put(id, scheduler);
+        if (schedulers.containsKey(id)) {
+            // scheduler to add already exists
+            // close new scheduler and return id of already existing scheduler
+            scheduler.close();
+        } else {
+            schedulers.put(id, scheduler);
+        }
         return id;
     }
 

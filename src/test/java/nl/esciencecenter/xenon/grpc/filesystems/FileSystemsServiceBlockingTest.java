@@ -67,7 +67,7 @@ public class FileSystemsServiceBlockingTest {
     }
 
     @Before
-    public void setUp() throws IOException, StatusException {
+    public void setUp() throws IOException, StatusException, XenonException {
         service = new FileSystemsService();
         // register mocked filesystem to service
         filesystem = mock(FileSystem.class);
