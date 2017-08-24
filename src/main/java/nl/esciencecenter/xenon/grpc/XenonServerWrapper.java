@@ -35,7 +35,7 @@ public class XenonServerWrapper {
     private boolean useTLS = false;
 
     private Server server;
-    private FileSystemService filesystemsService;
+    private FileSystemService filesystemService;
     private SchedulerService schedulerService;
 
     public static void main(String[] args) throws InterruptedException, IOException {
@@ -105,10 +105,10 @@ public class XenonServerWrapper {
         } else {
             builder = insecureServerBuilder();
         }
-        filesystemsService = new FileSystemService();
+        filesystemService = new FileSystemService();
         schedulerService = new SchedulerService();
         server = builder
-                .addService(filesystemsService)
+                .addService(filesystemService)
                 .addService(schedulerService)
                 .build();
     }
@@ -166,7 +166,7 @@ public class XenonServerWrapper {
         if (server != null) {
             server.shutdown();
             try {
-                filesystemsService.closeAllFileSystems();
+                filesystemService.closeAllFileSystems();
                 schedulerService.closeAllSchedulers();
             } catch (XenonException e) {
                 System.err.println("Unable to close all filesystems and schedulers");
