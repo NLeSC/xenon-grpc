@@ -192,9 +192,6 @@ message CopyStatus {
         NOT_CONNECTED = 4;
         // XenonException
         XENON = 5;
-        // IOException
-        IO = 6;
-        OTHER = 7;
     }
     ErrorType error_type = 8;
 }
@@ -351,12 +348,13 @@ message GetQueueStatusRequest {
 }
 
 message JobStatus {
-    string state = 1;
-    bool running = 2;
-    bool done = 3;
-    map<string, string> scheduler_specific_information = 4;
-    int32 exit_code = 5;
-    string error_message = 6;
+    Job job = 1;
+    string state = 2;
+    bool running = 3;
+    bool done = 4;
+    map<string, string> scheduler_specific_information = 5;
+    int32 exit_code = 6;
+    string error_message = 7;
     enum ErrorType {
         // No error
         NONE = 0;
@@ -372,7 +370,7 @@ message JobStatus {
         IO = 5;
         OTHER = 6;
     }
-    ErrorType error_type = 7;
+    ErrorType error_type = 8;
 }
 
 message GetJobStatusesResponse {
