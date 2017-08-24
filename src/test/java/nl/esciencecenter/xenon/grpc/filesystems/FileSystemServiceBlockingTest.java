@@ -46,13 +46,12 @@ import nl.esciencecenter.xenon.filesystems.CopyCancelledException;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
 import nl.esciencecenter.xenon.filesystems.CopyStatus;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 import nl.esciencecenter.xenon.grpc.FileSystemServiceGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
-
-
 
 public class FileSystemServiceBlockingTest {
     private Server server;
@@ -159,6 +158,32 @@ public class FileSystemServiceBlockingTest {
     public void exists() throws XenonException {
         XenonProto.PathRequest request = buildPathRequest("/etc/passwd");
         when(filesystem.exists(new Path("/etc/passwd"))).thenReturn(true);
+
+        XenonProto.Is response = client.exists(request);
+
+        assertTrue(response.getValue());
+    }
+
+    @Test
+    public void exists_customSeparator() throws XenonException {
+        XenonProto.PathRequest request = XenonProto.PathRequest.newBuilder()
+                .setFilesystem(createFileSystem())
+                .setPath(XenonProto.Path.newBuilder().setPath("@etc@passwd").setSeparator("@"))
+                .build();
+        when(filesystem.exists(new Path('@', "etc", "passwd"))).thenReturn(true);
+
+        XenonProto.Is response = client.exists(request);
+
+        assertTrue(response.getValue());
+    }
+
+    @Test
+    public void exists_windowsSeparator() throws XenonException {
+        XenonProto.PathRequest request = XenonProto.PathRequest.newBuilder()
+                .setFilesystem(createFileSystem())
+                .setPath(XenonProto.Path.newBuilder().setPath("\\etc\\passwd").setSeparator("\\\\"))
+                .build();
+        when(filesystem.exists(new Path('\\', "etc", "passwd"))).thenReturn(true);
 
         XenonProto.Is response = client.exists(request);
 
