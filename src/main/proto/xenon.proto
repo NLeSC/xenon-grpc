@@ -181,7 +181,7 @@ message CopyStatus {
     string error_message = 7;
     enum ErrorType {
         // No error
-        EMPTY = 0;
+        NONE = 0;
         // NoSuchPathException
         NOT_FOUND = 1;
         // CopyCancelledException
@@ -355,7 +355,7 @@ message JobStatus {
     string error_message = 6;
     enum ErrorType {
         // No error
-        EMPTY = 0;
+        NONE = 0;
         // NoSuchJobException
         NOT_FOUND = 1;
         // JobCanceledException
@@ -382,7 +382,7 @@ message QueueStatus {
     string error_message = 3;
     enum ErrorType {
         // No error
-        EMPTY = 0;
+        NONE = 0;
         // NoSuchQueueException
         NOT_FOUND = 1;
         // NotConnectedException
