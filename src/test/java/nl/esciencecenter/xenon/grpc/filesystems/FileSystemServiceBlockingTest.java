@@ -4,6 +4,7 @@ import static java.util.UUID.randomUUID;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.isWindows;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -51,19 +52,22 @@ import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 import nl.esciencecenter.xenon.grpc.FileSystemServiceGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 
+
+
 public class FileSystemServiceBlockingTest {
     private Server server;
     private ManagedChannel channel;
     private FileSystemServiceGrpc.FileSystemServiceBlockingStub client;
     private FileSystem filesystem;
     private FileSystemService service;
+    private String filesystemId;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     private XenonProto.FileSystem createFileSystem() {
         return XenonProto.FileSystem.newBuilder()
-            .setId("file://someone@/")
+            .setId(filesystemId)
             .build();
     }
 
@@ -81,13 +85,13 @@ public class FileSystemServiceBlockingTest {
     }
 
     @Before
-    public void setUp() throws IOException, StatusException {
+    public void setUp() throws IOException, StatusException, XenonException {
         service = new FileSystemService();
         // register mocked filesystem to service
         filesystem = mock(FileSystem.class);
         when(filesystem.getAdaptorName()).thenReturn("file");
         when(filesystem.getLocation()).thenReturn("/");
-        service.putFileSystem(filesystem, "someone");
+        filesystemId = service.putFileSystem(filesystem, "someone");
         // setup server
         String name = service.getClass().getName() + "-" + randomUUID().toString();
         server = InProcessServerBuilder.forName(name).directExecutor().addService(service).build();
@@ -328,6 +332,7 @@ public class FileSystemServiceBlockingTest {
 
         client.readSymbolicLink(request);
     }
+
 
     @Test
     public void isOpen() throws XenonException {
@@ -698,18 +703,16 @@ public class FileSystemServiceBlockingTest {
         XenonProto.FileSystems response = client.localFileSystems(empty());
 
         String username = System.getProperty("user.name");
-        XenonProto.FileSystem.Builder fsb = XenonProto.FileSystem.newBuilder();
-        XenonProto.FileSystems.Builder fssb = XenonProto.FileSystems.newBuilder();
+        int i = 0;
         for (File root : File.listRoots()) {
             String xroot = root.getAbsolutePath();
             if (isWindows()) {
                 xroot = xroot.substring(0, 2);
             }
-            fsb.setId("file://" + username + "@" + xroot);
-            fssb.addFilesystems(fsb.build());
+            assertTrue(response.getFilesystems(i).getId().startsWith("file://" + username + "@" + xroot + "#"));
+            i++;
         }
-        XenonProto.FileSystems expected = fssb.build();
-        assertEquals(expected, response);
+        assertEquals(i, response.getFilesystemsCount());
     }
 
     @Test
@@ -721,27 +724,23 @@ public class FileSystemServiceBlockingTest {
 
         XenonProto.FileSystem response = client.create(request);
 
-        String fsId = "file://user1@";
-        XenonProto.FileSystem expected = XenonProto.FileSystem.newBuilder()
-            .setId(fsId)
-            .build();
-        assertEquals(expected, response);
+        String expectedFilesystemId = "file://user1@";
+        assertTrue("Received an id", response.getId().startsWith(expectedFilesystemId));
         Stream<XenonProto.FileSystem> registeredFss = client.listFileSystems(empty()).getFilesystemsList().stream();
-        assertTrue("Registered file system", registeredFss.anyMatch(c -> c.getId().equals(fsId)));
+        assertTrue("Registered file system", registeredFss.anyMatch(c -> c.getId().startsWith(expectedFilesystemId)));
     }
 
     @Test
-    public void create_again_alreadyExistError() {
-        thrown.expectMessage("ALREADY_EXISTS: File system with id: file://user1@");
-
+    public void create_twiceSameRequest_shouldCreate2Filesystems() {
         XenonProto.CreateFileSystemRequest request = XenonProto.CreateFileSystemRequest.newBuilder()
             .setAdaptor("file")
             .setDefaultCredential(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
             .build();
+        XenonProto.FileSystem response1 = client.create(request);
 
-        client.create(request);
+        XenonProto.FileSystem response2 = client.create(request);
 
-        client.create(request);
+        assertNotEquals(response1, response2);
     }
 
     @Test

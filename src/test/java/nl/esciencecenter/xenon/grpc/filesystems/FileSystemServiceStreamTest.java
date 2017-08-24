@@ -24,10 +24,11 @@ import nl.esciencecenter.xenon.grpc.XenonProto;
 public class FileSystemServiceStreamTest {
     private FileSystem filesystem;
     private FileSystemService service;
+    private String filesystemId;
 
     private XenonProto.FileSystem createFileSystem() {
         return XenonProto.FileSystem.newBuilder()
-                .setId("file://someone@/")
+                .setId(filesystemId)
                 .build();
     }
 
@@ -38,13 +39,13 @@ public class FileSystemServiceStreamTest {
     }
 
     @Before
-    public void setUp() throws IOException, StatusException {
+    public void setUp() throws IOException, StatusException, XenonException {
         service = new FileSystemService();
         // register mocked filesystem to service
         filesystem = mock(FileSystem.class);
         when(filesystem.getAdaptorName()).thenReturn("file");
         when(filesystem.getLocation()).thenReturn("/");
-        service.putFileSystem(filesystem, "someone");
+        filesystemId = service.putFileSystem(filesystem, "someone");
     }
 
     @SuppressWarnings("unchecked")

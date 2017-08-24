@@ -62,7 +62,7 @@ public class SchedulerService extends SchedulerServiceGrpc.SchedulerServiceImplB
     }
 
     String putScheduler(Scheduler scheduler, String username) throws StatusException {
-        String id = scheduler.getAdaptorName() + "://" + username + "@" + scheduler.getLocation();
+        String id = scheduler.getAdaptorName() + "://" + username + "@" + scheduler.getLocation() + "#" + scheduler.hashCode();
         if (schedulers.containsKey(id)) {
             throw Status.ALREADY_EXISTS.augmentDescription("Scheduler with id: " + id).asException();
         } else {

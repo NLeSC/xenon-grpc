@@ -150,7 +150,7 @@ public class MapUtilsTest {
 
         XenonProto.FileSystems response = writeFileSystems(request);
 
-        XenonProto.FileSystem pfs = createFileSystem(username);
+        XenonProto.FileSystem pfs = createFileSystem(username, String.valueOf(fs.hashCode()));
         XenonProto.FileSystems expected = XenonProto.FileSystems.newBuilder()
                 .addFilesystems(pfs)
                 .build();
@@ -161,20 +161,25 @@ public class MapUtilsTest {
         }
     }
 
-    private XenonProto.FileSystem createFileSystem(String username) {
+    private XenonProto.FileSystem createFileSystem(String username, String uniqueFsId) {
+        String root = getRoot();
+        return XenonProto.FileSystem.newBuilder()
+            .setId("file://" + username + "@" + root + "#" + uniqueFsId)
+            .build();
+    }
+
+    private static String getRoot() {
         String root = File.listRoots()[0].getAbsolutePath();
         if (isWindows()) {
-            root = root.substring(0, 2).toLowerCase();
+            root = root.substring(0, 2);
         }
-        return XenonProto.FileSystem.newBuilder()
-                .setId("file://" + username + "@" + root)
-                .build();
+        return root;
     }
 
     @Test
     public void test_writeFileAttributes_minimal() {
 
-        XenonProto.FileSystem filesystem = createFileSystem("someuser");
+        XenonProto.FileSystem filesystem = createFileSystem("someuser", "1234");
         PathAttributesImplementation attribs = new PathAttributesImplementation();
         attribs.setPath(new Path("/somefile"));
         attribs.setCreationTime(1L);
@@ -204,7 +209,7 @@ public class MapUtilsTest {
     @Test
     public void test_writeFileAttributes_complete() {
 
-        XenonProto.FileSystem filesystem = createFileSystem("someuser");
+        XenonProto.FileSystem filesystem = createFileSystem("someuser", "1234");
         PathAttributesImplementation attribs = new PathAttributesImplementation();
         attribs.setPath(new Path("/somefile"));
         attribs.setCreationTime(1L);

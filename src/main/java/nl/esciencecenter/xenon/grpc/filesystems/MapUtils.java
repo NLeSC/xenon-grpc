@@ -173,7 +173,7 @@ class MapUtils {
     }
 
     static String getFileSystemId(FileSystem fileSystem, String username) {
-        return fileSystem.getAdaptorName() + "://" + username + "@" + fileSystem.getLocation();
+        return fileSystem.getAdaptorName() + "://" + username + "@" + fileSystem.getLocation() + "#" + fileSystem.hashCode();
     }
 
     private static XenonProto.FileSystem writeFileSystem(FileSystem fs) {
