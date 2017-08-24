@@ -97,6 +97,8 @@ message CreateFileSystemRequest {
 // Handle for Xenon FileSystem object
 message FileSystem {
     string id = 1;
+    // name of the adaptor that created this FileSystem
+    string adaptor_name = 2;
 }
 
 message FileSystems {
@@ -104,39 +106,46 @@ message FileSystems {
 }
 
 message Path {
+    string path = 1;
+    // Separator used in path. Defaults to `/`
+    string separator = 2;
+}
+
+message FileSystemPath {
     FileSystem filesystem = 1;
-    // In Xenon it is of class Path
-    string path = 2;
+    Path path = 2;
 }
 
 message DeleteRequest {
-    Path path = 1;
-    bool recursive = 2;
-}
-
-enum CopyMode {
-    CREATE = 0;
-    REPLACE = 1;
-    IGNORE = 2;
+    FileSystem filesystem = 1;
+    Path path = 2;
+    bool recursive = 3;
 }
 
 message CopyRequest {
-    Path source = 1;
-    Path target = 2;
-    CopyMode mode = 3;
-    bool recursive = 4;
+    FileSystem filesystem = 1;
+    Path source = 2;
+    FileSystem destination_filesystem = 3;
+    Path destination = 4;
+    enum CopyMode {
+        CREATE = 0;
+        REPLACE = 1;
+        IGNORE = 2;
+    }
+    CopyMode mode = 5;
+    bool recursive = 6;
 }
 
 message RenameRequest {
     FileSystem filesystem = 1;
-    string source = 2;
-    string target = 3;
+    Path source = 2;
+    Path target = 3;
 }
 
 message CreateSymbolicLinkRequest {
     FileSystem filesystem = 1;
-    string link = 2;
-    string target = 3;
+    Path link = 2;
+    Path target = 3;
 }
 
 message CopyOperation {
@@ -174,27 +183,29 @@ enum PosixFilePermission {
 }
 
 message PathAttributes {
-    Path path = 1;
-    uint64 creationTime = 2;
-    string group = 3;
-    bool isDirectory = 4;
-    bool isExecutable = 5;
-    bool isHidden = 6;
-    bool isOther = 7;
-    bool isReadable = 8;
-    bool isRegularFile = 9;
-    bool isSymbolicLink = 10;
-    bool isWritable = 11;
-    uint64 lastAccessTime = 12;
-    uint64 lastModifiedTime = 13;
-    string owner = 14;
-    repeated PosixFilePermission permissions = 15;
-    uint64 size = 16;
+    FileSystem filesystem = 1;
+    Path path = 2;
+    uint64 creationTime = 3;
+    string group = 4;
+    bool isDirectory = 5;
+    bool isExecutable = 6;
+    bool isHidden = 7;
+    bool isOther = 8;
+    bool isReadable = 9;
+    bool isRegularFile = 10;
+    bool isSymbolicLink = 11;
+    bool isWritable = 12;
+    uint64 lastAccessTime = 13;
+    uint64 lastModifiedTime = 14;
+    string owner = 15;
+    repeated PosixFilePermission permissions = 16;
+    uint64 size = 17;
 }
 
 message SetPosixFilePermissionsRequest {
-    Path path = 1;
-    repeated PosixFilePermission permissions = 2;
+    FileSystem filesystem = 1;
+    Path path = 2;
+    repeated PosixFilePermission permissions = 3;
 }
 
 message ReadFromFileResponse {
@@ -202,19 +213,22 @@ message ReadFromFileResponse {
 }
 
 message WriteToFileRequest {
-    Path path = 1;
-    bytes buffer = 2;
-    uint64 size = 3;
+    FileSystem filesystem = 1;
+    Path path = 2;
+    bytes buffer = 3;
+    uint64 size = 4;
 }
 
 message AppendToFileRequest {
-    Path path = 1;
-    bytes buffer = 2;
+    FileSystem filesystem = 1;
+    Path path = 2;
+    bytes buffer = 3;
 }
 
 message ListRequest {
-    Path dir = 1;
-    bool recursive = 2;
+    FileSystem filesystem = 1;
+    Path dir = 2;
+    bool recursive = 3;
 }
 
 message CreateSchedulerRequest {
@@ -267,16 +281,21 @@ message SubmitInteractiveJobRequest {
 
 message Job {
     string id = 1;
-    Scheduler scheduler = 2;
+}
+
+message SchedulerJob {
+    Scheduler scheduler = 1;
+    Job job = 2;
 }
 
 message Jobs {
-    repeated Job jobs = 1;
+    Scheduler scheduler = 1;
+    repeated Job jobs = 2;
 }
 
 message JobWithTimeout {
-    string id = 1;
-    Scheduler scheduler = 2;
+    Scheduler scheduler = 1;
+    Job job = 2;
     uint64 timeout = 3;
 }
 
@@ -299,12 +318,14 @@ message SchedulerAndQueue {
 }
 
 message JobStatus {
-    string state = 1;
-    bool running = 2;
-    bool done = 3;
-    map<string, string> schedulerSpecificInformation = 4;
-    int32 exitCode = 6;
-    string errorMessage = 7;
+    Scheduler scheduler = 1;
+    Job job = 2;
+    string state = 3;
+    bool running = 4;
+    bool done = 5;
+    map<string, string> schedulerSpecificInformation = 6;
+    int32 exitCode = 7;
+    string errorMessage = 8;
     enum ErrorType {
         EMPTY = 0;
         // NoSuchJobException
@@ -317,8 +338,7 @@ message JobStatus {
         IO = 4;
         OTHER = 5;
     }
-    ErrorType errorType = 8;
-    Job job = 9;
+    ErrorType errorType = 9;
 }
 
 message JobStatuses {
@@ -338,9 +358,10 @@ message QueueStatuses {
 }
 
 message SubmitInteractiveJobResponse {
-    bytes stdout = 1;
-    bytes stderr = 2;
-    Job job = 3;
+    Scheduler scheduler = 1;
+    Job job = 2;
+    bytes stdout = 3;
+    bytes stderr = 4;
 }
 
 message Is {
@@ -350,28 +371,30 @@ message Is {
 // XenonFiles represents the Xenon nl.esciencecenter.xenon.filesystems.FileSystem class.
 // This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
 service XenonFileSystems {
+    // Gives a list of the descriptions of the available adaptors.
     rpc getAdaptorDescriptions(Empty) returns (FileSystemAdaptorDescriptions) {}
+    // Gives the description of the adaptor with the given name.
     rpc getAdaptorDescription(AdaptorName) returns (FileSystemAdaptorDescription) {}
     rpc create(CreateFileSystemRequest) returns (FileSystem) {}
-    rpc createDirectories(Path) returns (Empty) {}
-    rpc createDirectory(Path) returns (Empty) {}
-    rpc createFile(Path) returns (Empty) {}
+    rpc createDirectories(FileSystemPath) returns (Empty) {}
+    rpc createDirectory(FileSystemPath) returns (Empty) {}
+    rpc createFile(FileSystemPath) returns (Empty) {}
     rpc createSymbolicLink(CreateSymbolicLinkRequest) returns (Empty) {}
     rpc copy(CopyRequest) returns (CopyOperation) {}
     rpc cancel(CopyOperation) returns (CopyStatus) {}
     rpc getStatus(CopyOperation) returns (CopyStatus) {}
     rpc rename(RenameRequest) returns (Empty) {}
     rpc delete(DeleteRequest) returns (Empty) {}
-    rpc exists(Path) returns (Is) {}
-    rpc readFromFile(Path) returns (stream ReadFromFileResponse) {}
+    rpc exists(FileSystemPath) returns (Is) {}
+    rpc readFromFile(FileSystemPath) returns (stream ReadFromFileResponse) {}
     rpc writeToFile(stream WriteToFileRequest) returns (Empty) {}
     rpc appendToFile(stream AppendToFileRequest) returns (Empty) {}
     rpc list(ListRequest) returns (stream PathAttributes) {}
-    rpc getAttributes(Path) returns (PathAttributes) {}
-    rpc getWorkingDirectory(FileSystem) returns (Path) {}
-    rpc setWorkingDirectory(Path) returns (Empty) {}
+    rpc getAttributes(FileSystemPath) returns (PathAttributes) {}
+    rpc getWorkingDirectory(FileSystem) returns (FileSystemPath) {}
+    rpc setWorkingDirectory(FileSystemPath) returns (Empty) {}
     rpc setPosixFilePermissions(SetPosixFilePermissionsRequest) returns (Empty) {}
-    rpc readSymbolicLink(Path) returns (Path) {}
+    rpc readSymbolicLink(FileSystemPath) returns (FileSystemPath) {}
     rpc isOpen(FileSystem) returns (Is) {}
     // Closes a filestem, any actions running it with this filestystem will be terminated, will also forget the filesystem
     // Any pending/running copy operations will be killed
@@ -389,21 +412,21 @@ service XenonSchedulers {
     rpc getAdaptorDescriptions(Empty) returns (SchedulerAdaptorDescriptions) {}
     rpc getAdaptorDescription(AdaptorName) returns (SchedulerAdaptorDescription) {}
     rpc create(CreateSchedulerRequest) returns (Scheduler) {}
-    rpc submitBatchJob(SubmitBatchJobRequest) returns (Job) {}
+    rpc submitBatchJob(SubmitBatchJobRequest) returns (SchedulerJob) {}
     // The first response message in the response stream will contain the job identifier and empty stdout and stdout.
     // Other response messages will also contain the job identifier and filled stdout and/or stderr.
     rpc submitInteractiveJob(stream SubmitInteractiveJobRequest) returns (stream SubmitInteractiveJobResponse) {}
     rpc getQueues(Scheduler) returns (Queues) {}
     rpc getDefaultQueueName(Scheduler) returns (Queue) {}
     rpc getJobs(SchedulerAndQueues) returns (Jobs) {}
-    rpc getJobStatus(Job) returns (JobStatus) {}
+    rpc getJobStatus(SchedulerJob) returns (JobStatus) {}
     rpc getJobStatuses(Jobs) returns (JobStatuses) {}
     rpc getQueueStatus(SchedulerAndQueue) returns (QueueStatus) {}
     rpc getQueueStatuses(SchedulerAndQueues) returns (QueueStatuses) {}
     rpc waitUntilDone(JobWithTimeout) returns (JobStatus) {}
     rpc waitUntilRunning(JobWithTimeout) returns (JobStatus) {}
     rpc isOpen(Scheduler) returns (Is) {}
-    rpc cancelJob(Job) returns (JobStatus) {}
+    rpc cancelJob(SchedulerJob) returns (JobStatus) {}
     // Close scheduler and forget it
     // If scheduler is embedded then any pending/running jobs will be killed
     rpc close(Scheduler) returns (Empty) {}
