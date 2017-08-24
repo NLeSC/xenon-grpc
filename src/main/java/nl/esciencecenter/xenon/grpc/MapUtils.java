@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.grpc.Status;
+import io.grpc.StatusException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
@@ -22,12 +27,8 @@ import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
+import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
 import nl.esciencecenter.xenon.schedulers.UnsupportedJobDescriptionException;
-
-import io.grpc.Status;
-import io.grpc.StatusException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MapUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapUtils.class);
@@ -86,11 +87,11 @@ public class MapUtils {
     }
 
     public static Credential mapCredential(XenonProto.CreateSchedulerRequest request) {
-        return mapCredential(request.getDefaultCred(), request.getPasswordCred(), request.getCertificateCred());
+        return mapCredential(request.getDefaultCredential(), request.getPasswordCredential(), request.getCertificateCredential());
     }
 
     public static Credential mapCredential(XenonProto.CreateFileSystemRequest request) {
-        return mapCredential(request.getDefaultCred(), request.getPasswordCred(), request.getCertificateCred());
+        return mapCredential(request.getDefaultCredential(), request.getPasswordCredential(), request.getCertificateCredential());
     }
 
     private static Credential mapCredential(XenonProto.DefaultCredential defaultCred, XenonProto.PasswordCredential passwordCred, XenonProto.CertificateCredential certificateCred) {
@@ -114,7 +115,8 @@ public class MapUtils {
             return (StatusException) e;
         } else if (e instanceof NoSuchPathException ||
             e instanceof UnknownAdaptorException ||
-            e instanceof UnknownPropertyException
+            e instanceof UnknownPropertyException ||
+            e instanceof NoSuchQueueException
             ) {
             s = Status.NOT_FOUND;
         } else if (e instanceof PathAlreadyExistsException) {

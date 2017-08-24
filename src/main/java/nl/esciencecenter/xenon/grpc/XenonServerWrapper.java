@@ -12,8 +12,8 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.grpc.filesystems.FileSystemsService;
-import nl.esciencecenter.xenon.grpc.schedulers.SchedulersService;
+import nl.esciencecenter.xenon.grpc.filesystems.FileSystemService;
+import nl.esciencecenter.xenon.grpc.schedulers.SchedulerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +35,8 @@ public class XenonServerWrapper {
     private boolean useTLS = false;
 
     private Server server;
-    private FileSystemsService filesystemsService;
-    private SchedulersService schedulersService;
+    private FileSystemService filesystemsService;
+    private SchedulerService schedulerService;
 
     public static void main(String[] args) throws InterruptedException, IOException {
         final XenonServerWrapper server;
@@ -105,11 +105,11 @@ public class XenonServerWrapper {
         } else {
             builder = insecureServerBuilder();
         }
-        filesystemsService = new FileSystemsService();
-        schedulersService = new SchedulersService();
+        filesystemsService = new FileSystemService();
+        schedulerService = new SchedulerService();
         server = builder
                 .addService(filesystemsService)
-                .addService(schedulersService)
+                .addService(schedulerService)
                 .build();
     }
 
@@ -167,7 +167,7 @@ public class XenonServerWrapper {
             server.shutdown();
             try {
                 filesystemsService.closeAllFileSystems();
-                schedulersService.closeAllSchedulers();
+                schedulerService.closeAllSchedulers();
             } catch (XenonException e) {
                 System.err.println("Unable to close all filesystems and schedulers");
                 System.err.println(e.getMessage());

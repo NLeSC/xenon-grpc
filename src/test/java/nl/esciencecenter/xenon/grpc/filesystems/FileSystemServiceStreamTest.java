@@ -10,20 +10,20 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.filesystems.Path;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-
 import com.google.protobuf.ByteString;
 import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
 import org.junit.Before;
 import org.junit.Test;
 
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+
 public class FileSystemServiceStreamTest {
     private FileSystem filesystem;
-    private FileSystemsService service;
+    private FileSystemService service;
 
     private XenonProto.FileSystem createFileSystem() {
         return XenonProto.FileSystem.newBuilder()
@@ -33,14 +33,13 @@ public class FileSystemServiceStreamTest {
 
     private XenonProto.Path buildPath(String path) {
         return XenonProto.Path.newBuilder()
-                .setFilesystem(createFileSystem())
-                .setPath(path)
-                .build();
+            .setPath(path)
+            .build();
     }
 
     @Before
     public void setUp() throws IOException, StatusException {
-        service = new FileSystemsService();
+        service = new FileSystemService();
         // register mocked filesystem to service
         filesystem = mock(FileSystem.class);
         when(filesystem.getAdaptorName()).thenReturn("file");
@@ -61,6 +60,7 @@ public class FileSystemServiceStreamTest {
         // send request
         ByteString content = ByteString.copyFrom("Some content".getBytes());
         XenonProto.WriteToFileRequest request = XenonProto.WriteToFileRequest.newBuilder()
+                .setFilesystem(createFileSystem())
                 .setPath(buildPath(path))
                 .setBuffer(content)
                 .build();
@@ -90,6 +90,7 @@ public class FileSystemServiceStreamTest {
         // send request
         ByteString content = ByteString.copyFrom("Some content".getBytes());
         XenonProto.WriteToFileRequest request = XenonProto.WriteToFileRequest.newBuilder()
+                .setFilesystem(createFileSystem())
                 .setPath(buildPath(path))
                 .setBuffer(content)
                 .setSize(12L)
@@ -120,6 +121,7 @@ public class FileSystemServiceStreamTest {
         // send request
         ByteString content = ByteString.copyFrom("Some content".getBytes());
         XenonProto.AppendToFileRequest request = XenonProto.AppendToFileRequest.newBuilder()
+                .setFilesystem(createFileSystem())
                 .setPath(buildPath(path))
                 .setBuffer(content)
                 .build();

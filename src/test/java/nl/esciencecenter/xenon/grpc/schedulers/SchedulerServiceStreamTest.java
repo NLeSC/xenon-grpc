@@ -16,13 +16,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
-import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.Scheduler;
-import nl.esciencecenter.xenon.schedulers.Streams;
-
 import com.google.protobuf.ByteString;
 import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
@@ -33,8 +26,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
 
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.grpc.XenonProto;
+import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
+import nl.esciencecenter.xenon.schedulers.Streams;
+
 public class SchedulerServiceStreamTest {
-    private SchedulersService service;
+    private SchedulerService service;
     private Scheduler scheduler;
     @Captor
     private ArgumentCaptor<StatusException> captor;
@@ -48,13 +48,12 @@ public class SchedulerServiceStreamTest {
     private XenonProto.Job buildJob(String jobId) {
         return XenonProto.Job.newBuilder()
                 .setId(jobId)
-                .setScheduler(createScheduler())
                 .build();
     }
 
     @Before
     public void setUp() throws Exception {
-        service = new SchedulersService();
+        service = new SchedulerService();
         // register mocked scheduler to service
         scheduler = mock(Scheduler.class);
         when(scheduler.getAdaptorName()).thenReturn("local");
@@ -177,7 +176,6 @@ public class SchedulerServiceStreamTest {
             .setJob(
                 XenonProto.Job.newBuilder()
                     .setId("local-0")
-                    .setScheduler(scheduler[0])
             );
         XenonProto.SubmitInteractiveJobResponse expected0 = responseBuilder.build();
         verify(responseObserver, timeout(1000)).onNext(expected0);
