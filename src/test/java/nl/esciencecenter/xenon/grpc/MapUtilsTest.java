@@ -61,7 +61,7 @@ public class MapUtilsTest {
     public void mapCredential_scheduler_username() throws Exception {
         XenonProto.CreateSchedulerRequest request = XenonProto.CreateSchedulerRequest.newBuilder()
                 .setAdaptor("file")
-                .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("someone"))
+                .setDefaultCredential(XenonProto.DefaultCredential.newBuilder().setUsername("someone"))
                 .build();
 
         Credential result = mapCredential(request);
@@ -74,7 +74,7 @@ public class MapUtilsTest {
     public void mapCredential_scheduler_usernamePassword() throws Exception {
         XenonProto.CreateSchedulerRequest request = XenonProto.CreateSchedulerRequest.newBuilder()
                 .setAdaptor("file")
-                .setPasswordCred(XenonProto.PasswordCredential.newBuilder().setUsername("someone").setPassword("mypassword"))
+                .setPasswordCredential(XenonProto.PasswordCredential.newBuilder().setUsername("someone").setPassword("mypassword"))
                 .build();
 
         Credential result = mapCredential(request);
@@ -87,7 +87,7 @@ public class MapUtilsTest {
     public void mapCredential_scheduler_certificate() throws Exception {
         XenonProto.CreateSchedulerRequest request = XenonProto.CreateSchedulerRequest.newBuilder()
                 .setAdaptor("file")
-                .setCertificateCred(XenonProto.CertificateCredential.newBuilder()
+                .setCertificateCredential(XenonProto.CertificateCredential.newBuilder()
                         .setUsername("someone")
                         .setCertfile("/home/someone/.ssh/id_rsa")
                         .setPassphrase("mypassphrase")

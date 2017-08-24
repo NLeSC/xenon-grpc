@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.grpc.SchedulerServiceGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.grpc.XenonSchedulersGrpc;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.QueueStatus;
@@ -33,8 +33,9 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
-public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBase {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulersService.class);
+public class SchedulerService extends SchedulerServiceGrpc.SchedulerServiceImplBase {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerService.class);
+
     private final Map<String, Scheduler> schedulers = new ConcurrentHashMap<>();
 
     @Override
@@ -60,12 +61,10 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
         }
     }
 
-    String putScheduler(Scheduler scheduler, String username) throws XenonException {
+    String putScheduler(Scheduler scheduler, String username) throws StatusException {
         String id = scheduler.getAdaptorName() + "://" + username + "@" + scheduler.getLocation() + "#" + scheduler.hashCode();
         if (schedulers.containsKey(id)) {
-            // scheduler to add already exists
-            // close new scheduler and return id of already existing scheduler
-            scheduler.close();
+            throw Status.ALREADY_EXISTS.augmentDescription("Scheduler with id: " + id).asException();
         } else {
             schedulers.put(id, scheduler);
         }
@@ -95,6 +94,60 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
         }
         responseObserver.onNext(setBuilder.build());
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getAdaptorNames(XenonProto.Empty request, StreamObserver<XenonProto.AdaptorNames> responseObserver) {
+        String[] names = Scheduler.getAdaptorNames();
+
+        XenonProto.AdaptorNames response = XenonProto.AdaptorNames.newBuilder().addAllName(Arrays.asList(names)).build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getAdaptorName(XenonProto.Scheduler request, StreamObserver<XenonProto.AdaptorName> responseObserver) {
+        try {
+            Scheduler scheduler = getScheduler(request);
+
+            String adaptorName = scheduler.getAdaptorName();
+
+            XenonProto.AdaptorName response = XenonProto.AdaptorName.newBuilder().setName(adaptorName).build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
+        }
+    }
+
+    @Override
+    public void getLocation(XenonProto.Scheduler request, StreamObserver<XenonProto.Location> responseObserver) {
+        try {
+            Scheduler scheduler = getScheduler(request);
+
+            String location = scheduler.getLocation();
+
+            XenonProto.Location response = XenonProto.Location.newBuilder().setLocation(location).build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
+        }
+    }
+
+    @Override
+    public void getProperties(XenonProto.Scheduler request, StreamObserver<XenonProto.Properties> responseObserver) {
+        try {
+            Scheduler scheduler = getScheduler(request);
+
+            Map<String, String> props = scheduler.getProperties();
+
+            XenonProto.Properties response = XenonProto.Properties.newBuilder().putAllProperties(props).build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
+        }
     }
 
     @Override
@@ -159,7 +212,7 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
     }
 
     @Override
-    public void getQueues(XenonProto.Scheduler request, StreamObserver<XenonProto.Queues> responseObserver) {
+    public void getQueueNames(XenonProto.Scheduler request, StreamObserver<XenonProto.Queues> responseObserver) {
         try {
             Scheduler scheduler = getScheduler(request);
             String[] queues = scheduler.getQueueNames();
@@ -183,11 +236,11 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
     }
 
     @Override
-    public void getQueueStatus(XenonProto.SchedulerAndQueue request, StreamObserver<XenonProto.QueueStatus> responseObserver) {
+    public void getQueueStatus(XenonProto.GetQueueStatusRequest request, StreamObserver<XenonProto.QueueStatus> responseObserver) {
         try {
             Scheduler scheduler = getScheduler(request.getScheduler());
             QueueStatus status = scheduler.getQueueStatus(request.getQueue());
-            XenonProto.QueueStatus response = mapQueueStatus(status, request.getScheduler());
+            XenonProto.QueueStatus response = mapQueueStatus(status);
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -203,7 +256,7 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             QueueStatus[] statuses = scheduler.getQueueStatuses(queues);
             XenonProto.QueueStatuses.Builder builder = XenonProto.QueueStatuses.newBuilder();
             for (QueueStatus status : statuses) {
-                builder.addStatuses(mapQueueStatus(status, request.getScheduler()));
+                builder.addStatuses(mapQueueStatus(status));
             }
             responseObserver.onNext(builder.build());
             responseObserver.onCompleted();
@@ -224,7 +277,6 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
 
             XenonProto.Job response = XenonProto.Job.newBuilder()
                 .setId(jobIdentifier)
-                .setScheduler(request.getScheduler())
                 .build();
 
             responseObserver.onNext(response);
@@ -235,13 +287,13 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
     }
 
     @Override
-    public void cancelJob(XenonProto.Job request, StreamObserver<XenonProto.JobStatus> responseObserver) {
+    public void cancelJob(XenonProto.JobRequest request, StreamObserver<XenonProto.JobStatus> responseObserver) {
         try {
             Scheduler scheduler = getScheduler(request.getScheduler());
 
-            JobStatus status = scheduler.cancelJob(request.getId());
+            JobStatus status = scheduler.cancelJob(request.getJob().getId());
 
-            XenonProto.JobStatus response = mapJobStatus(status, request.getScheduler());
+            XenonProto.JobStatus response = mapJobStatus(status);
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -250,13 +302,13 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
     }
 
     @Override
-    public void getJobStatus(XenonProto.Job request, StreamObserver<XenonProto.JobStatus> responseObserver) {
+    public void getJobStatus(XenonProto.JobRequest request, StreamObserver<XenonProto.JobStatus> responseObserver) {
         try {
             Scheduler scheduler = getScheduler(request.getScheduler());
 
-            JobStatus status = scheduler.getJobStatus(request.getId());
+            JobStatus status = scheduler.getJobStatus(request.getJob().getId());
 
-            XenonProto.JobStatus response = mapJobStatus(status, request.getScheduler());
+            XenonProto.JobStatus response = mapJobStatus(status);
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -265,27 +317,20 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
     }
 
     @Override
-    public void getJobStatuses(XenonProto.Jobs request, StreamObserver<XenonProto.JobStatuses> responseObserver) {
+    public void getJobStatuses(XenonProto.GetJobStatusesRequest request, StreamObserver<XenonProto.GetJobStatusesResponse> responseObserver) {
         try {
-            // group jobs by scheduler
-            Map<XenonProto.Scheduler, List<XenonProto.Job>> jobIdentifiersByScheduler = request.getJobsList().stream().collect(
-                    Collectors.groupingBy(XenonProto.Job::getScheduler)
-            );
-
-            XenonProto.JobStatuses.Builder builder = XenonProto.JobStatuses.newBuilder();
+            XenonProto.GetJobStatusesResponse.Builder builder = XenonProto.GetJobStatusesResponse.newBuilder();
 
             // for each scheduler fetch statuses
-            for ( Map.Entry<XenonProto.Scheduler, List<XenonProto.Job>> schedulerJobIdentifiers : jobIdentifiersByScheduler.entrySet()) {
-                Scheduler scheduler = getScheduler(schedulerJobIdentifiers.getKey());
-                List<String> jobIdentifiers = schedulerJobIdentifiers.getValue().stream().map(XenonProto.Job::getId).collect(Collectors.toList());
-                JobStatus[] statuses = scheduler.getJobStatuses(jobIdentifiers.toArray(new String[0]));
-                for (JobStatus status: statuses) {
-                    XenonProto.JobStatus statusResponse = mapJobStatus(status, schedulerJobIdentifiers.getKey());
-                    builder.addStatuses(statusResponse);
-                }
+            Scheduler scheduler = getScheduler(request.getScheduler());
+            List<String> jobIdentifiers = request.getJobsList().stream().map(XenonProto.Job::getId).collect(Collectors.toList());
+            JobStatus[] statuses = scheduler.getJobStatuses(jobIdentifiers.toArray(new String[0]));
+            for (JobStatus status: statuses) {
+                XenonProto.JobStatus statusResponse = mapJobStatus(status);
+                builder.addStatuses(statusResponse);
             }
 
-            XenonProto.JobStatuses response = builder.build();
+            XenonProto.GetJobStatusesResponse response = builder.build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -294,13 +339,13 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
     }
 
     @Override
-    public void waitUntilDone(XenonProto.JobWithTimeout request, StreamObserver<XenonProto.JobStatus> responseObserver) {
+    public void waitUntilDone(XenonProto.WaitRequest request, StreamObserver<XenonProto.JobStatus> responseObserver) {
         try {
             Scheduler scheduler = getScheduler(request.getScheduler());
 
-            JobStatus status = scheduler.waitUntilDone(request.getId(), request.getTimeout());
+            JobStatus status = scheduler.waitUntilDone(request.getJob().getId(), request.getTimeout());
 
-            XenonProto.JobStatus response = mapJobStatus(status, request.getScheduler());
+            XenonProto.JobStatus response = mapJobStatus(status);
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -309,13 +354,13 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
     }
 
     @Override
-    public void waitUntilRunning(XenonProto.JobWithTimeout request, StreamObserver<XenonProto.JobStatus> responseObserver) {
+    public void waitUntilRunning(XenonProto.WaitRequest request, StreamObserver<XenonProto.JobStatus> responseObserver) {
         try {
             Scheduler scheduler = getScheduler(request.getScheduler());
 
-            JobStatus status = scheduler.waitUntilRunning(request.getId(), request.getTimeout());
+            JobStatus status = scheduler.waitUntilRunning(request.getJob().getId(), request.getTimeout());
 
-            XenonProto.JobStatus response = mapJobStatus(status, request.getScheduler());
+            XenonProto.JobStatus response = mapJobStatus(status);
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -332,7 +377,7 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
             String[] queues = request.getQueuesList().toArray(new String[0]);
             String[] jobIdentifiers = scheduler.getJobs(queues);
 
-            XenonProto.Jobs response = mapJobs(schedulerRequest, jobIdentifiers);
+            XenonProto.Jobs response = mapJobs(jobIdentifiers);
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -354,7 +399,7 @@ public class SchedulersService extends XenonSchedulersGrpc.XenonSchedulersImplBa
                         XenonProto.JobDescription requestDescription = value.getDescription();
                         JobDescription description = mapJobDescription(requestDescription);
                         streams = scheduler.submitInteractiveJob(description);
-                        XenonProto.Job job = XenonProto.Job.newBuilder().setScheduler(value.getScheduler()).setId(streams.getJobIdentifier()).build();
+                        XenonProto.Job job = XenonProto.Job.newBuilder().setId(streams.getJobIdentifier()).build();
                         forwarder = new JobOutputStreamsForwarder(responseObserver, streams.getStderr(), streams.getStdout(), job);
                     }
                     // write incoming stdin to xenons stdin

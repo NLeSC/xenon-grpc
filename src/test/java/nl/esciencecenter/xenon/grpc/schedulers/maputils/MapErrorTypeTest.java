@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapErrorType;
+import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobStatusErrorType;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
@@ -35,7 +35,7 @@ public class MapErrorTypeTest {
 
     @Test
     public void test_mapErrorType() {
-        XenonProto.JobStatus.ErrorType result = mapErrorType(input);
+        XenonProto.JobStatus.ErrorType result = mapJobStatusErrorType(input);
 
         assertEquals(expected, result);
     }

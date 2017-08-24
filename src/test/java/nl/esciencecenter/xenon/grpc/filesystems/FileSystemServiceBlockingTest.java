@@ -17,13 +17,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.ProtocolStringList;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.StatusException;
@@ -43,19 +46,20 @@ import nl.esciencecenter.xenon.filesystems.CopyCancelledException;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
 import nl.esciencecenter.xenon.filesystems.CopyStatus;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
-import nl.esciencecenter.xenon.grpc.XenonFileSystemsGrpc;
+import nl.esciencecenter.xenon.grpc.FileSystemServiceGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 
-public class FileSystemsServiceBlockingTest {
+public class FileSystemServiceBlockingTest {
     private Server server;
     private ManagedChannel channel;
-    private XenonFileSystemsGrpc.XenonFileSystemsBlockingStub client;
+    private FileSystemServiceGrpc.FileSystemServiceBlockingStub client;
     private FileSystem filesystem;
+    private FileSystemService service;
     private String filesystemId;
-    private FileSystemsService service;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -66,9 +70,22 @@ public class FileSystemsServiceBlockingTest {
             .build();
     }
 
+    private XenonProto.PathRequest buildPathRequest(String path) {
+        return XenonProto.PathRequest.newBuilder()
+            .setFilesystem(createFileSystem())
+            .setPath(buildPath(path))
+            .build();
+    }
+
+    private XenonProto.Path buildPath(String path) {
+        return XenonProto.Path.newBuilder()
+            .setPath(path)
+            .build();
+    }
+
     @Before
     public void setUp() throws IOException, StatusException, XenonException {
-        service = new FileSystemsService();
+        service = new FileSystemService();
         // register mocked filesystem to service
         filesystem = mock(FileSystem.class);
         when(filesystem.getAdaptorName()).thenReturn("file");
@@ -80,7 +97,7 @@ public class FileSystemsServiceBlockingTest {
         server.start();
         // setup client
         channel = InProcessChannelBuilder.forName(name).directExecutor().usePlaintext(true).build();
-        client = XenonFileSystemsGrpc.newBlockingStub(channel);
+        client = FileSystemServiceGrpc.newBlockingStub(channel);
         MockitoAnnotations.initMocks(this);
     }
 
@@ -129,7 +146,7 @@ public class FileSystemsServiceBlockingTest {
 
     @Test
     public void closeAllFileSystems() throws XenonException, StatusException {
-        FileSystemsService service = new FileSystemsService();
+        FileSystemService service = new FileSystemService();
         service.putFileSystem(filesystem, "someone");
 
         service.closeAllFileSystems();
@@ -139,8 +156,34 @@ public class FileSystemsServiceBlockingTest {
 
     @Test
     public void exists() throws XenonException {
-        XenonProto.Path request = buildPath("/etc/passwd");
+        XenonProto.PathRequest request = buildPathRequest("/etc/passwd");
         when(filesystem.exists(new Path("/etc/passwd"))).thenReturn(true);
+
+        XenonProto.Is response = client.exists(request);
+
+        assertTrue(response.getValue());
+    }
+
+    @Test
+    public void exists_customSeparator() throws XenonException {
+        XenonProto.PathRequest request = XenonProto.PathRequest.newBuilder()
+                .setFilesystem(createFileSystem())
+                .setPath(XenonProto.Path.newBuilder().setPath("@etc@passwd").setSeparator("@"))
+                .build();
+        when(filesystem.exists(new Path('@', "etc", "passwd"))).thenReturn(true);
+
+        XenonProto.Is response = client.exists(request);
+
+        assertTrue(response.getValue());
+    }
+
+    @Test
+    public void exists_windowsSeparator() throws XenonException {
+        XenonProto.PathRequest request = XenonProto.PathRequest.newBuilder()
+                .setFilesystem(createFileSystem())
+                .setPath(XenonProto.Path.newBuilder().setPath("\\etc\\passwd").setSeparator("\\\\"))
+                .build();
+        when(filesystem.exists(new Path('\\', "etc", "passwd"))).thenReturn(true);
 
         XenonProto.Is response = client.exists(request);
 
@@ -151,7 +194,7 @@ public class FileSystemsServiceBlockingTest {
     public void exists_notConnected() throws XenonException {
         thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
 
-        XenonProto.Path request = buildPath("/etc/passwd");
+        XenonProto.PathRequest request = buildPathRequest("/etc/passwd");
         when(filesystem.exists(new Path("/etc/passwd"))).thenThrow(new NotConnectedException("sftp", "Not connected"));
 
         client.exists(request);
@@ -159,7 +202,7 @@ public class FileSystemsServiceBlockingTest {
 
     @Test
     public void createDirectory() throws XenonException {
-        XenonProto.Path request = buildPath("/somedir");
+        XenonProto.PathRequest request = buildPathRequest("/somedir");
 
         client.createDirectory(request);
 
@@ -170,7 +213,7 @@ public class FileSystemsServiceBlockingTest {
     public void createDirectory_notConnected() throws XenonException {
         thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
 
-        XenonProto.Path request = buildPath("/somedir");
+        XenonProto.PathRequest request = buildPathRequest("/somedir");
         doThrow(new NotConnectedException("sftp", "Not connected")).when(filesystem).createDirectory(new Path("/somedir"));
 
         client.createDirectory(request);
@@ -178,7 +221,7 @@ public class FileSystemsServiceBlockingTest {
 
     @Test
     public void createDirectories() throws XenonException {
-        XenonProto.Path request = buildPath("/somedir");
+        XenonProto.PathRequest request = buildPathRequest("/somedir");
 
         client.createDirectories(request);
 
@@ -189,7 +232,7 @@ public class FileSystemsServiceBlockingTest {
     public void createDirectories_notConnected() throws XenonException {
         thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
 
-        XenonProto.Path request = buildPath("/somedir");
+        XenonProto.PathRequest request = buildPathRequest("/somedir");
         doThrow(new NotConnectedException("sftp", "Not connected")).when(filesystem).createDirectories(new Path("/somedir"));
 
         client.createDirectories(request);
@@ -197,7 +240,7 @@ public class FileSystemsServiceBlockingTest {
 
     @Test
     public void createFile() throws XenonException {
-        XenonProto.Path request = buildPath("/somefile");
+        XenonProto.PathRequest request = buildPathRequest("/somefile");
 
         client.createFile(request);
 
@@ -208,7 +251,7 @@ public class FileSystemsServiceBlockingTest {
     public void createFile_notConnected() throws XenonException {
         thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
 
-        XenonProto.Path request = buildPath("/somefile");
+        XenonProto.PathRequest request = buildPathRequest("/somefile");
         doThrow(new NotConnectedException("sftp", "Not connected")).when(filesystem).createFile(new Path("/somefile"));
 
         client.createFile(request);
@@ -217,8 +260,8 @@ public class FileSystemsServiceBlockingTest {
     @Test
     public void delete() throws XenonException {
         XenonProto.DeleteRequest request = XenonProto.DeleteRequest.newBuilder()
+            .setFilesystem(createFileSystem())
             .setPath(XenonProto.Path.newBuilder()
-                .setFilesystem(createFileSystem())
                 .setPath("/somefile")
             )
             .build();
@@ -233,8 +276,8 @@ public class FileSystemsServiceBlockingTest {
         thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
 
         XenonProto.DeleteRequest request = XenonProto.DeleteRequest.newBuilder()
+            .setFilesystem(createFileSystem())
             .setPath(XenonProto.Path.newBuilder()
-                .setFilesystem(createFileSystem())
                 .setPath("/somefile")
             )
             .build();
@@ -246,8 +289,8 @@ public class FileSystemsServiceBlockingTest {
     @Test
     public void delete_recursive() throws XenonException {
         XenonProto.DeleteRequest request = XenonProto.DeleteRequest.newBuilder()
+            .setFilesystem(createFileSystem())
             .setPath(XenonProto.Path.newBuilder()
-                .setFilesystem(createFileSystem())
                 .setPath("/somefile")
             )
             .setRecursive(true)
@@ -261,15 +304,15 @@ public class FileSystemsServiceBlockingTest {
     @Test
     public void getAttributes() throws XenonException {
         String filename = "/etc/passwd";
-        XenonProto.Path request = buildPath(filename);
+        XenonProto.PathRequest request = buildPathRequest(filename);
         PathAttributesImplementation attribs = buildPathAttributesOfRegularFile(filename);
         when(filesystem.getAttributes(new Path(filename))).thenReturn(attribs);
 
         XenonProto.PathAttributes response = client.getAttributes(request);
 
         XenonProto.PathAttributes expected = XenonProto.PathAttributes.newBuilder()
-            .setPath(request)
-            .setIsRegularFile(true)
+            .setPath(buildPath(filename))
+            .setIsRegular(true)
             .build();
         assertEquals(expected, response);
     }
@@ -279,7 +322,7 @@ public class FileSystemsServiceBlockingTest {
         thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
 
         String filename = "/etc/passwd";
-        XenonProto.Path request = buildPath(filename);
+        XenonProto.PathRequest request = buildPathRequest(filename);
         when(filesystem.getAttributes(new Path(filename))).thenThrow(new NotConnectedException("sftp", "Not connected"));
 
         client.getAttributes(request);
@@ -295,7 +338,7 @@ public class FileSystemsServiceBlockingTest {
     @Test
     public void readSymbolicLink() throws XenonException {
         String path = "/var/run";
-        XenonProto.Path request = buildPath(path);
+        XenonProto.PathRequest request = buildPathRequest(path);
         when(filesystem.readSymbolicLink(new Path(path))).thenReturn(new Path("/run"));
 
         XenonProto.Path response = client.readSymbolicLink(request);
@@ -309,18 +352,12 @@ public class FileSystemsServiceBlockingTest {
         thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
 
         String path = "/var/run";
-        XenonProto.Path request = buildPath(path);
+        XenonProto.PathRequest request = buildPathRequest(path);
         when(filesystem.readSymbolicLink(new Path(path))).thenThrow(new NotConnectedException("sftp", "Not connected"));
 
         client.readSymbolicLink(request);
     }
 
-    private XenonProto.Path buildPath(String path) {
-        return XenonProto.Path.newBuilder()
-            .setFilesystem(createFileSystem())
-            .setPath(path)
-            .build();
-    }
 
     @Test
     public void isOpen() throws XenonException {
@@ -346,8 +383,8 @@ public class FileSystemsServiceBlockingTest {
     public void rename() throws XenonException {
         XenonProto.RenameRequest request = XenonProto.RenameRequest.newBuilder()
             .setFilesystem(createFileSystem())
-            .setSource("/var/run")
-            .setTarget("/run")
+            .setSource(buildPath("/var/run"))
+            .setTarget(buildPath("/run"))
             .build();
 
         client.rename(request);
@@ -361,8 +398,8 @@ public class FileSystemsServiceBlockingTest {
 
         XenonProto.RenameRequest request = XenonProto.RenameRequest.newBuilder()
             .setFilesystem(createFileSystem())
-            .setSource("/var/run")
-            .setTarget("/run")
+            .setSource(buildPath("/var/run"))
+            .setTarget(buildPath("/run"))
             .build();
         doThrow(new NotConnectedException("sftp", "Not connected")).when(filesystem).rename(new Path("/var/run"), new Path("/run"));
 
@@ -373,7 +410,7 @@ public class FileSystemsServiceBlockingTest {
     public void readFromFile() throws XenonException {
         String path = "/etc/pasword";
         byte[] content = "test data".getBytes();
-        XenonProto.Path request = buildPath(path);
+        XenonProto.PathRequest request = buildPathRequest(path);
         InputStream stream = new ByteArrayInputStream(content);
         when(filesystem.readFromFile(new Path(path))).thenReturn(stream);
 
@@ -395,8 +432,8 @@ public class FileSystemsServiceBlockingTest {
     public void createSymbolicLink() throws XenonException {
         XenonProto.CreateSymbolicLinkRequest request = XenonProto.CreateSymbolicLinkRequest.newBuilder()
             .setFilesystem(createFileSystem())
-            .setLink("/var/run")
-            .setTarget("/run")
+            .setLink(buildPath("/var/run"))
+            .setTarget(buildPath("/run"))
             .build();
 
         client.createSymbolicLink(request);
@@ -410,8 +447,8 @@ public class FileSystemsServiceBlockingTest {
 
         XenonProto.CreateSymbolicLinkRequest request = XenonProto.CreateSymbolicLinkRequest.newBuilder()
             .setFilesystem(createFileSystem())
-            .setLink("/var/run")
-            .setTarget("/run")
+            .setLink(buildPath("/var/run"))
+            .setTarget(buildPath("/run"))
             .build();
         doThrow(new NotConnectedException("sftp", "Not connected")).when(filesystem).createSymbolicLink(new Path("/var/run"), new Path("/run"));
 
@@ -422,6 +459,7 @@ public class FileSystemsServiceBlockingTest {
     public void setPosixFilePermissions() throws XenonException {
         XenonProto.Path path = buildPath("/etc/passwd");
         XenonProto.SetPosixFilePermissionsRequest request = XenonProto.SetPosixFilePermissionsRequest.newBuilder()
+            .setFilesystem(createFileSystem())
             .setPath(path)
             .addPermissions(XenonProto.PosixFilePermission.GROUP_EXECUTE)
             .build();
@@ -439,6 +477,7 @@ public class FileSystemsServiceBlockingTest {
 
         XenonProto.Path path = buildPath("/etc/passwd");
         XenonProto.SetPosixFilePermissionsRequest request = XenonProto.SetPosixFilePermissionsRequest.newBuilder()
+            .setFilesystem(createFileSystem())
             .setPath(path)
             .addPermissions(XenonProto.PosixFilePermission.GROUP_EXECUTE)
             .build();
@@ -454,15 +493,16 @@ public class FileSystemsServiceBlockingTest {
         String source = "/etc/passwd";
         String target = "/etc/passwd.bak";
         XenonProto.CopyRequest request = XenonProto.CopyRequest.newBuilder()
+            .setFilesystem(createFileSystem())
             .setSource(buildPath(source))
-            .setTarget(buildPath(target))
+            .setDestinationFilesystem(createFileSystem())
+            .setDestination(buildPath(target))
             .build();
         when(filesystem.copy(new Path(source), filesystem, new Path(target), CopyMode.CREATE, false)).thenReturn("COPY-1");
 
         XenonProto.CopyOperation response = client.copy(request);
 
         XenonProto.CopyOperation expected = XenonProto.CopyOperation.newBuilder()
-            .setFilesystem(createFileSystem())
             .setId("COPY-1")
             .build();
         assertEquals(expected, response);
@@ -475,8 +515,10 @@ public class FileSystemsServiceBlockingTest {
         String source = "/etc/passwd";
         String target = "/etc/passwd.bak";
         XenonProto.CopyRequest request = XenonProto.CopyRequest.newBuilder()
+            .setFilesystem(createFileSystem())
             .setSource(buildPath(source))
-            .setTarget(buildPath(target))
+            .setDestinationFilesystem(createFileSystem())
+            .setDestination(buildPath(target))
             .build();
         when(filesystem.copy(new Path(source), filesystem, new Path(target), CopyMode.CREATE, false)).thenThrow(new NotConnectedException("sftp", "Not connected"));
 
@@ -485,9 +527,9 @@ public class FileSystemsServiceBlockingTest {
 
     @Test
     public void cancel() throws XenonException {
-        XenonProto.CopyOperation request = XenonProto.CopyOperation.newBuilder()
+        XenonProto.CopyOperationRequest request = XenonProto.CopyOperationRequest.newBuilder()
             .setFilesystem(createFileSystem())
-            .setId("COPY-1")
+            .setCopyOperation(XenonProto.CopyOperation.newBuilder().setId("COPY-1"))
             .build();
         CopyStatus status = buildCopyStatus();
         when(filesystem.cancel("COPY-1")).thenReturn(status);
@@ -501,9 +543,9 @@ public class FileSystemsServiceBlockingTest {
     public void cancel_notConnected() throws XenonException {
         thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
 
-        XenonProto.CopyOperation request = XenonProto.CopyOperation.newBuilder()
+        XenonProto.CopyOperationRequest request = XenonProto.CopyOperationRequest.newBuilder()
             .setFilesystem(createFileSystem())
-            .setId("COPY-1")
+            .setCopyOperation(XenonProto.CopyOperation.newBuilder().setId("COPY-1"))
             .build();
         when(filesystem.cancel("COPY-1")).thenThrow(new NotConnectedException("sftp", "Not connected"));
 
@@ -525,9 +567,9 @@ public class FileSystemsServiceBlockingTest {
 
     @Test
     public void getStatus() throws XenonException {
-        XenonProto.CopyOperation request = XenonProto.CopyOperation.newBuilder()
+        XenonProto.CopyOperationRequest request = XenonProto.CopyOperationRequest.newBuilder()
             .setFilesystem(createFileSystem())
-            .setId("COPY-1")
+            .setCopyOperation(XenonProto.CopyOperation.newBuilder().setId("COPY-1"))
             .build();
         CopyStatus status = buildCopyStatus();
         when(filesystem.getStatus("COPY-1")).thenReturn(status);
@@ -542,9 +584,9 @@ public class FileSystemsServiceBlockingTest {
     public void getStatus_notConnected() throws XenonException {
         thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
 
-        XenonProto.CopyOperation request = XenonProto.CopyOperation.newBuilder()
+        XenonProto.CopyOperationRequest request = XenonProto.CopyOperationRequest.newBuilder()
             .setFilesystem(createFileSystem())
-            .setId("COPY-1")
+            .setCopyOperation(XenonProto.CopyOperation.newBuilder().setId("COPY-1"))
             .build();
         when(filesystem.getStatus("COPY-1")).thenThrow(new NotConnectedException("sftp", "Not connected"));
 
@@ -553,9 +595,9 @@ public class FileSystemsServiceBlockingTest {
 
     @Test
     public void waitUntilDone() throws XenonException {
-        XenonProto.CopyOperationWithTimeout request = XenonProto.CopyOperationWithTimeout.newBuilder()
+        XenonProto.WaitUntilDoneRequest request = XenonProto.WaitUntilDoneRequest.newBuilder()
             .setFilesystem(createFileSystem())
-            .setId("COPY-1")
+            .setCopyOperation(XenonProto.CopyOperation.newBuilder().setId("COPY-1"))
             .setTimeout(1024L)
             .build();
         CopyStatus status = buildCopyStatus();
@@ -570,9 +612,9 @@ public class FileSystemsServiceBlockingTest {
     public void waitUntilDone_notConnected() throws XenonException {
         thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
 
-        XenonProto.CopyOperationWithTimeout request = XenonProto.CopyOperationWithTimeout.newBuilder()
+        XenonProto.WaitUntilDoneRequest request = XenonProto.WaitUntilDoneRequest.newBuilder()
             .setFilesystem(createFileSystem())
-            .setId("COPY-1")
+            .setCopyOperation(XenonProto.CopyOperation.newBuilder().setId("COPY-1"))
             .setTimeout(1024L)
             .build();
         when(filesystem.waitUntilDone("COPY-1", 1024L)).thenThrow(new NotConnectedException("sftp", "Not connected"));
@@ -612,6 +654,7 @@ public class FileSystemsServiceBlockingTest {
     @Test
     public void list() throws XenonException {
         XenonProto.ListRequest request = XenonProto.ListRequest.newBuilder()
+            .setFilesystem(createFileSystem())
             .setDir(buildPath("/etc"))
             .build();
         Iterable<PathAttributes> listing = Arrays.asList(
@@ -628,11 +671,11 @@ public class FileSystemsServiceBlockingTest {
         List<XenonProto.PathAttributes> expected = Arrays.asList(
             XenonProto.PathAttributes.newBuilder()
                 .setPath(buildPath("/etc/passwd"))
-                .setIsRegularFile(true)
+                .setIsRegular(true)
                 .build(),
             XenonProto.PathAttributes.newBuilder()
                 .setPath(buildPath("/etc/group"))
-                .setIsRegularFile(true)
+                .setIsRegular(true)
                 .build()
         );
         assertEquals(expected, response);
@@ -660,7 +703,7 @@ public class FileSystemsServiceBlockingTest {
 
     @Test
     public void setWorkingDirectory() throws XenonException {
-        XenonProto.Path request = buildPath("/tmp");
+        XenonProto.PathRequest request = buildPathRequest("/tmp");
 
         client.setWorkingDirectory(request);
 
@@ -672,9 +715,9 @@ public class FileSystemsServiceBlockingTest {
         thrown.expectMessage("NOT_FOUND: File system with id: sftp://someone@localhost/");
 
         XenonProto.FileSystem fs = createUnknownFileSystem();
-        XenonProto.Path request = XenonProto.Path.newBuilder()
+        XenonProto.PathRequest request = XenonProto.PathRequest.newBuilder()
                 .setFilesystem(fs)
-                .setPath("/tmp")
+                .setPath(XenonProto.Path.newBuilder().setPath("/tmp"))
                 .build();
 
         client.setWorkingDirectory(request);
@@ -701,7 +744,7 @@ public class FileSystemsServiceBlockingTest {
     public void create() {
         XenonProto.CreateFileSystemRequest request = XenonProto.CreateFileSystemRequest.newBuilder()
             .setAdaptor("file")
-            .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
+            .setDefaultCredential(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
             .build();
 
         XenonProto.FileSystem response = client.create(request);
@@ -716,7 +759,7 @@ public class FileSystemsServiceBlockingTest {
     public void create_twiceSameRequest_shouldCreate2Filesystems() {
         XenonProto.CreateFileSystemRequest request = XenonProto.CreateFileSystemRequest.newBuilder()
             .setAdaptor("file")
-            .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
+            .setDefaultCredential(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
             .build();
         XenonProto.FileSystem response1 = client.create(request);
 
@@ -724,4 +767,70 @@ public class FileSystemsServiceBlockingTest {
 
         assertNotEquals(response1, response2);
     }
+
+    @Test
+    public void getAdaptorNames() {
+        XenonProto.AdaptorNames response = client.getAdaptorNames(empty());
+
+        ProtocolStringList names = response.getNameList();
+        List<String> expectedNames = Arrays.asList("file", "sftp");
+        assertTrue("Contains file and sftp", names.containsAll(expectedNames));
+    }
+
+    @Test
+    public void getAdaptorName() {
+        XenonProto.AdaptorName response = client.getAdaptorName(createFileSystem());
+
+        String expected = "file";
+        assertEquals(expected, response.getName());
+    }
+
+    @Test
+    public void getAdaptorName_unknownFileSystem() {
+        thrown.expectMessage("NOT_FOUND: File system with id: sftp://someone@localhost");
+
+        XenonProto.FileSystem request = XenonProto.FileSystem.newBuilder()
+            .setId("sftp://someone@localhost")
+            .build();
+
+        client.getAdaptorName(request);
+    }
+    @Test
+    public void getLocation() {
+        XenonProto.Location response = client.getLocation(createFileSystem());
+
+        String expected = "/";
+        assertEquals(expected, response.getLocation());
+    }
+
+    @Test
+    public void getLocation_unknownScheduler() {
+        thrown.expectMessage("NOT_FOUND: File system with id: sftp://someone@localhost");
+
+        XenonProto.FileSystem request = XenonProto.FileSystem.newBuilder()
+            .setId("sftp://someone@localhost")
+            .build();
+
+        client.getLocation(request);
+    }
+
+    @Test
+    public void getProperties() {
+        XenonProto.Properties response = client.getProperties(createFileSystem());
+
+        Map<String, String> expected = new HashMap<>();
+        assertEquals(expected, response.getPropertiesMap());
+    }
+
+    @Test
+    public void getProperties_unknownScheduler() {
+        thrown.expectMessage("NOT_FOUND: File system with id: sftp://someone@localhost");
+
+        XenonProto.FileSystem request = XenonProto.FileSystem.newBuilder()
+            .setId("sftp://someone@localhost")
+            .build();
+
+        client.getProperties(request);
+    }
+
 }

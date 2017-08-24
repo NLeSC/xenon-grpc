@@ -12,13 +12,18 @@ import io.grpc.StatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.AttributeNotSupportedException;
+import nl.esciencecenter.xenon.filesystems.CopyCancelledException;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
 import nl.esciencecenter.xenon.filesystems.CopyStatus;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
+import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 import nl.esciencecenter.xenon.grpc.XenonProto;
@@ -74,7 +79,7 @@ class MapUtils {
         return permissions;
     }
 
-    static CopyMode mapCopyMode(XenonProto.CopyMode mode) throws StatusException {
+    static CopyMode mapCopyMode(XenonProto.CopyRequest.CopyMode mode) throws StatusException {
         switch (mode) {
             case CREATE:
                 return CopyMode.CREATE;
@@ -87,16 +92,16 @@ class MapUtils {
         }
     }
 
-    static XenonProto.PathAttributes writeFileAttributes(XenonProto.FileSystem filesystem, PathAttributes a) {
+    static XenonProto.PathAttributes writeFileAttributes(PathAttributes a) {
         XenonProto.PathAttributes.Builder builder = XenonProto.PathAttributes.newBuilder()
-            .setPath(writePath(a.getPath(), filesystem))
+            .setPath(writePath(a.getPath()))
             .setCreationTime(a.getCreationTime())
             .setIsDirectory(a.isDirectory())
             .setIsExecutable(a.isExecutable())
             .setIsHidden(a.isHidden())
             .setIsOther(a.isOther())
             .setIsReadable(a.isReadable())
-            .setIsRegularFile(a.isRegular())
+            .setIsRegular(a.isRegular())
             .setIsSymbolicLink(a.isSymbolicLink())
             .setIsWritable(a.isWritable())
             .setLastAccessTime(a.getLastAccessTime())
@@ -163,8 +168,8 @@ class MapUtils {
         return permissions;
     }
 
-    static XenonProto.Path writePath(Path path, XenonProto.FileSystem fs) {
-        return XenonProto.Path.newBuilder().setFilesystem(fs).setPath(path.toString()).build();
+    static XenonProto.Path writePath(Path path) {
+        return XenonProto.Path.newBuilder().setPath(path.toString()).build();
     }
 
     static String getFileSystemId(FileSystem fileSystem, String username) {
@@ -185,7 +190,10 @@ class MapUtils {
         return builder.build();
     }
 
-    static XenonProto.CopyStatus mapCopyStatus(CopyStatus status, XenonProto.CopyOperation operation) {
+    static XenonProto.CopyStatus mapCopyStatus(CopyStatus status) {
+        XenonProto.CopyOperation operation = XenonProto.CopyOperation.newBuilder()
+            .setId(status.getCopyIdentifier())
+            .build();
         XenonProto.CopyStatus.Builder builder = XenonProto.CopyStatus.newBuilder()
             .setBytesCopied(status.bytesCopied())
             .setBytesToCopy(status.bytesToCopy())
@@ -194,9 +202,23 @@ class MapUtils {
             .setDone(status.isDone())
             .setRunning(status.isRunning());
         if (status.hasException()) {
-            builder.setError(status.getException().getMessage());
+            builder.setErrorMessage(status.getException().getMessage());
+            builder.setErrorType(mapCopyStatusErrorType(status.getException()));
         }
         return builder.build();
+    }
+
+    static XenonProto.CopyStatus.ErrorType mapCopyStatusErrorType(XenonException exception) {
+        if (exception instanceof NoSuchPathException) {
+            return XenonProto.CopyStatus.ErrorType.NOT_FOUND;
+        } else if (exception instanceof CopyCancelledException) {
+            return XenonProto.CopyStatus.ErrorType.CANCELLED;
+        } else if (exception instanceof PathAlreadyExistsException) {
+            return XenonProto.CopyStatus.ErrorType.ALREADY_EXISTS;
+        } else if (exception instanceof NotConnectedException) {
+            return XenonProto.CopyStatus.ErrorType.NOT_CONNECTED;
+        }
+        return XenonProto.CopyStatus.ErrorType.XENON;
     }
 
     static XenonProto.FileSystemAdaptorDescription mapFileAdaptorDescription(FileSystemAdaptorDescription status) {

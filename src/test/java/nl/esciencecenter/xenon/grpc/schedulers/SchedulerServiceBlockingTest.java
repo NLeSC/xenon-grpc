@@ -11,9 +11,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+
+import com.google.protobuf.ProtocolStringList;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -28,19 +31,19 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
+import nl.esciencecenter.xenon.grpc.SchedulerServiceGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.grpc.XenonSchedulersGrpc;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 
-public class SchedulersServiceBlockingTest {
-    private SchedulersService service;
+public class SchedulerServiceBlockingTest {
+    private SchedulerService service;
     private Server server;
     private ManagedChannel channel;
-    private XenonSchedulersGrpc.XenonSchedulersBlockingStub client;
     private Scheduler scheduler;
+    private SchedulerServiceGrpc.SchedulerServiceBlockingStub client;
 
     @Rule
     public ExpectedException thrown= ExpectedException.none();
@@ -52,16 +55,22 @@ public class SchedulersServiceBlockingTest {
                 .build();
     }
 
-    private XenonProto.Job buildJob(String jobId) {
-        return XenonProto.Job.newBuilder()
-                .setId(jobId)
+    private XenonProto.JobRequest buildJobRequest(String jobId) {
+        return XenonProto.JobRequest.newBuilder()
+                .setJob(buildJob(jobId))
                 .setScheduler(createScheduler())
                 .build();
     }
 
+    private XenonProto.Job buildJob(String jobId) {
+        return XenonProto.Job.newBuilder()
+            .setId(jobId)
+            .build();
+    }
+
     @Before
     public void setUp() throws Exception {
-        service = new SchedulersService();
+        service = new SchedulerService();
         // register mocked scheduler to service
         scheduler = mock(Scheduler.class);
         when(scheduler.getAdaptorName()).thenReturn("local");
@@ -73,7 +82,7 @@ public class SchedulersServiceBlockingTest {
         server.start();
         // setup client
         channel = InProcessChannelBuilder.forName(name).directExecutor().usePlaintext(true).build();
-        client = XenonSchedulersGrpc.newBlockingStub(channel);
+        client = SchedulerServiceGrpc.newBlockingStub(channel);
     }
 
     @After
@@ -147,7 +156,7 @@ public class SchedulersServiceBlockingTest {
 
     @Test
     public void closeAllSchedulers() throws Exception {
-        service = new SchedulersService();
+        service = new SchedulerService();
         service.putScheduler(scheduler, "someone");
 
         service.closeAllSchedulers();
@@ -184,22 +193,22 @@ public class SchedulersServiceBlockingTest {
     }
 
     @Test
-    public void getQueues() throws Exception {
+    public void getQueueNames() throws Exception {
         String[] queues = new String[]{"default", "other"};
         when(scheduler.getQueueNames()).thenReturn(queues);
 
-        XenonProto.Queues response = client.getQueues(createScheduler());
+        XenonProto.Queues response = client.getQueueNames(createScheduler());
 
         XenonProto.Queues expected = XenonProto.Queues.newBuilder().addAllName(Arrays.asList(queues)).build();
         assertEquals(expected, response);
     }
 
     @Test
-    public void getQueues_notConnected() throws Exception {
+    public void getQueueNames_notConnected() throws Exception {
         thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
         when(scheduler.getQueueNames()).thenThrow(new NotConnectedException("slurm", "Not connected"));
 
-        client.getQueues(createScheduler());
+        client.getQueueNames(createScheduler());
     }
 
     @Test
@@ -224,7 +233,7 @@ public class SchedulersServiceBlockingTest {
         String queueName = "somequeue";
         Map<String, String> info = new HashMap<>();
         info.put("state", "idle");
-        XenonProto.SchedulerAndQueue request = XenonProto.SchedulerAndQueue.newBuilder()
+        XenonProto.GetQueueStatusRequest request = XenonProto.GetQueueStatusRequest.newBuilder()
                 .setScheduler(createScheduler())
                 .setQueue(queueName)
                 .build();
@@ -235,7 +244,6 @@ public class SchedulersServiceBlockingTest {
 
         XenonProto.QueueStatus expected = XenonProto.QueueStatus.newBuilder()
                 .setName(queueName)
-                .setScheduler(createScheduler())
                 .putAllSchedulerSpecificInformation(info)
                 .build();
         assertEquals(expected, response);
@@ -246,7 +254,7 @@ public class SchedulersServiceBlockingTest {
         thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
 
         String queueName = "somequeue";
-        XenonProto.SchedulerAndQueue request = XenonProto.SchedulerAndQueue.newBuilder()
+        XenonProto.GetQueueStatusRequest request = XenonProto.GetQueueStatusRequest.newBuilder()
                 .setScheduler(createScheduler())
                 .setQueue(queueName)
                 .build();
@@ -274,7 +282,6 @@ public class SchedulersServiceBlockingTest {
         XenonProto.QueueStatuses expected = XenonProto.QueueStatuses.newBuilder()
                 .addStatuses(XenonProto.QueueStatus.newBuilder()
                         .setName(queueName)
-                        .setScheduler(createScheduler())
                         .putAllSchedulerSpecificInformation(info)
                 )
                 .build();
@@ -335,13 +342,13 @@ public class SchedulersServiceBlockingTest {
     @Test
     public void cancelJob() throws Exception {
         String jobId = "JOBID-1";
-        XenonProto.Job request = buildJob(jobId);
+        XenonProto.JobRequest request = buildJobRequest(jobId);
         JobStatus status = new JobStatusImplementation(jobId, "COMPLETED", 0, null, false, true, new HashMap<>());
         when(scheduler.cancelJob(jobId)).thenReturn(status);
 
         XenonProto.JobStatus response = client.cancelJob(request);
 
-        XenonProto.JobStatus expected = buildJobStatus(request);
+        XenonProto.JobStatus expected = buildJobStatus(request.getJob());
         assertEquals(expected, response);
     }
 
@@ -350,7 +357,7 @@ public class SchedulersServiceBlockingTest {
         thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
 
         String jobId = "JOBID-1";
-        XenonProto.Job request = buildJob(jobId);
+        XenonProto.JobRequest request = buildJobRequest(jobId);
         when(scheduler.cancelJob(jobId)).thenThrow(new NotConnectedException("slurm", "Not connected"));
 
         client.cancelJob(request);
@@ -369,13 +376,13 @@ public class SchedulersServiceBlockingTest {
     @Test
     public void getJobStatus() throws Exception {
         String jobId = "JOBID-1";
-        XenonProto.Job request = buildJob(jobId);
+        XenonProto.JobRequest request = buildJobRequest(jobId);
         JobStatus status = new JobStatusImplementation(jobId, "COMPLETED", 0, null, false, true, new HashMap<>());
         when(scheduler.getJobStatus(jobId)).thenReturn(status);
 
         XenonProto.JobStatus response = client.getJobStatus(request);
 
-        XenonProto.JobStatus expected = buildJobStatus(request);
+        XenonProto.JobStatus expected = buildJobStatus(request.getJob());
         assertEquals(expected, response);
     }
 
@@ -384,7 +391,7 @@ public class SchedulersServiceBlockingTest {
         thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
 
         String jobId = "JOBID-1";
-        XenonProto.Job request = buildJob(jobId);
+        XenonProto.JobRequest request = buildJobRequest(jobId);
         when(scheduler.getJobStatus(jobId)).thenThrow(new NotConnectedException("slurm", "Not connected"));
 
         client.getJobStatus(request);
@@ -393,15 +400,16 @@ public class SchedulersServiceBlockingTest {
     @Test
     public void getJobStatuses() throws Exception {
         String jobId = "JOBID-1";
-        XenonProto.Jobs request = XenonProto.Jobs.newBuilder()
+        XenonProto.GetJobStatusesRequest request = XenonProto.GetJobStatusesRequest.newBuilder()
+                .setScheduler(createScheduler())
                 .addJobs(buildJob(jobId))
                 .build();
         JobStatus status = new JobStatusImplementation(jobId, "COMPLETED", 0, null, false, true, new HashMap<>());
         when(scheduler.getJobStatuses(jobId)).thenReturn(new JobStatus[]{status});
 
-        XenonProto.JobStatuses response = client.getJobStatuses(request);
+        XenonProto.GetJobStatusesResponse response = client.getJobStatuses(request);
 
-        XenonProto.JobStatuses expected = XenonProto.JobStatuses.newBuilder()
+        XenonProto.GetJobStatusesResponse expected = XenonProto.GetJobStatusesResponse.newBuilder()
                 .addStatuses(buildJobStatus(buildJob(jobId)))
                 .build();
         assertEquals(expected, response);
@@ -412,7 +420,8 @@ public class SchedulersServiceBlockingTest {
         thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
 
         String jobId = "JOBID-1";
-        XenonProto.Jobs request = XenonProto.Jobs.newBuilder()
+        XenonProto.GetJobStatusesRequest request = XenonProto.GetJobStatusesRequest.newBuilder()
+                .setScheduler(createScheduler())
                 .addJobs(buildJob(jobId))
                 .build();
         when(scheduler.getJobStatuses(jobId)).thenThrow(new NotConnectedException("slurm", "Not connected"));
@@ -423,8 +432,8 @@ public class SchedulersServiceBlockingTest {
     @Test
     public void waitUntilDone() throws Exception {
         String jobId = "JOBID-1";
-        XenonProto.JobWithTimeout request = XenonProto.JobWithTimeout.newBuilder()
-                .setId(jobId)
+        XenonProto.WaitRequest request = XenonProto.WaitRequest.newBuilder()
+                .setJob(buildJob(jobId))
                 .setScheduler(createScheduler())
                 .setTimeout(42L)
                 .build();
@@ -442,8 +451,8 @@ public class SchedulersServiceBlockingTest {
         thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
 
         String jobId = "JOBID-1";
-        XenonProto.JobWithTimeout request = XenonProto.JobWithTimeout.newBuilder()
-                .setId(jobId)
+        XenonProto.WaitRequest request = XenonProto.WaitRequest.newBuilder()
+                .setJob(buildJob(jobId))
                 .setScheduler(createScheduler())
                 .setTimeout(42L)
                 .build();
@@ -455,8 +464,8 @@ public class SchedulersServiceBlockingTest {
     @Test
     public void waitUntilRunning() throws Exception {
         String jobId = "JOBID-1";
-        XenonProto.JobWithTimeout request = XenonProto.JobWithTimeout.newBuilder()
-                .setId(jobId)
+        XenonProto.WaitRequest request = XenonProto.WaitRequest.newBuilder()
+                .setJob(buildJob(jobId))
                 .setScheduler(createScheduler())
                 .setTimeout(42L)
                 .build();
@@ -474,8 +483,8 @@ public class SchedulersServiceBlockingTest {
         thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
 
         String jobId = "JOBID-1";
-        XenonProto.JobWithTimeout request = XenonProto.JobWithTimeout.newBuilder()
-                .setId(jobId)
+        XenonProto.WaitRequest request = XenonProto.WaitRequest.newBuilder()
+                .setJob(buildJob(jobId))
                 .setScheduler(createScheduler())
                 .setTimeout(42L)
                 .build();
@@ -519,9 +528,9 @@ public class SchedulersServiceBlockingTest {
     @Test
     public void create() {
         XenonProto.CreateSchedulerRequest request = XenonProto.CreateSchedulerRequest.newBuilder()
-            .setAdaptor("local")
-            .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
-            .build();
+                .setAdaptor("local")
+                .setDefaultCredential(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
+                .build();
 
         XenonProto.Scheduler response = client.create(request);
 
@@ -536,12 +545,78 @@ public class SchedulersServiceBlockingTest {
     public void create_twiceSameRequest_shouldCreate2Schedulers() {
         XenonProto.CreateSchedulerRequest request = XenonProto.CreateSchedulerRequest.newBuilder()
             .setAdaptor("local")
-            .setDefaultCred(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
+            .setDefaultCredential(XenonProto.DefaultCredential.newBuilder().setUsername("user1"))
             .build();
         XenonProto.Scheduler response1 = client.create(request);
 
         XenonProto.Scheduler response2 = client.create(request);
 
         assertNotEquals(response1, response2);
+    }
+
+    @Test
+    public void getAdaptorNames() {
+        XenonProto.AdaptorNames response = client.getAdaptorNames(empty());
+
+        ProtocolStringList names = response.getNameList();
+        List<String> expectedNames = Arrays.asList("local", "ssh", "slurm");
+        assertTrue("Contains local, ssh and slurm", names.containsAll(expectedNames));
+    }
+
+    @Test
+    public void getAdaptorName() {
+        XenonProto.AdaptorName response = client.getAdaptorName(createScheduler());
+
+        String expected = "local";
+        assertEquals(expected, response.getName());
+    }
+
+    @Test
+    public void getAdaptorName_unknownScheduler() {
+        thrown.expectMessage("NOT_FOUND: Scheduler with id: ssh://someone@localhost");
+
+        XenonProto.Scheduler request = XenonProto.Scheduler.newBuilder()
+            .setId("ssh://someone@localhost")
+            .build();
+
+        client.getAdaptorName(request);
+    }
+
+    @Test
+    public void getLocation() {
+        XenonProto.Location response = client.getLocation(createScheduler());
+
+        String expected = "local://";
+        assertEquals(expected, response.getLocation());
+    }
+
+    @Test
+    public void getLocation_unknownScheduler() {
+        thrown.expectMessage("NOT_FOUND: Scheduler with id: ssh://someone@localhost");
+
+        XenonProto.Scheduler request = XenonProto.Scheduler.newBuilder()
+            .setId("ssh://someone@localhost")
+            .build();
+
+        client.getLocation(request);
+    }
+
+    @Test
+    public void getProperties() {
+        XenonProto.Properties response = client.getProperties(createScheduler());
+
+        Map<String, String> expected = new HashMap<>();
+        assertEquals(expected, response.getPropertiesMap());
+    }
+
+    @Test
+    public void getProperties_unknownScheduler() {
+        thrown.expectMessage("NOT_FOUND: Scheduler with id: ssh://someone@localhost");
+
+        XenonProto.Scheduler request = XenonProto.Scheduler.newBuilder()
+            .setId("ssh://someone@localhost")
+            .build();
+
+        client.getProperties(request);
     }
 }

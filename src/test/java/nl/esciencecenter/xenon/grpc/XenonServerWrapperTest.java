@@ -42,14 +42,14 @@ public class XenonServerWrapperTest {
     @Test
     public void parseArgs_proto() throws ArgumentParserException {
         exit.expectSystemExitWithStatus(0);
+        exit.checkAssertionAfterwards(() -> {
+            assertThat(systemOutRule.getLog(), containsString("package xenon"));
+            assertThat(systemOutRule.getLog(), containsString("service FileSystemService"));
+            assertThat(systemOutRule.getLog(), containsString("service SchedulerService"));
+        });
         XenonServerWrapper wrapper = new XenonServerWrapper();
 
         wrapper.parseArgs(new String[]{"--proto"});
-
-        assertThat(systemOutRule.getLog(), containsString("package xenon"));
-        assertThat(systemOutRule.getLog(), containsString("service XenonGlobal"));
-        assertThat(systemOutRule.getLog(), containsString("service XenonFiles"));
-        assertThat(systemOutRule.getLog(), containsString("service XenonJobs"));
     }
 
 }

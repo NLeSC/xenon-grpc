@@ -21,7 +21,7 @@ public class WriteToFileBroadcaster extends Broadcaster implements StreamObserve
         try {
             // open pip to write to on first incoming chunk
             if (pipe == null) {
-                String id = value.getPath().getFilesystem().getId();
+                String id = value.getFilesystem().getId();
                 if (!fileSystems.containsKey(id)) {
                     throw Status.NOT_FOUND.withDescription("File system with id: " + id).asException();
                 }

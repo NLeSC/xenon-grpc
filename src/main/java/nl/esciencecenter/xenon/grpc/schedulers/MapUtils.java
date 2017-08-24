@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
+import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
 import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 
@@ -21,18 +23,32 @@ public class MapUtils {
         throw new IllegalStateException("Utility class");
     }
 
-    public static XenonProto.QueueStatus mapQueueStatus(QueueStatus status, XenonProto.Scheduler scheduler) {
+    public static XenonProto.QueueStatus mapQueueStatus(QueueStatus status) {
         XenonProto.QueueStatus.Builder builder = XenonProto.QueueStatus.newBuilder()
                 .setName(status.getQueueName())
-                .setScheduler(scheduler);
+                ;
         Map<String, String> info = status.getSchedulerSpecficInformation();
         if (info != null) {
             builder.putAllSchedulerSpecificInformation(info);
         }
         if (status.hasException()) {
-            builder.setError(status.getException().getMessage());
+            builder.setErrorMessage(status.getException().getMessage());
+            builder.setErrorType(mapQueueStatusErrorType(status.getException()));
         }
         return builder.build();
+    }
+
+    private static XenonProto.QueueStatus.ErrorType mapQueueStatusErrorType(Exception exception) {
+        if (exception instanceof NoSuchQueueException) {
+            return XenonProto.QueueStatus.ErrorType.NOT_FOUND;
+        } else if (exception instanceof NotConnectedException) {
+            return XenonProto.QueueStatus.ErrorType.NOT_CONNECTED;
+        } else if (exception instanceof XenonException) {
+            return XenonProto.QueueStatus.ErrorType.XENON;
+        } else if (exception instanceof IOException) {
+            return XenonProto.QueueStatus.ErrorType.IO;
+        }
+        return XenonProto.QueueStatus.ErrorType.OTHER;
     }
 
     private static String defaultValue(String value) {
@@ -68,15 +84,12 @@ public class MapUtils {
         return description;
     }
 
-    public static XenonProto.JobStatus mapJobStatus(JobStatus status, XenonProto.Scheduler scheduler) {
+    public static XenonProto.JobStatus mapJobStatus(JobStatus status) {
         XenonProto.JobStatus.Builder builder = XenonProto.JobStatus.newBuilder()
+            .setJob(XenonProto.Job.newBuilder().setId(status.getJobIdentifier()))
             .setState(status.getState())
             .setRunning(status.isRunning())
             .setDone(status.isDone())
-            .setJob(XenonProto.Job.newBuilder()
-                .setId(status.getJobIdentifier())
-                .setScheduler(scheduler)
-                .build())
             ;
         Integer exitCode = status.getExitCode();
         if (exitCode != null) {
@@ -89,13 +102,13 @@ public class MapUtils {
         if (status.hasException()) {
             builder
                     .setErrorMessage(status.getException().getMessage())
-                    .setErrorType(mapErrorType(status.getException()));
+                    .setErrorType(mapJobStatusErrorType(status.getException()));
         }
 
         return builder.build();
     }
 
-    public static XenonProto.JobStatus.ErrorType mapErrorType(Exception exception) {
+    public static XenonProto.JobStatus.ErrorType mapJobStatusErrorType(Exception exception) {
         if (exception instanceof JobCanceledException) {
             return XenonProto.JobStatus.ErrorType.CANCELLED;
         } else if (exception instanceof NoSuchJobException) {
@@ -118,9 +131,9 @@ public class MapUtils {
                 .build();
     }
 
-    static XenonProto.Jobs mapJobs(XenonProto.Scheduler scheduler, String[] jobIdentifiers) {
+    static XenonProto.Jobs mapJobs(String[] jobIdentifiers) {
         XenonProto.Jobs.Builder builder = XenonProto.Jobs.newBuilder();
-        XenonProto.Job.Builder jobBuilder = XenonProto.Job.newBuilder().setScheduler(scheduler);
+        XenonProto.Job.Builder jobBuilder = XenonProto.Job.newBuilder();
         for (String jobId : jobIdentifiers) {
             XenonProto.Job job = jobBuilder.setId(jobId).build();
             builder.addJobs(job);

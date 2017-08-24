@@ -86,7 +86,7 @@ jacocoTestReport {
     afterEvaluate {
         classDirectories = files(classDirectories.files.collect {
             fileTree(dir: it, exclude: ['nl/esciencecenter/xenon/grpc/XenonProto*',
-                                        'nl/esciencecenter/xenon/grpc/Xenon*Grpc*'])
+                                        'nl/esciencecenter/xenon/grpc/*ServiceGrpc*'])
         })
     }
 }
