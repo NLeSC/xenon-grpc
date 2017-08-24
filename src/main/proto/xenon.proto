@@ -318,6 +318,10 @@ message JobRequest {
 }
 
 message Jobs {
+    repeated Job jobs = 2;
+}
+
+message GetJobStatusesRequest {
     Scheduler scheduler = 1;
     repeated Job jobs = 2;
 }
@@ -371,7 +375,7 @@ message JobStatus {
     ErrorType error_type = 7;
 }
 
-message JobStatuses {
+message GetJobStatusesResponse {
     repeated JobStatus statuses = 1;
 }
 
@@ -515,7 +519,7 @@ service SchedulerService {
     // Get the status of a Job.
     rpc getJobStatus(JobRequest) returns (JobStatus) {}
     // Get the status of all specified jobs.
-    rpc getJobStatuses(Jobs) returns (JobStatuses) {}
+    rpc getJobStatuses(GetJobStatusesRequest) returns (GetJobStatusesResponse) {}
     // Get the status of the queue.
     rpc getQueueStatus(GetQueueStatusRequest) returns (QueueStatus) {}
     // Get the status of all queues.
