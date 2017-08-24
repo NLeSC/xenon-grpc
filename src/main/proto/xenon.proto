@@ -67,6 +67,10 @@ message AdaptorName {
     string name = 1;
 }
 
+message AdaptorNames {
+    repeated string name = 1;
+}
+
 message CertificateCredential {
     // Path to certificate file
     string certfile = 1;
@@ -81,6 +85,10 @@ message PasswordCredential {
 
 message DefaultCredential {
     string username = 1;
+}
+
+message Location {
+    string location = 1;
 }
 
 message CreateFileSystemRequest {
@@ -98,7 +106,7 @@ message CreateFileSystemRequest {
 message FileSystem {
     string id = 1;
     // name of the adaptor that created this FileSystem
-    string adaptor_name = 2;
+    string adaptor = 2;
 }
 
 message FileSystems {
@@ -407,34 +415,69 @@ message Is {
 service FileSystemService {
     // Gives a list of the descriptions of the available adaptors.
     rpc getAdaptorDescriptions(Empty) returns (FileSystemAdaptorDescriptions) {}
+    // Gives a list names of the available adaptors.
+    rpc getAdaptorNames(Empty) returns (AdaptorNames) {}
     // Gives the description of the adaptor with the given name.
     rpc getAdaptorDescription(AdaptorName) returns (FileSystemAdaptorDescription) {}
+    // Create a new FileSystem using the adaptor that connects to a data store at location using the credentials to get access.
     rpc create(CreateFileSystemRequest) returns (FileSystem) {}
+    // Get the name of the adaptor that created this FileSystem.
+    rpc getAdaptorName(FileSystem) returns (AdaptorName) {}
+    // Get the location that this FileSystem is connected to.
+    rpc getLocation(FileSystem) returns (Location) {}
+    // Get the properties used to create this FileSystem.
+    rpc getProperties(FileSystem) returns (Properties) {}
+    // Creates a new directory, including parent directories, failing if the directory already exists.
     rpc createDirectories(PathRequest) returns (Empty) {}
+    // Creates a new directory, failing if the directory already exists.
     rpc createDirectory(PathRequest) returns (Empty) {}
+    // Creates a new empty file, failing if the file already exists.
     rpc createFile(PathRequest) returns (Empty) {}
+    // Creates a new symbolic link, failing if the link already exists
     rpc createSymbolicLink(CreateSymbolicLinkRequest) returns (Empty) {}
+    // Asynchronously Copy an existing source path to a target path on a different file system.
     rpc copy(CopyRequest) returns (CopyOperation) {}
+    // Cancel a copy operation.
     rpc cancel(CopyOperationRequest) returns (CopyStatus) {}
+    // Retrieve the status of an copy.
     rpc getStatus(CopyOperationRequest) returns (CopyStatus) {}
+    // Rename an existing source path to a non-existing target path
     rpc rename(RenameRequest) returns (Empty) {}
+    // Deletes an existing path.
     rpc delete(DeleteRequest) returns (Empty) {}
+    // Tests if a path exists.
     rpc exists(PathRequest) returns (Is) {}
+    // Open an existing file and return an InputStream to read from this file.
     rpc readFromFile(PathRequest) returns (stream ReadFromFileResponse) {}
+    // Open a file and return an OutputStream to write to this file.
+    // In Xenon library if request is missing size field then FileSystem.writeToFile(Path file) is used
+    // else FileSystem.writeToFile(Path path, long size) is used
     rpc writeToFile(stream WriteToFileRequest) returns (Empty) {}
+    // Open an existing file and return an OutputStream to append data to this file.
     rpc appendToFile(stream AppendToFileRequest) returns (Empty) {}
+    // List all entries in the directory dir.
     rpc list(ListRequest) returns (stream PathAttributes) {}
+    // Get the PathAttributes of an existing path.
     rpc getAttributes(PathRequest) returns (PathAttributes) {}
+    // Get the current working directory of this file system.
     rpc getWorkingDirectory(FileSystem) returns (Path) {}
+    // Set the current working directory of this file system to directory.
     rpc setWorkingDirectory(PathRequest) returns (Empty) {}
+    // Sets the POSIX permissions of a path
     rpc setPosixFilePermissions(SetPosixFilePermissionsRequest) returns (Empty) {}
+    // Reads the target of a symbolic link
     rpc readSymbolicLink(PathRequest) returns (Path) {}
+    // Return if the connection to the FileSystem is open.
     rpc isOpen(FileSystem) returns (Is) {}
-    // Closes a filestem, any actions running it with this filestystem will be terminated, will also forget the filesystem
-    // Any pending/running copy operations will be killed
+    // Close this filestem
+    // Any pending/running copy operations of this filestystem will be terminated
+    // Will also forget this filesystem
     rpc close(FileSystem) returns (Empty) {}
+    // Wait until a copy operation is done or until a timeout expires.
     rpc waitUntilDone(WaitUntilDoneRequest) returns (CopyStatus) {}
     // Returns filesystems for all local drives
+    // Not part of FileSystem class in Xenon library
+    // In Xenon library available as LocalFileSystemUtils.getLocalFileSystems()
     rpc localFileSystems(Empty) returns (FileSystems) {}
     // List the created filesystems
     // Specific to grpc, not part of Xenon library
@@ -443,31 +486,57 @@ service FileSystemService {
 
 // The Jobs API of Xenon. This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about schedulers and jobs.
 service SchedulerService {
+    // Gives a list of the descriptions of the available adaptors.
     rpc getAdaptorDescriptions(Empty) returns (SchedulerAdaptorDescriptions) {}
+    // Gives a list names of the available adaptors.
+    rpc getAdaptorNames(Empty) returns (AdaptorNames) {}
+    // Gives the description of the adaptor with the given name.
     rpc getAdaptorDescription(AdaptorName) returns (SchedulerAdaptorDescription) {}
+    // Create a new Scheduler using the adaptor connecting to the location using credentials to get access.
     rpc create(CreateSchedulerRequest) returns (Scheduler) {}
+    // Get the name of the adaptor that created this Scheduler.
+    rpc getAdaptorName(Scheduler) returns (AdaptorName) {}
+    // Get the location that this Scheduler is connected to.
+    rpc getLocation(Scheduler) returns (Location) {}
+    // Get the properties used to create this Scheduler.
+    rpc getProperties(Scheduler) returns (Properties) {}
+    // Submit a batch job.
     rpc submitBatchJob(SubmitBatchJobRequest) returns (Job) {}
+    // Submit an interactive job
     // The first response message in the response stream will contain the job identifier and empty stdout and stdout.
     // Other response messages will also contain the job identifier and filled stdout and/or stderr.
     rpc submitInteractiveJob(stream SubmitInteractiveJobRequest) returns (stream SubmitInteractiveJobResponse) {}
-    rpc getQueues(Scheduler) returns (Queues) {}
+    // Get the queue names supported by this Scheduler.
+    rpc getQueueNames(Scheduler) returns (Queues) {}
+    // Get the name of the default queue.
     rpc getDefaultQueueName(Scheduler) returns (Queue) {}
+    // Get all job identifier of jobs currently in (one ore more) queues.
     rpc getJobs(SchedulerAndQueues) returns (Jobs) {}
+    // Get the status of a Job.
     rpc getJobStatus(JobRequest) returns (JobStatus) {}
+    // Get the status of all specified jobs.
     rpc getJobStatuses(Jobs) returns (JobStatuses) {}
+    // Get the status of the queue.
     rpc getQueueStatus(GetQueueStatusRequest) returns (QueueStatus) {}
+    // Get the status of all queues.
     rpc getQueueStatuses(SchedulerAndQueues) returns (QueueStatuses) {}
+    // Wait until a job is done or until a timeout expires.
     rpc waitUntilDone(WaitRequest) returns (JobStatus) {}
+    // Wait until a job starts running, or until a timeout expires.
     rpc waitUntilRunning(WaitRequest) returns (JobStatus) {}
+    // Test if the connection of this Scheduler is open.
     rpc isOpen(Scheduler) returns (Is) {}
+    // Cancel a job
     rpc cancelJob(JobRequest) returns (JobStatus) {}
-    // Close scheduler and forget it
+    // Close this Scheduler.
     // If scheduler is embedded then any pending/running jobs will be killed
+    // Will also forget this scheduler
     rpc close(Scheduler) returns (Empty) {}
+    // Get scheduler on local filesystem with default location, credential and no properties
+    // Not part of Scheduler class in Xenon library
+    // In Xenon library available as Scheduler.create("local")
     rpc localScheduler(Empty) returns (Scheduler) {}
     // List the created schedulers
     // Specific to grpc, not part of Xenon library
     rpc listSchedulers(Empty) returns (Schedulers) {}
 }
-
-
