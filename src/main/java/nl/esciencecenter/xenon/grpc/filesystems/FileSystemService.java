@@ -126,8 +126,7 @@ public class FileSystemService extends FileSystemServiceGrpc.FileSystemServiceIm
         if (XenonProto.Path.getDefaultInstance().getSeparator().equals(request.getSeparator())) {
             return new Path(request.getPath());
         }
-        String[] elements = request.getPath().split(request.getSeparator());
-        return new Path(request.getSeparator().charAt(0), elements);
+        return new Path(request.getSeparator().charAt(0), request.getPath());
     }
 
     private FileSystem getFileSystem(XenonProto.FileSystem fileSystemRequest) throws StatusException {

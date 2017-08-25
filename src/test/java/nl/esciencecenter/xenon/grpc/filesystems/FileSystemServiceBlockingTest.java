@@ -164,13 +164,27 @@ public class FileSystemServiceBlockingTest {
         assertTrue(response.getValue());
     }
 
+
+    @Test
+    public void exists_unixSeparator() throws XenonException {
+        XenonProto.PathRequest request = XenonProto.PathRequest.newBuilder()
+                .setFilesystem(createFileSystem())
+                .setPath(XenonProto.Path.newBuilder().setPath("/etc/passwd").setSeparator("/"))
+                .build();
+        when(filesystem.exists(new Path('/', "/etc/passwd"))).thenReturn(true);
+
+        XenonProto.Is response = client.exists(request);
+
+        assertTrue(response.getValue());
+    }
+
     @Test
     public void exists_customSeparator() throws XenonException {
         XenonProto.PathRequest request = XenonProto.PathRequest.newBuilder()
                 .setFilesystem(createFileSystem())
                 .setPath(XenonProto.Path.newBuilder().setPath("@etc@passwd").setSeparator("@"))
                 .build();
-        when(filesystem.exists(new Path('@', "etc", "passwd"))).thenReturn(true);
+        when(filesystem.exists(new Path('@', "@etc@passwd"))).thenReturn(true);
 
         XenonProto.Is response = client.exists(request);
 
@@ -183,7 +197,7 @@ public class FileSystemServiceBlockingTest {
                 .setFilesystem(createFileSystem())
                 .setPath(XenonProto.Path.newBuilder().setPath("\\etc\\passwd").setSeparator("\\\\"))
                 .build();
-        when(filesystem.exists(new Path('\\', "etc", "passwd"))).thenReturn(true);
+        when(filesystem.exists(new Path('\\', "\\etc\\passwd"))).thenReturn(true);
 
         XenonProto.Is response = client.exists(request);
 
