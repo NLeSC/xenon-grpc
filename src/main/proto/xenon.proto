@@ -41,6 +41,7 @@ message SchedulerAdaptorDescription {
     bool is_embedded = 5;
     bool supports_interactive = 6;
     bool supports_batch = 7;
+    bool uses_file_system = 8;
 }
 
 message SchedulerAdaptorDescriptions {

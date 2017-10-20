@@ -121,13 +121,17 @@ public class MapUtils {
         return XenonProto.JobStatus.ErrorType.OTHER;
     }
 
-    static XenonProto.SchedulerAdaptorDescription mapJobAdaptorDescription(SchedulerAdaptorDescription desc) {
+    public static XenonProto.SchedulerAdaptorDescription mapSchedulerAdaptorDescription(SchedulerAdaptorDescription desc) {
         List<XenonProto.PropertyDescription> supportedProperties = mapPropertyDescriptions(desc.getSupportedProperties());
         return XenonProto.SchedulerAdaptorDescription.newBuilder()
                 .setName(desc.getName())
                 .setDescription(desc.getDescription())
                 .addAllSupportedLocations(Arrays.asList(desc.getSupportedLocations()))
                 .addAllSupportedProperties(supportedProperties)
+                .setIsEmbedded(desc.isEmbedded())
+                .setSupportsBatch(desc.supportsBatch())
+                .setSupportsInteractive(desc.supportsInteractive())
+                .setUsesFileSystem(desc.usesFileSystem())
                 .build();
     }
 

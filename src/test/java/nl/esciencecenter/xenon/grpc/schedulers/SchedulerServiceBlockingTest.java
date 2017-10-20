@@ -23,6 +23,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
+import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
