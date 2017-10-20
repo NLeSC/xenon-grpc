@@ -106,8 +106,6 @@ message CreateFileSystemRequest {
 // Handle for Xenon FileSystem object
 message FileSystem {
     string id = 1;
-    // name of the adaptor that created this FileSystem
-    string adaptor = 2;
 }
 
 message FileSystems {
