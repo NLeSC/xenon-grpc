@@ -6,10 +6,8 @@ import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.parsePermissions
 import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writeFileAttributes;
 import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writeFileSystems;
 import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.writePermissions;
-import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.isWindows;
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -175,7 +173,6 @@ public class MapUtilsTest {
     @Test
     public void test_writeFileAttributes_minimal() {
 
-        XenonProto.FileSystem filesystem = createFileSystem("someuser", "1234");
         PathAttributesImplementation attribs = new PathAttributesImplementation();
         attribs.setPath(new Path("/somefile"));
         attribs.setCreationTime(1L);
@@ -205,7 +202,6 @@ public class MapUtilsTest {
     @Test
     public void test_writeFileAttributes_complete() {
 
-        XenonProto.FileSystem filesystem = createFileSystem("someuser", "1234");
         PathAttributesImplementation attribs = new PathAttributesImplementation();
         attribs.setPath(new Path("/somefile"));
         attribs.setCreationTime(1L);
