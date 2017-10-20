@@ -34,7 +34,7 @@ To get help run
 
 Or call the jar directly with
 ```bash
-
+java -jar xenon-grpc-*/lib/xenon-grpc-*-all.jar
 ```
 
 # Development
