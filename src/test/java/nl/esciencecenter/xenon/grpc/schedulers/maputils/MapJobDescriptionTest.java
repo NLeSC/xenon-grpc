@@ -40,7 +40,7 @@ public class MapJobDescriptionTest {
             .setWorkingDirectory("/tmp/work/dir")
             .putEnvironment("MYKEY", "myvalue")
             .setQueueName("important")
-            .setMaxTime(1024)
+            .setMaxRuntime(1024)
             .setNodeCount(16)
             .setProcessesPerNode(4)
             .setStartSingleProcess(true)
@@ -61,7 +61,7 @@ public class MapJobDescriptionTest {
         envs.put("MYKEY", "myvalue");
         expected.setEnvironment(envs);
         expected.setQueueName("important");
-        expected.setMaxTime(1024);
+        expected.setMaxRuntime(1024);
         expected.setNodeCount(16);
         expected.setProcessesPerNode(4);
         expected.setStartSingleProcess(true);

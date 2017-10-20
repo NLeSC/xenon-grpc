@@ -27,7 +27,7 @@ public class MapUtils {
         XenonProto.QueueStatus.Builder builder = XenonProto.QueueStatus.newBuilder()
                 .setName(status.getQueueName())
                 ;
-        Map<String, String> info = status.getSchedulerSpecficInformation();
+        Map<String, String> info = status.getSchedulerSpecificInformation();
         if (info != null) {
             builder.putAllSchedulerSpecificInformation(info);
         }
@@ -67,8 +67,8 @@ public class MapUtils {
         }
         description.setEnvironment(d.getEnvironmentMap());
         description.setQueueName(defaultValue(d.getQueueName()));
-        if (d.getMaxTime() != 0) {
-            description.setMaxTime(d.getMaxTime());
+        if (d.getMaxRuntime() != 0) {
+            description.setMaxRuntime(d.getMaxRuntime());
         }
         if (d.getNodeCount() != 0) {
             description.setNodeCount(d.getNodeCount());
@@ -95,7 +95,7 @@ public class MapUtils {
         if (exitCode != null) {
             builder.setExitCode(exitCode);
         }
-        Map<String, String> info = status.getSchedulerSpecficInformation();
+        Map<String, String> info = status.getSchedulerSpecificInformation();
         if (info != null) {
             builder.putAllSchedulerSpecificInformation(info);
         }

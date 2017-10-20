@@ -3,6 +3,7 @@ package nl.esciencecenter.xenon.grpc.filesystems;
 import static java.util.UUID.randomUUID;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.isWindows;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
@@ -523,8 +524,8 @@ public class FileSystemServiceBlockingTest {
     }
 
     @Test
-    public void copy_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+    public void copy_illegalarg() throws XenonException {
+        thrown.expectMessage("INVALID_ARGUMENT: Copy mode is invalid");
 
         String source = "/etc/passwd";
         String target = "/etc/passwd.bak";
@@ -534,7 +535,7 @@ public class FileSystemServiceBlockingTest {
             .setDestinationFilesystem(createFileSystem())
             .setDestination(buildPath(target))
             .build();
-        when(filesystem.copy(new Path(source), filesystem, new Path(target), CopyMode.CREATE, false)).thenThrow(new NotConnectedException("sftp", "Not connected"));
+        when(filesystem.copy(new Path(source), filesystem, new Path(target), CopyMode.CREATE, false)).thenThrow(new IllegalArgumentException("Copy mode is invalid"));
 
         client.copy(request);
     }

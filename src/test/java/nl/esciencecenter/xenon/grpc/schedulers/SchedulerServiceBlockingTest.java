@@ -2,6 +2,8 @@ package nl.esciencecenter.xenon.grpc.schedulers;
 
 import static java.util.UUID.randomUUID;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
@@ -169,7 +171,8 @@ public class SchedulerServiceBlockingTest {
         XenonProto.Scheduler response = client.localScheduler(empty());
 
         String currentUser = System.getProperty("user.name");
-        assertTrue(response.getId().startsWith("local://" + currentUser + "@local://"));
+        String expectedId = "local://" + currentUser + "@#";
+        assertThat(response.getId(), containsString(expectedId));
     }
 
     @Test
@@ -535,8 +538,8 @@ public class SchedulerServiceBlockingTest {
         XenonProto.Scheduler response = client.create(request);
 
 
-        String expectedSchedulerId = "local://user1@local://#";
-        assertTrue("Received an id", response.getId().startsWith(expectedSchedulerId));
+        String expectedSchedulerId = "local://user1@#";
+        assertThat(response.getId(), containsString(expectedSchedulerId));
         Stream<XenonProto.Scheduler> registeredSchedulers = client.listSchedulers(empty()).getSchedulersList().stream();
         assertTrue("Registered scheduler", registeredSchedulers.anyMatch(c -> c.getId().startsWith(expectedSchedulerId)));
     }

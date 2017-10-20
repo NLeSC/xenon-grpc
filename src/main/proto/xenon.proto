@@ -283,7 +283,7 @@ message JobDescription {
     string working_directory = 3;
     map<string, string> environment = 4;
     string queue_name = 5;
-    uint32 max_time = 6;
+    uint32 max_runtime = 6;
     uint32 node_count = 7;
     uint32 processes_per_node = 8;
     bool start_single_process = 9;

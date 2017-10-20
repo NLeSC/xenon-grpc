@@ -29,7 +29,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
-ext.xenonLibVersion = '2.0.0-rc2'
+ext.xenonLibVersion = 'master-SNAPSHOT'
 
 dependencies {
     compile "io.grpc:grpc-netty:${grpcVersion}"

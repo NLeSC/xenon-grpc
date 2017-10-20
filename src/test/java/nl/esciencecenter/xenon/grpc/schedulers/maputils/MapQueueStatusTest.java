@@ -63,14 +63,14 @@ public class MapQueueStatusTest {
     @Test
     public void withException() {
 
-        QueueStatus request = new QueueStatusImplementation(xScheduler, "somequeue", new Exception("Something bad"), null);
+        QueueStatus request = new QueueStatusImplementation(xScheduler, "somequeue", new XenonException(xScheduler.getAdaptorName(), "Something bad"), null);
 
         XenonProto.QueueStatus response = MapUtils.mapQueueStatus(request);
 
         XenonProto.QueueStatus expected = builder
             .setName("somequeue")
-            .setErrorMessage("Something bad")
-            .setErrorType(XenonProto.QueueStatus.ErrorType.OTHER)
+            .setErrorMessage("local adaptor: Something bad")
+            .setErrorType(XenonProto.QueueStatus.ErrorType.XENON)
             .build();
         assertEquals(expected, response);
     }
