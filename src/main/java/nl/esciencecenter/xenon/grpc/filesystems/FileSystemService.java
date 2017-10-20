@@ -39,7 +39,17 @@ import nl.esciencecenter.xenon.grpc.XenonProto;
 
 public class FileSystemService extends FileSystemServiceGrpc.FileSystemServiceImplBase {
     private static final int BUFFER_SIZE = 8192;
-    private Map<String, FileSystem> fileSystems = new ConcurrentHashMap<>();
+    private final Map<String, FileSystem> fileSystems;
+
+    public FileSystemService(Map<String, FileSystem> fileSystems) {
+        super();
+        this.fileSystems = fileSystems;
+    }
+
+    FileSystemService() {
+        super();
+        this.fileSystems = new ConcurrentHashMap<>();
+    }
 
     @Override
     public void create(XenonProto.CreateFileSystemRequest request, StreamObserver<XenonProto.FileSystem> responseObserver) {

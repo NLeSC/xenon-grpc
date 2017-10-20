@@ -3,11 +3,12 @@ package nl.esciencecenter.xenon.grpc.schedulers;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapCredential;
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapException;
+import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.getFileSystemId;
+import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapSchedulerAdaptorDescription;
 import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobDescription;
 import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobStatus;
 import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobs;
 import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapQueueStatus;
-import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapSchedulerAdaptorDescription;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -19,6 +20,10 @@ import java.util.stream.Collectors;
 import io.grpc.Status;
 import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.grpc.SchedulerServiceGrpc;
@@ -29,13 +34,22 @@ import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SchedulerService extends SchedulerServiceGrpc.SchedulerServiceImplBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerService.class);
 
     private final Map<String, Scheduler> schedulers = new ConcurrentHashMap<>();
+    private final Map<String, FileSystem> fileSystems;
+
+    public SchedulerService(Map<String, FileSystem> fileSystems) {
+        super();
+        this.fileSystems = fileSystems;
+    }
+
+    SchedulerService() {
+        super();
+        this.fileSystems = new ConcurrentHashMap<>();
+    }
 
     @Override
     public void create(XenonProto.CreateSchedulerRequest request, StreamObserver<XenonProto.Scheduler> responseObserver) {
@@ -434,5 +448,32 @@ public class SchedulerService extends SchedulerServiceGrpc.SchedulerServiceImplB
                 }
             }
         };
+    }
+
+    static String getUsername(String schedulerId, Scheduler scheduler) {
+        String username = schedulerId.replace(scheduler.getAdaptorName() + "://", "");
+        return username.substring(0, username.indexOf('@'));
+    }
+
+    @Override
+    public void getFileSystem(XenonProto.Scheduler request, StreamObserver<XenonProto.FileSystem> responseObserver) {
+        try {
+            Scheduler scheduler = getScheduler(request);
+            FileSystem fileSystem = scheduler.getFileSystem();
+
+            String username = getUsername(request.getId(), scheduler);
+            String fileSystemId = getFileSystemId(fileSystem, username);
+            if (!fileSystems.containsKey(fileSystemId)) {
+                fileSystems.put(fileSystemId, fileSystem);
+            }
+
+            XenonProto.FileSystem value = XenonProto.FileSystem.newBuilder()
+                    .setId(fileSystemId)
+                    .build();
+            responseObserver.onNext(value);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
+        }
     }
 }

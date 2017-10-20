@@ -31,7 +31,7 @@ import nl.esciencecenter.xenon.grpc.XenonProto;
 /*
     MapUtils to convert Xenon objects to gRPC response fields
  */
-class MapUtils {
+public class MapUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapUtils.class);
 
     private MapUtils() {
@@ -172,7 +172,7 @@ class MapUtils {
         return XenonProto.Path.newBuilder().setPath(path.toString()).build();
     }
 
-    static String getFileSystemId(FileSystem fileSystem, String username) {
+    public static String getFileSystemId(FileSystem fileSystem, String username) {
         return fileSystem.getAdaptorName() + "://" + username + "@" + fileSystem.getLocation() + "#" + fileSystem.hashCode();
     }
 

@@ -2,6 +2,7 @@ package nl.esciencecenter.xenon.grpc.schedulers;
 
 import static java.util.UUID.randomUUID;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
+import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.getLocalFileSystems;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -15,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 
@@ -23,7 +25,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
-import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,6 +49,7 @@ public class SchedulerServiceBlockingTest {
     private ManagedChannel channel;
     private Scheduler scheduler;
     private SchedulerServiceGrpc.SchedulerServiceBlockingStub client;
+    private Map<String, FileSystem> filesystems;
 
     @Rule
     public ExpectedException thrown= ExpectedException.none();
@@ -73,7 +76,8 @@ public class SchedulerServiceBlockingTest {
 
     @Before
     public void setUp() throws Exception {
-        service = new SchedulerService();
+        filesystems = new ConcurrentHashMap<>();
+        service = new SchedulerService(filesystems);
         // register mocked scheduler to service
         scheduler = mock(Scheduler.class);
         when(scheduler.getAdaptorName()).thenReturn("local");
@@ -623,4 +627,25 @@ public class SchedulerServiceBlockingTest {
 
         client.getProperties(request);
     }
+
+    @Test
+    public void getFileSystem_usesFileSystemTrue() throws XenonException {
+        FileSystem local_fs = getLocalFileSystems()[0];
+        when(scheduler.getFileSystem()).thenReturn(local_fs);
+
+        XenonProto.FileSystem response = client.getFileSystem(createScheduler());
+
+        assertThat(response.getId(), containsString("file://someone@"));
+        assertTrue("Filesystem saved", filesystems.containsValue(local_fs));
+    }
+
+    @Test
+    public void getFileSystem_usesFileSystemFalse() throws XenonException {
+        thrown.expectMessage("UNIMPLEMENTED: someadaptor adaptor: No FileSystem used");
+        XenonException e = new nl.esciencecenter.xenon.UnsupportedOperationException("someadaptor", "No FileSystem used");
+        when(scheduler.getFileSystem()).thenThrow(e);
+
+        client.getFileSystem(createScheduler());
+    }
+
 }
