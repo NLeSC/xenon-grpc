@@ -531,6 +531,8 @@ service SchedulerService {
     rpc isOpen(Scheduler) returns (Is) {}
     // Cancel a job
     rpc cancelJob(JobRequest) returns (JobStatus) {}
+    // Retrieve the FileSystem used internally by this Scheduler.
+    rpc getFileSystem(Scheduler) returns (FileSystem) {}
     // Close this Scheduler.
     // If scheduler is embedded then any pending/running jobs will be killed
     // Will also forget this scheduler
