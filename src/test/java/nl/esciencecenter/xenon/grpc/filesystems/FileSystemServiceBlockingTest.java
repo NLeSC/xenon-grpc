@@ -89,6 +89,7 @@ public class FileSystemServiceBlockingTest {
         filesystem = mock(FileSystem.class);
         when(filesystem.getAdaptorName()).thenReturn("file");
         when(filesystem.getLocation()).thenReturn("/");
+        when(filesystem.getPathSeparator()).thenReturn("/");
         filesystemId = service.putFileSystem(filesystem, "someone");
         // setup server
         String name = service.getClass().getName() + "-" + randomUUID().toString();
@@ -800,11 +801,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void getAdaptorName_unknownFileSystem() {
-        thrown.expectMessage("NOT_FOUND: File system with id: sftp://someone@localhost");
-
-        XenonProto.FileSystem request = XenonProto.FileSystem.newBuilder()
-            .setId("sftp://someone@localhost")
-            .build();
+        XenonProto.FileSystem request = unknownFileSystem();
 
         client.getAdaptorName(request);
     }
@@ -817,12 +814,8 @@ public class FileSystemServiceBlockingTest {
     }
 
     @Test
-    public void getLocation_unknownScheduler() {
-        thrown.expectMessage("NOT_FOUND: File system with id: sftp://someone@localhost");
-
-        XenonProto.FileSystem request = XenonProto.FileSystem.newBuilder()
-            .setId("sftp://someone@localhost")
-            .build();
+    public void getLocation_unknownFileSystem() {
+        XenonProto.FileSystem request = unknownFileSystem();
 
         client.getLocation(request);
     }
@@ -836,14 +829,32 @@ public class FileSystemServiceBlockingTest {
     }
 
     @Test
-    public void getProperties_unknownScheduler() {
-        thrown.expectMessage("NOT_FOUND: File system with id: sftp://someone@localhost");
-
-        XenonProto.FileSystem request = XenonProto.FileSystem.newBuilder()
-            .setId("sftp://someone@localhost")
-            .build();
+    public void getProperties_unknownFileSystem() {
+        XenonProto.FileSystem request = unknownFileSystem();
 
         client.getProperties(request);
     }
 
+    private XenonProto.FileSystem unknownFileSystem() {
+        thrown.expectMessage("NOT_FOUND: File system with id: sftp://someone@localhost");
+
+        return XenonProto.FileSystem.newBuilder()
+            .setId("sftp://someone@localhost")
+            .build();
+    }
+
+    @Test
+    public void getPathSeparator() {
+        XenonProto.GetPathSeparatorResponse response = client.getPathSeparator(createFileSystem());
+
+        String expected = "/";
+        assertEquals(expected, response.getSeparator());
+    }
+
+    @Test
+    public void getPathSeparator_unknownFileSystem() {
+        XenonProto.FileSystem request = unknownFileSystem();
+
+        client.getPathSeparator(request);
+    }
 }

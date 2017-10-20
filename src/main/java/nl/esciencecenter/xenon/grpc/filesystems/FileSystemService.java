@@ -529,4 +529,21 @@ public class FileSystemService extends FileSystemServiceGrpc.FileSystemServiceIm
             responseObserver.onError(mapException(e));
         }
     }
+
+    @Override
+    public void getPathSeparator(XenonProto.FileSystem request, StreamObserver<XenonProto.GetPathSeparatorResponse> responseObserver) {
+        try {
+            FileSystem filesystem = getFileSystem(request);
+
+            String separator = filesystem.getPathSeparator();
+
+            XenonProto.GetPathSeparatorResponse value = XenonProto.GetPathSeparatorResponse.newBuilder()
+                    .setSeparator(separator)
+                    .build();
+            responseObserver.onNext(value);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
+        }
+    }
 }

@@ -256,6 +256,10 @@ message ListRequest {
     bool recursive = 3;
 }
 
+message GetPathSeparatorResponse {
+    string separator = 1;
+}
+
 message CreateSchedulerRequest {
     string adaptor = 1;
     string location = 2;
@@ -468,6 +472,8 @@ service FileSystemService {
     rpc setPosixFilePermissions(SetPosixFilePermissionsRequest) returns (Empty) {}
     // Reads the target of a symbolic link
     rpc readSymbolicLink(PathRequest) returns (Path) {}
+    // Get the path separator used by this file system.
+    rpc getPathSeparator(FileSystem) returns (GetPathSeparatorResponse) {}
     // Return if the connection to the FileSystem is open.
     rpc isOpen(FileSystem) returns (Is) {}
     // Close this filestem
