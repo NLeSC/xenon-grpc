@@ -455,6 +455,7 @@ public class SchedulerService extends SchedulerServiceGrpc.SchedulerServiceImplB
                     .setId(fileSystemId)
                     .build();
             responseObserver.onNext(value);
+            responseObserver.onCompleted();
         } catch (Exception e) {
             responseObserver.onError(mapException(e));
         }
