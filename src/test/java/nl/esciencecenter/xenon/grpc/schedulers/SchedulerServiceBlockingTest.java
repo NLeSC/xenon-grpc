@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 
@@ -48,6 +49,7 @@ public class SchedulerServiceBlockingTest {
     private ManagedChannel channel;
     private Scheduler scheduler;
     private SchedulerServiceGrpc.SchedulerServiceBlockingStub client;
+    private Map<String, FileSystem> filesystems;
 
     @Rule
     public ExpectedException thrown= ExpectedException.none();
@@ -74,7 +76,8 @@ public class SchedulerServiceBlockingTest {
 
     @Before
     public void setUp() throws Exception {
-        service = new SchedulerService();
+        filesystems = new ConcurrentHashMap<>();
+        service = new SchedulerService(filesystems);
         // register mocked scheduler to service
         scheduler = mock(Scheduler.class);
         when(scheduler.getAdaptorName()).thenReturn("local");
@@ -632,7 +635,8 @@ public class SchedulerServiceBlockingTest {
 
         XenonProto.FileSystem response = client.getFileSystem(createScheduler());
 
-        assertThat(response.getId(), containsString("file://"));
+        assertThat(response.getId(), containsString("file://someone@"));
+        assertTrue("Filesystem saved", filesystems.containsValue(local_fs));
     }
 
     @Test

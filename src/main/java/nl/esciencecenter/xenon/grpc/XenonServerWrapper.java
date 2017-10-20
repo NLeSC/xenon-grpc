@@ -12,6 +12,7 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.grpc.filesystems.FileSystemService;
 import nl.esciencecenter.xenon.grpc.schedulers.SchedulerService;
 import org.slf4j.Logger;
@@ -21,6 +22,8 @@ import javax.net.ssl.SSLException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
@@ -105,8 +108,9 @@ public class XenonServerWrapper {
         } else {
             builder = insecureServerBuilder();
         }
-        filesystemService = new FileSystemService();
-        schedulerService = new SchedulerService();
+        Map<String, FileSystem> fileSystems = new ConcurrentHashMap<>();
+        filesystemService = new FileSystemService(fileSystems);
+        schedulerService = new SchedulerService(fileSystems);
         server = builder
                 .addService(filesystemService)
                 .addService(schedulerService)

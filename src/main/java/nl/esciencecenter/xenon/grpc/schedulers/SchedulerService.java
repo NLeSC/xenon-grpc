@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 import io.grpc.Status;
 import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
-import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +39,17 @@ public class SchedulerService extends SchedulerServiceGrpc.SchedulerServiceImplB
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerService.class);
 
     private final Map<String, Scheduler> schedulers = new ConcurrentHashMap<>();
+    private final Map<String, FileSystem> fileSystems;
+
+    public SchedulerService(Map<String, FileSystem> fileSystems) {
+        super();
+        this.fileSystems = fileSystems;
+    }
+
+    SchedulerService() {
+        super();
+        this.fileSystems = new ConcurrentHashMap<>();
+    }
 
     @Override
     public void create(XenonProto.CreateSchedulerRequest request, StreamObserver<XenonProto.Scheduler> responseObserver) {
@@ -440,16 +450,22 @@ public class SchedulerService extends SchedulerServiceGrpc.SchedulerServiceImplB
         };
     }
 
+    static String getUsername(String schedulerId, Scheduler scheduler) {
+        String username = schedulerId.replace(scheduler.getAdaptorName() + "://", "");
+        return username.substring(0, username.indexOf('@'));
+    }
+
     @Override
     public void getFileSystem(XenonProto.Scheduler request, StreamObserver<XenonProto.FileSystem> responseObserver) {
         try {
             Scheduler scheduler = getScheduler(request);
             FileSystem fileSystem = scheduler.getFileSystem();
 
-            // TODO use username of scheduler instead of local user name
-            DefaultCredential cred = new DefaultCredential();
-            String fileSystemId = getFileSystemId(fileSystem, cred.getUsername());
-            // TODO fileSystemId is probably unknown in FileSystemService, so check if fs service knows fs and if not add the fs to the fs list
+            String username = getUsername(request.getId(), scheduler);
+            String fileSystemId = getFileSystemId(fileSystem, username);
+            if (!fileSystems.containsKey(fileSystemId)) {
+                fileSystems.put(fileSystemId, fileSystem);
+            }
 
             XenonProto.FileSystem value = XenonProto.FileSystem.newBuilder()
                     .setId(fileSystemId)
