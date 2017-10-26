@@ -3,9 +3,11 @@ package nl.esciencecenter.xenon.grpc;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.grpc.Status;
 import io.grpc.StatusException;
+import nl.esciencecenter.xenon.credentials.CredentialMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,26 +90,91 @@ public class MapUtils {
     }
 
     public static Credential mapCredential(XenonProto.CreateSchedulerRequest request) {
-        return mapCredential(request.getDefaultCredential(), request.getPasswordCredential(), request.getCertificateCredential());
+        XenonProto.CreateSchedulerRequest.CredentialCase credCase = request.getCredentialCase();
+        switch (credCase) {
+            case CERTIFICATE_CREDENTIAL:
+                return mapCertificateCredential(request.getCertificateCredential());
+            case PASSWORD_CREDENTIAL:
+                return mapPasswordCredential(request.getPasswordCredential());
+            case DEFAULT_CREDENTIAL:
+                return mapDefaultCredential(request.getDefaultCredential());
+            case CREDENTIAL_MAP:
+                return mapCredentialMap(request.getCredentialMap());
+            case CREDENTIAL_NOT_SET:
+                break;
+        }
+        return new DefaultCredential();
     }
 
     public static Credential mapCredential(XenonProto.CreateFileSystemRequest request) {
-        return mapCredential(request.getDefaultCredential(), request.getPasswordCredential(), request.getCertificateCredential());
+        XenonProto.CreateFileSystemRequest.CredentialCase credCase = request.getCredentialCase();
+        switch (credCase) {
+            case CERTIFICATE_CREDENTIAL:
+                return mapCertificateCredential(request.getCertificateCredential());
+            case PASSWORD_CREDENTIAL:
+                return mapPasswordCredential(request.getPasswordCredential());
+            case DEFAULT_CREDENTIAL:
+                return mapDefaultCredential(request.getDefaultCredential());
+            case CREDENTIAL_MAP:
+                return mapCredentialMap(request.getCredentialMap());
+            case CREDENTIAL_NOT_SET:
+                break;
+        }
+        return new DefaultCredential();
     }
 
-    private static Credential mapCredential(XenonProto.DefaultCredential defaultCred, XenonProto.PasswordCredential passwordCred, XenonProto.CertificateCredential certificateCred) {
-        Credential credential;
-        // if embedded message is not set then the request field will have the default instance,
-        if (!XenonProto.CertificateCredential.getDefaultInstance().equals(certificateCred)) {
-            credential = new CertificateCredential(certificateCred.getUsername(), certificateCred.getCertfile(), certificateCred.getPassphrase().toCharArray());
-        } else if (!XenonProto.PasswordCredential.getDefaultInstance().equals(passwordCred)) {
-            credential = new PasswordCredential(passwordCred.getUsername(), passwordCred.getPassword().toCharArray());
-        } else if (!XenonProto.DefaultCredential.getDefaultInstance().equals(defaultCred)) {
-            credential = new DefaultCredential(defaultCred.getUsername());
-        } else {
-            credential = new DefaultCredential();
+    private static Credential mapCredentialMap(XenonProto.CredentialMap credentialMap) {
+        XenonProto.CredentialMap.FallbackCase fallbackCase = credentialMap.getFallbackCase();
+        CredentialMap cred = new CredentialMap();
+        switch (fallbackCase) {
+            case CERTIFICATE_CREDENTIAL:
+                cred = new CredentialMap(mapCertificateCredential(credentialMap.getCertificateCredential()));
+                break;
+            case PASSWORD_CREDENTIAL:
+                cred = new CredentialMap(mapPasswordCredential(credentialMap.getPasswordCredential()));
+                break;
+            case DEFAULT_CREDENTIAL:
+                cred = new CredentialMap(mapDefaultCredential(credentialMap.getDefaultCredential()));
+                break;
+            case FALLBACK_NOT_SET:
+                break;
         }
-        return credential;
+
+        for (Map.Entry<String, XenonProto.UserCredential> entry : credentialMap.getEntriesMap().entrySet()) {
+            cred.put(entry.getKey(), mapCredential(entry.getValue()));
+        }
+
+        return cred;
+    }
+
+    private static UserCredential mapCredential(XenonProto.UserCredential value) {
+        XenonProto.UserCredential.EntryCase entryCase = value.getEntryCase();
+        switch (entryCase) {
+            case CERTIFICATE_CREDENTIAL:
+                return mapCertificateCredential(value.getCertificateCredential());
+            case PASSWORD_CREDENTIAL:
+                return mapPasswordCredential(value.getPasswordCredential());
+            case DEFAULT_CREDENTIAL:
+                return mapDefaultCredential(value.getDefaultCredential());
+            case ENTRY_NOT_SET:
+                break;
+        }
+        return new DefaultCredential();
+    }
+
+    private static UserCredential mapDefaultCredential(XenonProto.DefaultCredential defaultCred) {
+        if (XenonProto.DefaultCredential.getDefaultInstance().equals(defaultCred)) {
+            return new DefaultCredential();
+        }
+        return new DefaultCredential(defaultCred.getUsername());
+    }
+
+    private static UserCredential mapPasswordCredential(XenonProto.PasswordCredential passwordCred) {
+        return new PasswordCredential(passwordCred.getUsername(), passwordCred.getPassword().toCharArray());
+    }
+
+    private static UserCredential mapCertificateCredential(XenonProto.CertificateCredential certificateCred) {
+        return new CertificateCredential(certificateCred.getUsername(), certificateCred.getCertfile(), certificateCred.getPassphrase().toCharArray());
     }
 
     public static StatusException mapException(Throwable e) {
