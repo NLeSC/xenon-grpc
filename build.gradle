@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'com.google.protobuf' version '0.8.2'
+    id 'com.google.protobuf' version '0.8.3'
     // distribution
     id 'application'
     id 'com.github.johnrengelman.shadow' version '2.0.1'
@@ -19,35 +19,33 @@ version = '1.0.0'
 applicationName = 'xenon-grpc'
 group = 'nl.esciencecenter.xenon.grpc'
 mainClassName = 'nl.esciencecenter.xenon.grpc.XenonServerWrapper'
-ext.grpcVersion = '1.5.0'
+ext.grpcVersion = '1.7.0'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
     jcenter()
-    maven { url 'https://jitpack.io' }
 }
 
-ext.xenonLibVersion = 'master-SNAPSHOT'
+ext.xenonLibVersion = '2.0.0'
 
 dependencies {
     compile "io.grpc:grpc-netty:${grpcVersion}"
     compile "io.grpc:grpc-protobuf:${grpcVersion}"
     compile "io.grpc:grpc-stub:${grpcVersion}"
     compile 'org.slf4j:slf4j-api:1.7.25'
-    // compile "nl.esciencecenter.xenon:xenon:${xenonLibVersion}"
-    compile 'com.github.NLeSC:Xenon:master-SNAPSHOT'
-    compile 'net.sourceforge.argparse4j:argparse4j:0.7.0'
-    compile 'io.netty:netty-tcnative-boringssl-static:2.0.5.Final'
+    compile "nl.esciencecenter.xenon:xenon:${xenonLibVersion}"
+    compile 'net.sourceforge.argparse4j:argparse4j:0.8.1'
+    compile 'io.netty:netty-tcnative-boringssl-static:2.0.6.Final'
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.8.47'
+    testCompile 'org.mockito:mockito-core:2.11.0'
     testCompile 'com.github.stefanbirkner:system-rules:1.16.1'
 }
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.3.0'
+        artifact = 'com.google.protobuf:protoc:3.4.0'
     }
     plugins {
         grpc {
@@ -101,7 +99,7 @@ sonarqube {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.1'
+    gradleVersion = '4.2.1'
 }
 
 buildConfig {

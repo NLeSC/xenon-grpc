@@ -3,6 +3,7 @@ package nl.esciencecenter.xenon.grpc.schedulers;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapCredential;
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapException;
+import static nl.esciencecenter.xenon.grpc.MapUtils.usernameOfCredential;
 import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.getFileSystemId;
 import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapSchedulerAdaptorDescription;
 import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobDescription;
@@ -61,8 +62,7 @@ public class SchedulerService extends SchedulerServiceGrpc.SchedulerServiceImplB
                     credential,
                     request.getPropertiesMap()
             );
-
-            String id = putScheduler(scheduler, credential.getUsername());
+            String id = putScheduler(scheduler, usernameOfCredential(credential));
 
             XenonProto.Scheduler value = XenonProto.Scheduler.newBuilder()
                     .setId(id)

@@ -3,6 +3,7 @@ package nl.esciencecenter.xenon.grpc.filesystems;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapCredential;
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapException;
+import static nl.esciencecenter.xenon.grpc.MapUtils.usernameOfCredential;
 import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.getFileSystemId;
 import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.mapCopyMode;
 import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.mapCopyStatus;
@@ -62,7 +63,7 @@ public class FileSystemService extends FileSystemServiceGrpc.FileSystemServiceIm
                     request.getPropertiesMap()
             );
 
-            String fileSystemId = putFileSystem(fileSystem, credential.getUsername());
+            String fileSystemId = putFileSystem(fileSystem, usernameOfCredential(credential));
 
             XenonProto.FileSystem value = XenonProto.FileSystem.newBuilder()
                     .setId(fileSystemId)

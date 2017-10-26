@@ -3,11 +3,14 @@ package nl.esciencecenter.xenon.grpc;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapCredential;
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
+import static nl.esciencecenter.xenon.grpc.MapUtils.usernameOfCredential;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
 import java.util.List;
 
+import nl.esciencecenter.xenon.credentials.CredentialMap;
+import nl.esciencecenter.xenon.credentials.UserCredential;
 import org.junit.Test;
 
 import nl.esciencecenter.xenon.XenonPropertyDescription;
@@ -112,5 +115,21 @@ public class MapUtilsTest {
         assertEquals(expected, result);
     }
 
+    @Test
+    public void usernameOfCredential_usercredential() {
+        UserCredential cred = new DefaultCredential("myusername");
 
+        String username = usernameOfCredential(cred);
+
+        assertEquals("myusername", username);
+    }
+
+    @Test
+    public void usernameOfCredential_nonusercredential() {
+        Credential cred = new CredentialMap();
+
+        String username = usernameOfCredential(cred);
+
+        assertEquals("nousername", username);
+    }
 }

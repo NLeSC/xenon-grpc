@@ -49,7 +49,7 @@ public class XenonServerWrapper {
     }
 
     ArgumentParser buildArgumentParser() {
-        ArgumentParser myparser = ArgumentParsers.newArgumentParser(BuildConfig.NAME)
+        ArgumentParser myparser = ArgumentParsers.newFor(BuildConfig.NAME).build()
                 .defaultHelp(true)
                 .description("gRPC (http://www.grpc.io/) server for Xenon (https://nlesc.github.io/Xenon/)")
                 .version("Xenon gRPC v" + BuildConfig.VERSION + ", Xenon Library v" + BuildConfig.XENON_LIB_VERSION);

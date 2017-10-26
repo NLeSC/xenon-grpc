@@ -22,6 +22,7 @@ import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
+import nl.esciencecenter.xenon.credentials.UserCredential;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
@@ -143,5 +144,13 @@ public class MapUtils {
             s = Status.INTERNAL;
         }
         return s.withDescription(e.getMessage()).withCause(e).asException();
+    }
+
+    public static String usernameOfCredential(Credential credential) {
+        if (credential instanceof UserCredential) {
+            return ((UserCredential) credential).getUsername();
+        } else {
+            return "nousername";
+        }
     }
 }
