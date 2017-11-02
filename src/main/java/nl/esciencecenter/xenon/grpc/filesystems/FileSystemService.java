@@ -486,6 +486,21 @@ public class FileSystemService extends FileSystemServiceGrpc.FileSystemServiceIm
     }
 
     @Override
+    public void getCredential(XenonProto.FileSystem request, StreamObserver<XenonProto.GetCredentialResponse> responseObserver) {
+        try {
+            FileSystem filesystem = getFileSystem(request);
+
+            Credential credential = filesystem.getCredential();
+
+            XenonProto.GetCredentialResponse response = nl.esciencecenter.xenon.grpc.MapUtils.toCredentialResponse(credential);
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
+        }
+    }
+
+    @Override
     public void getProperties(XenonProto.FileSystem request, StreamObserver<XenonProto.Properties> responseObserver) {
         try {
             FileSystem filesystem = getFileSystem(request);

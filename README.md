@@ -53,7 +53,7 @@ For use polyglot
 ```bash
 wget https://github.com/grpc-ecosystem/polyglot/releases/download/v1.2.0/polyglot.jar
 java -jar polyglot.jar --command=list_services  --proto_discovery_root=src/main/proto
-echo {} | java -jar polyglot.jar --endpoint=localhost:50051 --proto_discovery_root=src/main/proto --full_method=xenon.XenonJobs/getAdaptorDescriptions --command=call
+echo {} | java -jar polyglot.jar --endpoint=localhost:50051 --proto_discovery_root=src/main/proto --full_method=xenon.SchedulerService/getAdaptorDescriptions --command=call
 ```
 
 ## Python client

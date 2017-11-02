@@ -149,6 +149,21 @@ public class SchedulerService extends SchedulerServiceGrpc.SchedulerServiceImplB
     }
 
     @Override
+    public void getCredential(XenonProto.Scheduler request, StreamObserver<XenonProto.GetCredentialResponse> responseObserver) {
+        try {
+            Scheduler scheduler = getScheduler(request);
+
+            Credential credential = scheduler.getCredential();
+
+            XenonProto.GetCredentialResponse response = nl.esciencecenter.xenon.grpc.MapUtils.toCredentialResponse(credential);
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
+        }
+    }
+
+    @Override
     public void getProperties(XenonProto.Scheduler request, StreamObserver<XenonProto.Properties> responseObserver) {
         try {
             Scheduler scheduler = getScheduler(request);

@@ -100,7 +100,7 @@ message UserCredential {
 message CredentialMap {
     // In Xenon accessible by get(), put() and containsCredential() on object directly
     map<string, UserCredential> entries = 1;
-    // In Xenon the
+    // In Xenon it is called default instead of fallback.
     oneof fallback {
         CertificateCredential certificate_credential = 2;
         PasswordCredential password_credential = 3;
@@ -461,8 +461,8 @@ service FileSystemService {
     rpc getAdaptorName(FileSystem) returns (AdaptorName) {}
     // Get the location that this FileSystem is connected to.
     rpc getLocation(FileSystem) returns (Location) {}
-    // Get the credential used to create this Scheduler
-    rpc getCredential(Scheduler) returns (GetCredentialResponse) {}
+    // Get the credential used to create this FileSystem.
+    rpc getCredential(FileSystem) returns (GetCredentialResponse) {}
     // Get the properties used to create this FileSystem.
     rpc getProperties(FileSystem) returns (Properties) {}
     // Creates a new directory, including parent directories, failing if the directory already exists.
@@ -538,7 +538,7 @@ service SchedulerService {
     rpc getAdaptorName(Scheduler) returns (AdaptorName) {}
     // Get the location that this Scheduler is connected to.
     rpc getLocation(Scheduler) returns (Location) {}
-    // Get the credential used to create this Scheduler
+    // Get the credential used to create this Scheduler.
     rpc getCredential(Scheduler) returns (GetCredentialResponse) {}
     // Get the properties used to create this Scheduler.
     rpc getProperties(Scheduler) returns (Properties) {}

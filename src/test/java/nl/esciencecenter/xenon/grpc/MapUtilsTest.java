@@ -3,23 +3,29 @@ package nl.esciencecenter.xenon.grpc;
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapCredential;
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapPropertyDescriptions;
+import static nl.esciencecenter.xenon.grpc.MapUtils.toCredentialResponse;
 import static nl.esciencecenter.xenon.grpc.MapUtils.usernameOfCredential;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
 import java.util.List;
 
-import nl.esciencecenter.xenon.credentials.CredentialMap;
-import nl.esciencecenter.xenon.credentials.UserCredential;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.CredentialMap;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
+import nl.esciencecenter.xenon.credentials.UserCredential;
 
 public class MapUtilsTest {
+    @Rule
+    public ExpectedException thrown= ExpectedException.none();
 
     @Test
     public void mapPropertyDescriptions_booltype() throws Exception {
@@ -310,5 +316,219 @@ public class MapUtilsTest {
         String username = usernameOfCredential(cred);
 
         assertEquals("nousername", username);
+    }
+
+    @Test
+    public void toCredentialResponse_unknownclass_exception() throws XenonException {
+        thrown.expect(XenonException.class);
+        thrown.expectMessage("Unknown credential class");
+
+        Credential cred = getUnknownCredential();
+
+        toCredentialResponse(cred);
+    }
+
+    @Test
+    public void toCredentialResponse_default() throws XenonException {
+        Credential cred = new DefaultCredential("someone");
+
+        XenonProto.GetCredentialResponse response = toCredentialResponse(cred);
+
+        XenonProto.GetCredentialResponse expected = XenonProto.GetCredentialResponse.newBuilder()
+            .setDefaultCredential(
+                XenonProto.DefaultCredential.newBuilder().setUsername("someone")
+            ).build();
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void toCredentialResponse_password() throws XenonException {
+        Credential cred = new PasswordCredential("someone", "mypassword".toCharArray());
+
+        XenonProto.GetCredentialResponse response = toCredentialResponse(cred);
+
+        XenonProto.GetCredentialResponse expected = XenonProto.GetCredentialResponse.newBuilder()
+            .setPasswordCredential(
+                XenonProto.PasswordCredential.newBuilder()
+                    .setUsername("someone")
+                    .setPassword("mypassword"))
+            .build();
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void toCredentialResponse_certificate() throws XenonException {
+        Credential cred = new CertificateCredential("someone","/home/someone/.ssh/id_rsa", "mypassphrase".toCharArray());
+
+        XenonProto.GetCredentialResponse response = toCredentialResponse(cred);
+
+        XenonProto.GetCredentialResponse expected = XenonProto.GetCredentialResponse.newBuilder()
+            .setCertificateCredential(XenonProto.CertificateCredential.newBuilder()
+                .setUsername("someone")
+                .setCertfile("/home/someone/.ssh/id_rsa")
+                .setPassphrase("mypassphrase")
+            )
+            .build();
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void toCredentialResponse_map_emptyAndNoDefault() throws XenonException {
+        Credential cred = new CredentialMap();
+
+        XenonProto.GetCredentialResponse response = toCredentialResponse(cred);
+
+        XenonProto.GetCredentialResponse expected = XenonProto.GetCredentialResponse.newBuilder()
+            .setCredentialMap(XenonProto.CredentialMap.getDefaultInstance())
+            .build();
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void toCredentialResponse_map_defaultCredAsDefault() throws XenonException {
+        Credential cred = new CredentialMap(new DefaultCredential("someone"));
+
+        XenonProto.GetCredentialResponse response = toCredentialResponse(cred);
+
+        XenonProto.GetCredentialResponse expected = XenonProto.GetCredentialResponse.newBuilder()
+            .setCredentialMap(XenonProto.CredentialMap.newBuilder()
+                .setDefaultCredential(XenonProto.DefaultCredential.newBuilder()
+                    .setUsername("someone")
+                )
+            )
+            .build();
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void toCredentialResponse_map_passwordAsDefault() throws XenonException {
+        Credential cred = new CredentialMap(new PasswordCredential("someone", "mypassword".toCharArray()));
+
+        XenonProto.GetCredentialResponse response = toCredentialResponse(cred);
+
+        XenonProto.GetCredentialResponse expected = XenonProto.GetCredentialResponse.newBuilder()
+            .setCredentialMap(XenonProto.CredentialMap.newBuilder()
+                .setPasswordCredential(XenonProto.PasswordCredential.newBuilder()
+                    .setUsername("someone")
+                    .setPassword("mypassword"))
+            )
+            .build();
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void toCredentialResponse_map_certAsDefault() throws XenonException {
+        Credential cred = new CredentialMap(new CertificateCredential("someone","/home/someone/.ssh/id_rsa", "mypassphrase".toCharArray()));
+
+        XenonProto.GetCredentialResponse response = toCredentialResponse(cred);
+
+        XenonProto.GetCredentialResponse expected = XenonProto.GetCredentialResponse.newBuilder()
+            .setCredentialMap(XenonProto.CredentialMap.newBuilder()
+                .setCertificateCredential(XenonProto.CertificateCredential.newBuilder()
+                    .setUsername("someone")
+                    .setCertfile("/home/someone/.ssh/id_rsa")
+                    .setPassphrase("mypassphrase")
+                )
+            )
+            .build();
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void toCredentialResponse_map_unknownAsDefault() throws XenonException {
+        thrown.expect(XenonException.class);
+        thrown.expectMessage("Unknown credential class");
+
+        Credential cred = new CredentialMap(getUnknownCredential());
+
+        toCredentialResponse(cred);
+    }
+
+    @Test
+    public void toCredentialResponse_map_defaultAsEntry() throws XenonException {
+        CredentialMap cred = new CredentialMap();
+        cred.put("somehost", new DefaultCredential("someoneelse"));
+
+        XenonProto.GetCredentialResponse response = toCredentialResponse(cred);
+
+        XenonProto.UserCredential credEntry = XenonProto.UserCredential.newBuilder()
+            .setDefaultCredential(
+                XenonProto.DefaultCredential.newBuilder().setUsername("someoneelse").build()
+            ).build();
+        XenonProto.GetCredentialResponse expected = XenonProto.GetCredentialResponse.newBuilder()
+            .setCredentialMap(XenonProto.CredentialMap.newBuilder()
+                .putEntries("somehost", credEntry)
+                .build()
+            )
+            .build();
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void toCredentialResponse_map_passwordAsEntry() throws XenonException {
+        CredentialMap cred = new CredentialMap();
+        cred.put("somehost", new PasswordCredential("someone", "mypassword".toCharArray()));
+
+        XenonProto.GetCredentialResponse response = toCredentialResponse(cred);
+
+        XenonProto.UserCredential credEntry = XenonProto.UserCredential.newBuilder()
+            .setPasswordCredential(XenonProto.PasswordCredential.newBuilder()
+                .setUsername("someone")
+                .setPassword("mypassword")
+            ).build();
+        XenonProto.GetCredentialResponse expected = XenonProto.GetCredentialResponse.newBuilder()
+            .setCredentialMap(XenonProto.CredentialMap.newBuilder()
+                .putEntries("somehost", credEntry)
+                .build()
+            )
+            .build();
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void toCredentialResponse_map_certAsEntry() throws XenonException {
+        CredentialMap cred = new CredentialMap();
+        cred.put("somehost", new CertificateCredential("someone", "/home/someone/.ssh/id_rsa", "mypassphrase".toCharArray()));
+
+        XenonProto.GetCredentialResponse response = toCredentialResponse(cred);
+
+        XenonProto.UserCredential credEntry = XenonProto.UserCredential.newBuilder()
+            .setCertificateCredential(XenonProto.CertificateCredential.newBuilder()
+                .setUsername("someone")
+                .setCertfile("/home/someone/.ssh/id_rsa")
+                .setPassphrase("mypassphrase")
+            ).build();
+        XenonProto.GetCredentialResponse expected = XenonProto.GetCredentialResponse.newBuilder()
+            .setCredentialMap(XenonProto.CredentialMap.newBuilder()
+                .putEntries("somehost", credEntry)
+                .build()
+            )
+            .build();
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void toCredentialResponse_map_unknownAsEntry() throws XenonException {
+        thrown.expect(XenonException.class);
+        thrown.expectMessage("Unknown credential class");
+
+        CredentialMap cred = new CredentialMap();
+        cred.put("somehost", getUnknownCredential());
+
+        toCredentialResponse(cred);
+    }
+
+    private UserCredential getUnknownCredential() {
+        return new UserCredential() {
+            @Override
+            public String getUsername() {
+                return null;
+            }
+
+            @Override
+            public int hashCode() {
+                return super.hashCode();
+            }
+        };
     }
 }

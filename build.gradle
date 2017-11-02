@@ -26,16 +26,19 @@ targetCompatibility = 1.8
 repositories {
     mavenCentral()
     jcenter()
+    maven { url 'https://jitpack.io' }
 }
 
-ext.xenonLibVersion = '2.1.0'
+//ext.xenonLibVersion = '2.1.0'
+ext.xenonLibVersion = 'master-SNAPSHOT'
 
 dependencies {
     compile "io.grpc:grpc-netty:${grpcVersion}"
     compile "io.grpc:grpc-protobuf:${grpcVersion}"
     compile "io.grpc:grpc-stub:${grpcVersion}"
     compile 'org.slf4j:slf4j-api:1.7.25'
-    compile "nl.esciencecenter.xenon:xenon:${xenonLibVersion}"
+//    compile "nl.esciencecenter.xenon:xenon:${xenonLibVersion}"
+    compile "com.github.NLeSC:Xenon:${xenonLibVersion}"
     compile 'net.sourceforge.argparse4j:argparse4j:0.8.1'
     compile 'io.netty:netty-tcnative-boringssl-static:2.0.6.Final'
     testCompile 'junit:junit:4.12'

@@ -7,7 +7,6 @@ import java.util.Map;
 
 import io.grpc.Status;
 import io.grpc.StatusException;
-import nl.esciencecenter.xenon.credentials.CredentialMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +21,7 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.CredentialMap;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.credentials.UserCredential;
@@ -141,13 +141,13 @@ public class MapUtils {
         }
 
         for (Map.Entry<String, XenonProto.UserCredential> entry : credentialMap.getEntriesMap().entrySet()) {
-            cred.put(entry.getKey(), mapCredential(entry.getValue()));
+            cred.put(entry.getKey(), mapUserCredential(entry.getValue()));
         }
 
         return cred;
     }
 
-    private static UserCredential mapCredential(XenonProto.UserCredential value) {
+    private static UserCredential mapUserCredential(XenonProto.UserCredential value) {
         XenonProto.UserCredential.EntryCase entryCase = value.getEntryCase();
         switch (entryCase) {
             case CERTIFICATE_CREDENTIAL:
@@ -175,6 +175,72 @@ public class MapUtils {
 
     private static UserCredential mapCertificateCredential(XenonProto.CertificateCredential certificateCred) {
         return new CertificateCredential(certificateCred.getUsername(), certificateCred.getCertfile(), certificateCred.getPassphrase().toCharArray());
+    }
+
+    public static XenonProto.GetCredentialResponse toCredentialResponse(Credential credential) throws XenonException {
+        XenonProto.GetCredentialResponse.Builder builder = XenonProto.GetCredentialResponse.newBuilder();
+        if (credential instanceof CredentialMap) {
+            builder.setCredentialMap(mapCredentialMap((CredentialMap) credential));
+        } else if (credential instanceof CertificateCredential) {
+            builder.setCertificateCredential(mapCertificateCredential((CertificateCredential) credential));
+        } else if (credential instanceof PasswordCredential) {
+            builder.setPasswordCredential(mapPasswordCredential((PasswordCredential) credential));
+        } else if (credential instanceof DefaultCredential) {
+            builder.setDefaultCredential(mapDefaultCredential((DefaultCredential) credential));
+        } else {
+            throw new XenonException("credential", "Unknown credential class");
+        }
+        return builder.build();
+    }
+
+    private static XenonProto.DefaultCredential mapDefaultCredential(DefaultCredential credential) {
+        return XenonProto.DefaultCredential.newBuilder().setUsername(credential.getUsername()).build();
+    }
+
+    private static XenonProto.PasswordCredential mapPasswordCredential(PasswordCredential credential) {
+        return XenonProto.PasswordCredential.newBuilder().setUsername(credential.getUsername()).setPassword(String.valueOf(credential.getPassword())).build();
+    }
+
+    private static XenonProto.CertificateCredential mapCertificateCredential(CertificateCredential credential) {
+        return XenonProto.CertificateCredential.newBuilder()
+            .setCertfile(credential.getCertificateFile())
+            .setUsername(credential.getUsername())
+            .setPassphrase(String.valueOf(credential.getPassword()))
+            .build();
+    }
+
+    private static XenonProto.CredentialMap mapCredentialMap(CredentialMap credential) throws XenonException {
+        XenonProto.CredentialMap.Builder builder = XenonProto.CredentialMap.newBuilder();
+        UserCredential defaultCred = credential.getDefault();
+        if (defaultCred != null) {
+            if (defaultCred instanceof CertificateCredential) {
+                builder.setCertificateCredential(mapCertificateCredential((CertificateCredential) defaultCred));
+            } else if (defaultCred instanceof PasswordCredential) {
+                builder.setPasswordCredential(mapPasswordCredential((PasswordCredential) defaultCred));
+            } else if (defaultCred instanceof DefaultCredential) {
+                builder.setDefaultCredential(mapDefaultCredential((DefaultCredential) defaultCred));
+            } else {
+                throw new XenonException("credential", "Unknown credential class");
+            }
+        }
+        for (String key : credential.keySet()) {
+            builder.putEntries(key, mapUserCredential(credential.get(key)));
+        }
+        return builder.build();
+    }
+
+    private static XenonProto.UserCredential mapUserCredential(UserCredential credential) throws XenonException {
+        XenonProto.UserCredential.Builder builder = XenonProto.UserCredential.newBuilder();
+        if (credential instanceof CertificateCredential) {
+            builder.setCertificateCredential(mapCertificateCredential((CertificateCredential) credential));
+        } else if (credential instanceof PasswordCredential) {
+            builder.setPasswordCredential(mapPasswordCredential((PasswordCredential) credential));
+        } else if (credential instanceof DefaultCredential) {
+            builder.setDefaultCredential(mapDefaultCredential((DefaultCredential) credential));
+        } else {
+            throw new XenonException("credential", "Unknown credential class");
+        }
+        return builder.build();
     }
 
     public static StatusException mapException(Throwable e) {
