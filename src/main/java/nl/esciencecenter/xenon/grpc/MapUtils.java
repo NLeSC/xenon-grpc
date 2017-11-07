@@ -188,9 +188,13 @@ public class MapUtils {
         } else if (credential instanceof DefaultCredential) {
             builder.setDefaultCredential(mapDefaultCredential((DefaultCredential) credential));
         } else {
-            throw new XenonException("credential", "Unknown credential class");
+            return catchUnknownCredential();
         }
         return builder.build();
+    }
+
+    private static XenonProto.GetCredentialResponse catchUnknownCredential() throws XenonException {
+        throw new XenonException("credential", "Unknown credential class");
     }
 
     private static XenonProto.DefaultCredential mapDefaultCredential(DefaultCredential credential) {
@@ -220,7 +224,7 @@ public class MapUtils {
             } else if (defaultCred instanceof DefaultCredential) {
                 builder.setDefaultCredential(mapDefaultCredential((DefaultCredential) defaultCred));
             } else {
-                throw new XenonException("credential", "Unknown credential class");
+                catchUnknownCredential();
             }
         }
         for (String key : credential.keySet()) {
@@ -238,7 +242,7 @@ public class MapUtils {
         } else if (credential instanceof DefaultCredential) {
             builder.setDefaultCredential(mapDefaultCredential((DefaultCredential) credential));
         } else {
-            throw new XenonException("credential", "Unknown credential class");
+            catchUnknownCredential();
         }
         return builder.build();
     }
