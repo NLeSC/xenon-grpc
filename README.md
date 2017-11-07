@@ -42,8 +42,8 @@ java -jar xenon-grpc-*/lib/xenon-grpc-*-all.jar
 ## Run server
 
 ```bash
-./gradlew installShadowDist
-./build/install/xenon-grpc-shadow/bin/xenon-grpc
+./gradlew installDist
+./build/install/xenon-grpc/bin/xenon-grpc
 ```
 
 ## Run client
@@ -105,6 +105,8 @@ print(response)
 
 Generates application tar/zip in `build/distributions/` directory.
 
-1. Create a new GitHub release
-2. Upload the files in `build/distributions/` directory to that release
-3. Publish release
+1. Bump version in `build.gradle`, add version to `CHANGELOG.md` and commit/push
+2. Create a new GitHub release
+3. Upload the files in `build/distributions/` directory to that release
+4. Publish release
+5. Edit Zenodo entry, correct license, add [Xenon doi](https://doi.org/10.5281/zenodo.597993) as `is referenced by this upload`.

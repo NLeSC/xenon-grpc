@@ -10,7 +10,7 @@ plugins {
     // test coverage
     id 'jacoco'
     // quality
-    id 'org.sonarqube' version '2.5'
+    id 'org.sonarqube' version '2.6'
     // xenon --version reads version from this file
     id 'de.fuerstenau.buildconfig' version '1.1.8'
 }
@@ -29,16 +29,14 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
-//ext.xenonLibVersion = '2.1.0'
-ext.xenonLibVersion = 'master-SNAPSHOT'
+ext.xenonLibVersion = '2.2.0'
 
 dependencies {
     compile "io.grpc:grpc-netty:${grpcVersion}"
     compile "io.grpc:grpc-protobuf:${grpcVersion}"
     compile "io.grpc:grpc-stub:${grpcVersion}"
     compile 'org.slf4j:slf4j-api:1.7.25'
-//    compile "nl.esciencecenter.xenon:xenon:${xenonLibVersion}"
-    compile "com.github.NLeSC:Xenon:${xenonLibVersion}"
+    compile "nl.esciencecenter.xenon:xenon:${xenonLibVersion}"
     compile 'net.sourceforge.argparse4j:argparse4j:0.8.1'
     compile 'io.netty:netty-tcnative-boringssl-static:2.0.6.Final'
     testCompile 'junit:junit:4.12'
@@ -79,7 +77,7 @@ idea {
 // use shadow tasks everywhere
 distZip.enabled = false
 distTar.enabled = false
-installDist.enabled = false
+installDist.enabled = true
 
 jacocoTestReport {
     // Exclude classes of generated source code by protoc
@@ -102,7 +100,7 @@ sonarqube {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.2.1'
+    gradleVersion = '4.3'
 }
 
 buildConfig {

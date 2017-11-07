@@ -1,5 +1,15 @@
 package nl.esciencecenter.xenon.grpc;
 
+import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.net.ssl.SSLException;
+
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.netty.GrpcSslContexts;
@@ -11,21 +21,13 @@ import net.sourceforge.argparse4j.inf.ArgumentGroup;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.grpc.filesystems.FileSystemService;
 import nl.esciencecenter.xenon.grpc.schedulers.SchedulerService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.net.ssl.SSLException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 public class XenonServerWrapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(XenonServerWrapper.class);
@@ -54,6 +56,7 @@ public class XenonServerWrapper {
                 .description("gRPC (http://www.grpc.io/) server for Xenon (https://nlesc.github.io/Xenon/)")
                 .version("Xenon gRPC v" + BuildConfig.VERSION + ", Xenon Library v" + BuildConfig.XENON_LIB_VERSION);
         myparser.addArgument("--version").action(Arguments.version()).help("Prints version and exists");
+        myparser.addArgument("--verbose", "-v").help("Repeat for more verbose logging").action(Arguments.count());
         myparser.addArgument("--port", "-p")
                 .type(Integer.class).setDefault(DEFAULT_PORT)
                 .help("Port to bind to");
@@ -131,6 +134,23 @@ public class XenonServerWrapper {
         if (!useTLS && anyTLS) {
             throw new ArgumentParserException("Unable to enable mutual TLS. mutual TLS requires --server-cert-chain, --server-private-key and --client-cert-chain arguments set", parser);
         }
+        configureLogger(res);
+    }
+
+    private void configureLogger(Namespace res) {
+        Integer verboseness = res.getInt("verbose");
+        ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        if (verboseness == 1) {
+            root.setLevel(ch.qos.logback.classic.Level.WARN);
+        } else if (verboseness == 2) {
+            root.setLevel(ch.qos.logback.classic.Level.INFO);
+        } else if (verboseness == 3) {
+            root.setLevel(ch.qos.logback.classic.Level.DEBUG);
+        } else if (verboseness > 3) {
+            root.setLevel(ch.qos.logback.classic.Level.TRACE);
+        } else {
+            root.setLevel(ch.qos.logback.classic.Level.ERROR);
+        }
     }
 
     private void printProto() {
@@ -148,7 +168,7 @@ public class XenonServerWrapper {
     }
 
     private ServerBuilder<?> secureServerBuilder() throws SSLException {
-        LOGGER.info("Server started, listening on port {} with mutual TLS", port);
+        LOGGER.error("Server started, listening on port {} with mutual TLS", port);
         LOGGER.info("On client use:");
         LOGGER.info("- {} as server certificate chain file", serverCertChain);
         LOGGER.info("- {} as client certificate chain file", clientCertChain);
@@ -162,7 +182,7 @@ public class XenonServerWrapper {
 
 
     private ServerBuilder<?> insecureServerBuilder() {
-        LOGGER.info("Server started, listening on port {}", port);
+        LOGGER.error("Server started, listening on port {}", port);
         return ServerBuilder.forPort(port);
     }
 
