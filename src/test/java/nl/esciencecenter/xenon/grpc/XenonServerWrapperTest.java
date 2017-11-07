@@ -52,4 +52,18 @@ public class XenonServerWrapperTest {
         wrapper.parseArgs(new String[]{"--proto"});
     }
 
+    @Test
+    public void getPort() {
+        XenonServerWrapper wrapper = new XenonServerWrapper();
+
+        Integer expected = 50051;
+        assertEquals(expected, wrapper.getPort());
+    }
+
+    @Test
+    public void getUseTLS() {
+        XenonServerWrapper wrapper = new XenonServerWrapper();
+
+        assertFalse(wrapper.getUseTLS());
+    }
 }

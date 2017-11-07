@@ -1,6 +1,8 @@
 package nl.esciencecenter.xenon.grpc.filesystems;
 
 import static nl.esciencecenter.xenon.grpc.MapUtils.empty;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -15,6 +17,7 @@ import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
@@ -107,6 +110,34 @@ public class FileSystemServiceStreamTest {
         verify(responseObserver).onNext(empty());
         verify(responseObserver).onCompleted();
         verify(responseObserver, never()).onError(any());
+
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void writeToFile_badFsID() throws XenonException {
+        ArgumentCaptor<StatusException> captor = ArgumentCaptor.forClass(StatusException.class);
+        StreamObserver<XenonProto.Empty> responseObserver = (StreamObserver<XenonProto.Empty>) mock(StreamObserver.class);
+        String path = "/somefile";
+        OutputStream pipe = mock(OutputStream.class);
+        when(filesystem.writeToFile(new Path(path))).thenReturn(pipe);
+
+        StreamObserver<XenonProto.WriteToFileRequest> requestBroadcaster = service.writeToFile(responseObserver);
+
+        // send request
+        ByteString content = ByteString.copyFrom("".getBytes());
+        String badFSID = "bad filesystem id";
+        XenonProto.WriteToFileRequest request = XenonProto.WriteToFileRequest.newBuilder()
+            .setFilesystem(XenonProto.FileSystem.newBuilder().setId(badFSID))
+            .setPath(buildPath(path))
+            .setBuffer(content)
+            .build();
+        requestBroadcaster.onNext(request);
+        requestBroadcaster.onCompleted();
+
+        verify(responseObserver).onError(captor.capture());
+        StatusException actual = captor.getValue();
+        assertThat(actual.getMessage(), containsString(badFSID));
     }
 
     @SuppressWarnings("unchecked")
@@ -137,5 +168,32 @@ public class FileSystemServiceStreamTest {
         verify(responseObserver).onNext(empty());
         verify(responseObserver).onCompleted();
         verify(responseObserver, never()).onError(any());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void appendToFile_badFsID() throws XenonException {
+        ArgumentCaptor<StatusException> captor = ArgumentCaptor.forClass(StatusException.class);
+        StreamObserver<XenonProto.Empty> responseObserver = (StreamObserver<XenonProto.Empty>) mock(StreamObserver.class);
+        String path = "/somefile";
+        OutputStream pipe = mock(OutputStream.class);
+        when(filesystem.appendToFile(new Path(path))).thenReturn(pipe);
+
+        StreamObserver<XenonProto.AppendToFileRequest> requestBroadcaster = service.appendToFile(responseObserver);
+
+        // send request
+        ByteString content = ByteString.copyFrom("Some content".getBytes());
+        String badFSID = "bad filesystem id";
+        XenonProto.AppendToFileRequest request = XenonProto.AppendToFileRequest.newBuilder()
+            .setFilesystem(XenonProto.FileSystem.newBuilder().setId(badFSID))
+            .setPath(buildPath(path))
+            .setBuffer(content)
+            .build();
+        requestBroadcaster.onNext(request);
+        requestBroadcaster.onCompleted();
+
+        verify(responseObserver).onError(captor.capture());
+        StatusException actual = captor.getValue();
+        assertThat(actual.getMessage(), containsString(badFSID));
     }
 }
