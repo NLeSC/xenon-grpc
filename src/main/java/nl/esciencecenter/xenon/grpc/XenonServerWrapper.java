@@ -14,6 +14,7 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NettyServerBuilder;
+import io.grpc.protobuf.services.ProtoReflectionService;
 import io.netty.handler.ssl.ClientAuth;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
@@ -117,6 +118,7 @@ public class XenonServerWrapper {
         server = builder
                 .addService(filesystemService)
                 .addService(schedulerService)
+                .addService(ProtoReflectionService.newInstance())
                 .build();
     }
 

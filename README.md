@@ -1,7 +1,9 @@
 gRPC (http://www.grpc.io/) server for Xenon (https://nlesc.github.io/Xenon/).
 
 Can be used to use Xenon in a non-java based language. 
-For example pyxenon (https://github.com/NLeSC/pyxenon) will use the Xenon gRPC server in the future. 
+For example pyxenon (https://github.com/NLeSC/pyxenon) uses the Xenon gRPC server.
+
+The server tries to mimic the Xenon library API as much as possible, differences are described in the [proto file](src/main/proto/xenon.proto) .
 
 [![Build Status](https://travis-ci.org/NLeSC/xenon-grpc.svg?branch=master)](https://travis-ci.org/NLeSC/xenon-grpc)
 [![Build status](https://ci.appveyor.com/api/projects/status/tep8bad05e76a69w/branch/master?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon-grpc/branch/master)
@@ -51,9 +53,9 @@ java -jar xenon-grpc-*/lib/xenon-grpc-*-all.jar
 For use polyglot
 
 ```bash
-wget https://github.com/grpc-ecosystem/polyglot/releases/download/v1.2.0/polyglot.jar
+wget https://github.com/grpc-ecosystem/polyglot/releases/download/v1.4.0/polyglot.jar
 java -jar polyglot.jar --command=list_services  --proto_discovery_root=src/main/proto
-echo {} | java -jar polyglot.jar --endpoint=localhost:50051 --proto_discovery_root=src/main/proto --full_method=xenon.SchedulerService/getAdaptorDescriptions --command=call
+echo {} | java -jar polyglot.jar --command=call --endpoint=localhost:50051 --full_method=xenon.SchedulerService/getAdaptorDescriptions
 ```
 
 ## Python client

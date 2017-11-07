@@ -35,6 +35,7 @@ dependencies {
     compile "io.grpc:grpc-netty:${grpcVersion}"
     compile "io.grpc:grpc-protobuf:${grpcVersion}"
     compile "io.grpc:grpc-stub:${grpcVersion}"
+    compile "io.grpc:grpc-services:${grpcVersion}"
     compile 'org.slf4j:slf4j-api:1.7.25'
     compile "nl.esciencecenter.xenon:xenon:${xenonLibVersion}"
     compile 'net.sourceforge.argparse4j:argparse4j:0.8.1'
