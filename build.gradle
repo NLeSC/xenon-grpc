@@ -10,16 +10,16 @@ plugins {
     // test coverage
     id 'jacoco'
     // quality
-    id 'org.sonarqube' version '2.6'
+    id 'org.sonarqube' version '2.6.1'
     // xenon --version reads version from this file
     id 'de.fuerstenau.buildconfig' version '1.1.8'
 }
 
-version = '2.0.0'
+version = '2.0.1'
 applicationName = 'xenon-grpc'
 group = 'nl.esciencecenter.xenon.grpc'
 mainClassName = 'nl.esciencecenter.xenon.grpc.XenonServerWrapper'
-ext.grpcVersion = '1.7.0'
+ext.grpcVersion = '1.8.0'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -39,15 +39,15 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.25'
     compile "nl.esciencecenter.xenon:xenon:${xenonLibVersion}"
     compile 'net.sourceforge.argparse4j:argparse4j:0.8.1'
-    compile 'io.netty:netty-tcnative-boringssl-static:2.0.6.Final'
+    compile 'io.netty:netty-tcnative-boringssl-static:2.0.7.Final'
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.11.0'
-    testCompile 'com.github.stefanbirkner:system-rules:1.16.1'
+    testCompile 'org.mockito:mockito-core:2.12.0'
+    testCompile 'com.github.stefanbirkner:system-rules:1.17.0'
 }
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.4.0'
+        artifact = 'com.google.protobuf:protoc:3.5.0'
     }
     plugins {
         grpc {
@@ -101,7 +101,7 @@ sonarqube {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.3'
+    gradleVersion = '4.3.1'
 }
 
 buildConfig {
