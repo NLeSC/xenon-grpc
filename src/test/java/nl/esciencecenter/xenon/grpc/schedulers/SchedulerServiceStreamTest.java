@@ -126,7 +126,7 @@ public class SchedulerServiceStreamTest {
         // verify response
         verify(responseObserver, timeout(1000)).onError(captor.capture());
         StatusException error = captor.getValue();
-        assertEquals("INVALID_ARGUMENT: file adaptor: No executable", error.getMessage());
+        assertEquals("INVALID_ARGUMENT: nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException: file adaptor: No executable", error.getMessage());
         verify(responseObserver, never()).onNext(any(XenonProto.SubmitInteractiveJobResponse.class));
         verify(responseObserver, never()).onCompleted();
     }

@@ -5,11 +5,11 @@ import static nl.esciencecenter.xenon.grpc.MapUtils.mapCredential;
 import static nl.esciencecenter.xenon.grpc.MapUtils.mapException;
 import static nl.esciencecenter.xenon.grpc.MapUtils.usernameOfCredential;
 import static nl.esciencecenter.xenon.grpc.filesystems.MapUtils.getFileSystemId;
-import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapSchedulerAdaptorDescription;
 import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobDescription;
 import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobStatus;
 import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapJobs;
 import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapQueueStatus;
+import static nl.esciencecenter.xenon.grpc.schedulers.MapUtils.mapSchedulerAdaptorDescription;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 import io.grpc.Status;
 import io.grpc.StatusException;
 import io.grpc.stub.StreamObserver;
-import nl.esciencecenter.xenon.filesystems.FileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.grpc.SchedulerServiceGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
@@ -56,7 +56,7 @@ public class SchedulerService extends SchedulerServiceGrpc.SchedulerServiceImplB
     public void create(XenonProto.CreateSchedulerRequest request, StreamObserver<XenonProto.Scheduler> responseObserver) {
         try {
             Credential credential = mapCredential(request);
-            Scheduler scheduler = Scheduler.create(
+            Scheduler scheduler = Scheduler.create( // NOSONAR, close is called on termination of server
                     request.getAdaptor(),
                     request.getLocation(),
                     credential,

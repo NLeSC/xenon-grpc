@@ -19,13 +19,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
-
 import com.google.protobuf.ProtocolStringList;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
-import nl.esciencecenter.xenon.filesystems.FileSystem;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,6 +34,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.grpc.SchedulerServiceGrpc;
 import nl.esciencecenter.xenon.grpc.XenonProto;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
@@ -112,7 +111,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void getAdaptorDescription_unknown() throws XenonException {
-        thrown.expectMessage("NOT_FOUND: Scheduler adaptor: Adaptor 'bigcompute' not found");
+        thrown.expectMessage("NOT_FOUND: nl.esciencecenter.xenon.UnknownAdaptorException: Scheduler adaptor: Adaptor 'bigcompute' not found");
 
         XenonProto.AdaptorName request = XenonProto.AdaptorName.newBuilder()
             .setName("bigcompute")
@@ -194,7 +193,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void getDefaultQueueName_notConnected() throws Exception {
-        thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: slurm adaptor: Not connected");
         when(scheduler.getDefaultQueueName()).thenThrow(new NotConnectedException("slurm", "Not connected"));
 
         client.getDefaultQueueName(createScheduler());
@@ -213,7 +212,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void getQueueNames_notConnected() throws Exception {
-        thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: slurm adaptor: Not connected");
         when(scheduler.getQueueNames()).thenThrow(new NotConnectedException("slurm", "Not connected"));
 
         client.getQueueNames(createScheduler());
@@ -230,7 +229,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void isOpen_Exception() throws Exception {
-        thrown.expectMessage("INTERNAL: slurm adaptor: Something bad");
+        thrown.expectMessage("INTERNAL: nl.esciencecenter.xenon.XenonException: slurm adaptor: Something bad");
         when(scheduler.isOpen()).thenThrow(new XenonException("slurm", "Something bad"));
 
         client.isOpen(createScheduler());
@@ -259,7 +258,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void getQueueStatus_notConnected() throws Exception {
-        thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: slurm adaptor: Not connected");
 
         String queueName = "somequeue";
         XenonProto.GetQueueStatusRequest request = XenonProto.GetQueueStatusRequest.newBuilder()
@@ -297,7 +296,7 @@ public class SchedulerServiceBlockingTest {
     }
     @Test
     public void getQueueStatuses_notConnected() throws Exception {
-        thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: slurm adaptor: Not connected");
 
         String queueName = "somequeue";
         XenonProto.SchedulerAndQueues request = XenonProto.SchedulerAndQueues.newBuilder()
@@ -331,7 +330,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void submitBatchJob_notConnected() throws Exception {
-        thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: slurm adaptor: Not connected");
 
         XenonProto.JobDescription descriptionRequest = XenonProto.JobDescription.newBuilder()
                 .setExecutable("myexecutable")
@@ -362,7 +361,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void cancelJob_notConnected() throws Exception {
-        thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: slurm adaptor: Not connected");
 
         String jobId = "JOBID-1";
         XenonProto.JobRequest request = buildJobRequest(jobId);
@@ -396,7 +395,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void getJobStatus_notConnected() throws Exception {
-        thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: slurm adaptor: Not connected");
 
         String jobId = "JOBID-1";
         XenonProto.JobRequest request = buildJobRequest(jobId);
@@ -425,7 +424,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void getJobStatuses_notConnected() throws Exception {
-        thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: slurm adaptor: Not connected");
 
         String jobId = "JOBID-1";
         XenonProto.GetJobStatusesRequest request = XenonProto.GetJobStatusesRequest.newBuilder()
@@ -456,7 +455,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void waitUntilDone_notConnected() throws Exception {
-        thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: slurm adaptor: Not connected");
 
         String jobId = "JOBID-1";
         XenonProto.WaitRequest request = XenonProto.WaitRequest.newBuilder()
@@ -488,7 +487,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void waitUntilRunning_notConnected() throws Exception {
-        thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: slurm adaptor: Not connected");
 
         String jobId = "JOBID-1";
         XenonProto.WaitRequest request = XenonProto.WaitRequest.newBuilder()
@@ -521,7 +520,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void getJobs_notConnected() throws Exception {
-        thrown.expectMessage("UNAVAILABLE: slurm adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: slurm adaptor: Not connected");
 
         String queueName = "somequeue";
         XenonProto.SchedulerAndQueues request = XenonProto.SchedulerAndQueues.newBuilder()
@@ -641,7 +640,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void getFileSystem_usesFileSystemFalse() throws XenonException {
-        thrown.expectMessage("UNIMPLEMENTED: someadaptor adaptor: No FileSystem used");
+        thrown.expectMessage("UNIMPLEMENTED: nl.esciencecenter.xenon.UnsupportedOperationException: someadaptor adaptor: No FileSystem used");
         XenonException e = new nl.esciencecenter.xenon.UnsupportedOperationException("someadaptor", "No FileSystem used");
         when(scheduler.getFileSystem()).thenThrow(e);
 

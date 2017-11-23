@@ -56,7 +56,7 @@ public class FileSystemService extends FileSystemServiceGrpc.FileSystemServiceIm
     public void create(XenonProto.CreateFileSystemRequest request, StreamObserver<XenonProto.FileSystem> responseObserver) {
         try {
             Credential credential = mapCredential(request);
-            FileSystem fileSystem = FileSystem.create(
+            FileSystem fileSystem = FileSystem.create( // NOSONAR, close is called on termination of server
                     request.getAdaptor(),
                     request.getLocation(),
                     credential,

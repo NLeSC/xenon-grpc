@@ -206,7 +206,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void exists_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: sftp adaptor: Not connected");
 
         XenonProto.PathRequest request = buildPathRequest("/etc/passwd");
         when(filesystem.exists(new Path("/etc/passwd"))).thenThrow(new NotConnectedException("sftp", "Not connected"));
@@ -225,7 +225,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void createDirectory_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: sftp adaptor: Not connected");
 
         XenonProto.PathRequest request = buildPathRequest("/somedir");
         doThrow(new NotConnectedException("sftp", "Not connected")).when(filesystem).createDirectory(new Path("/somedir"));
@@ -244,7 +244,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void createDirectories_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: sftp adaptor: Not connected");
 
         XenonProto.PathRequest request = buildPathRequest("/somedir");
         doThrow(new NotConnectedException("sftp", "Not connected")).when(filesystem).createDirectories(new Path("/somedir"));
@@ -263,7 +263,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void createFile_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: sftp adaptor: Not connected");
 
         XenonProto.PathRequest request = buildPathRequest("/somefile");
         doThrow(new NotConnectedException("sftp", "Not connected")).when(filesystem).createFile(new Path("/somefile"));
@@ -287,7 +287,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void delete_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: sftp adaptor: Not connected");
 
         XenonProto.DeleteRequest request = XenonProto.DeleteRequest.newBuilder()
             .setFilesystem(createFileSystem())
@@ -333,7 +333,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void getAttributes_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: sftp adaptor: Not connected");
 
         String filename = "/etc/passwd";
         XenonProto.PathRequest request = buildPathRequest(filename);
@@ -363,7 +363,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void readSymbolicLink_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: sftp adaptor: Not connected");
 
         String path = "/var/run";
         XenonProto.PathRequest request = buildPathRequest(path);
@@ -385,7 +385,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void isOpen_exception() throws XenonException {
-        thrown.expectMessage("INTERNAL: sftp adaptor: Something bad");
+        thrown.expectMessage("INTERNAL: nl.esciencecenter.xenon.XenonException: sftp adaptor: Something bad");
 
         XenonProto.FileSystem request = createFileSystem();
         when(filesystem.isOpen()).thenThrow(new XenonException("sftp", "Something bad"));
@@ -408,7 +408,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void rename_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: sftp adaptor: Not connected");
 
         XenonProto.RenameRequest request = XenonProto.RenameRequest.newBuilder()
             .setFilesystem(createFileSystem())
@@ -457,7 +457,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void createSymbolicLink_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: sftp adaptor: Not connected");
 
         XenonProto.CreateSymbolicLinkRequest request = XenonProto.CreateSymbolicLinkRequest.newBuilder()
             .setFilesystem(createFileSystem())
@@ -487,7 +487,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void setPosixFilePermissions_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: sftp adaptor: Not connected");
 
         XenonProto.Path path = buildPath("/etc/passwd");
         XenonProto.SetPosixFilePermissionsRequest request = XenonProto.SetPosixFilePermissionsRequest.newBuilder()
@@ -524,7 +524,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void copy_illegalarg() throws XenonException {
-        thrown.expectMessage("INVALID_ARGUMENT: Copy mode is invalid");
+        thrown.expectMessage("INVALID_ARGUMENT: java.lang.IllegalArgumentException: Copy mode is invalid");
 
         String source = "/etc/passwd";
         String target = "/etc/passwd.bak";
@@ -555,7 +555,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void cancel_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: sftp adaptor: Not connected");
 
         XenonProto.CopyOperationRequest request = XenonProto.CopyOperationRequest.newBuilder()
             .setFilesystem(createFileSystem())
@@ -596,7 +596,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void getStatus_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: sftp adaptor: Not connected");
 
         XenonProto.CopyOperationRequest request = XenonProto.CopyOperationRequest.newBuilder()
             .setFilesystem(createFileSystem())
@@ -624,7 +624,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void waitUntilDone_notConnected() throws XenonException {
-        thrown.expectMessage("UNAVAILABLE: sftp adaptor: Not connected");
+        thrown.expectMessage("UNAVAILABLE: nl.esciencecenter.xenon.adaptors.NotConnectedException: sftp adaptor: Not connected");
 
         XenonProto.WaitUntilDoneRequest request = XenonProto.WaitUntilDoneRequest.newBuilder()
             .setFilesystem(createFileSystem())
@@ -649,7 +649,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void getAdaptorDescription_unknown() throws XenonException {
-        thrown.expectMessage("NOT_FOUND: FileSystem adaptor: Adaptor 'bigstore' not found");
+        thrown.expectMessage("NOT_FOUND: nl.esciencecenter.xenon.UnknownAdaptorException: FileSystem adaptor: Adaptor 'bigstore' not found");
 
         XenonProto.AdaptorName request = XenonProto.AdaptorName.newBuilder()
             .setName("bigstore")

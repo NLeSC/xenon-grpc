@@ -280,7 +280,7 @@ public class MapUtils {
             LOGGER.debug("Unable to map exception failing back to INTERNAL status code", e);
             s = Status.INTERNAL;
         }
-        return s.withDescription(e.getMessage()).withCause(e).asException();
+        return s.withDescription(e.getClass().getName() + ": " + e.getMessage()).withCause(e).asException();
     }
 
     public static String usernameOfCredential(Credential credential) {
