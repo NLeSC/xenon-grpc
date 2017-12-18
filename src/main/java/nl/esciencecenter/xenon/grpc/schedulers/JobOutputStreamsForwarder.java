@@ -49,7 +49,7 @@ class JobOutputStreamsForwarder {
                                 response = builder.clearStdout().setStderr(ByteString.copyFrom(buffer, 0, read)).build();
                             }
 
-                            observer.onNext(response);
+                            writeOut(response);
                         }
 
                     } else if (read == -1) {
@@ -73,9 +73,9 @@ class JobOutputStreamsForwarder {
         new StreamForwarder(stderr, false).start();
     }
 
-//    private synchronized void writeOut(XenonProto.SubmitInteractiveJobResponse response) {
-//        observer.onNext(response);
-//    }
+    private synchronized void writeOut(XenonProto.SubmitInteractiveJobResponse response) {
+        observer.onNext(response);
+    }
 
     public synchronized void close() {
         if (++streamsDone == 2) {
