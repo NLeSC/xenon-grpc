@@ -73,9 +73,9 @@ class JobOutputStreamsForwarder {
         new StreamForwarder(stderr, false).start();
     }
 
-    // private synchronized void writeOut(XenonProto.SubmitInteractiveJobResponse response) {
-    // observer.onNext(response);
-    // }
+//    private synchronized void writeOut(XenonProto.SubmitInteractiveJobResponse response) {
+//        observer.onNext(response);
+//    }
 
     public synchronized void close() {
         if (++streamsDone == 2) {
