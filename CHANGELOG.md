@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [2018-01-04] 2.0.1
+
 ### Changed
 
 * Use latest dependencies and plugins
@@ -13,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 * Class of exception lost in translation [#32]
+* Interactive job: sometimes output to stdout is repeated, sometimes skipped [#34]
 
 ## [2017-11-07] 2.0.0
 
