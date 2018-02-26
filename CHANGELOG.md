@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Added
+
+* Name to JobDescription and JobStatus
+* Max memory to JobDescription
+
+### Changed
+
+* Use latest dependencies and plugins
+* Depends on Xenon 2.4.0
+
 ## [2018-01-04] 2.0.1
 
 ### Changed

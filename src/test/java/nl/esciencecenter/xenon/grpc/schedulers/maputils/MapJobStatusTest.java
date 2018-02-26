@@ -77,4 +77,21 @@ public class MapJobStatusTest {
             .build();
         assertEquals(expected, response);
     }
+
+    @Test
+    public void withName() {
+        JobStatus request = new JobStatusImplementation("JOBID-1", "myjobname", "COMPLETED", null, null, false, false, null);
+        XenonProto.JobStatus response = mapJobStatus(request);
+
+        XenonProto.JobStatus expected = builder
+            .setState("COMPLETED")
+            .setJob(
+                XenonProto.Job.newBuilder()
+                    .setId("JOBID-1")
+            )
+            .setErrorType(XenonProto.JobStatus.ErrorType.NONE)
+            .setName("myjobname")
+            .build();
+        assertEquals(expected, response);
+    }
 }

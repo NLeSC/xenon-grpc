@@ -7,11 +7,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.grpc.XenonProto;
-import nl.esciencecenter.xenon.schedulers.JobDescription;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import nl.esciencecenter.xenon.grpc.XenonProto;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 public class MapJobDescriptionTest {
     private XenonProto.JobDescription.Builder builder;
@@ -48,6 +48,8 @@ public class MapJobDescriptionTest {
             .setStderr("/tmp/stderr.txt")
             .setStdout("/tmp/stdout.txt")
             .putOptions("xenon.adaptors.schedulers.ssh.agent", "true")
+            .setName("myjobname")
+            .setMaxMemory(4096)
         ;
 
         XenonProto.JobDescription request = builder.build();
@@ -71,6 +73,8 @@ public class MapJobDescriptionTest {
         Map<String, String> opts = new HashMap<>();
         opts.put("xenon.adaptors.schedulers.ssh.agent", "true");
         expected.setJobOptions(opts);
+        expected.setName("myjobname");
+        expected.setMaxMemory(4096);
         assertEquals(expected, response);
     }
 }

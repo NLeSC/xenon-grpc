@@ -81,6 +81,12 @@ public class MapUtils {
         description.setStdin(defaultValue(d.getStdin()));
         description.setStdout(defaultValue(d.getStdout()));
         description.setJobOptions(d.getOptionsMap());
+        if (! d.getName().equals("")) {
+            description.setName(d.getName());
+        }
+        if (d.getMaxMemory() != 0) {
+            description.setMaxMemory(d.getMaxMemory());
+        }
         return description;
     }
 
@@ -104,7 +110,9 @@ public class MapUtils {
                     .setErrorMessage(status.getException().getMessage())
                     .setErrorType(mapJobStatusErrorType(status.getException()));
         }
-
+        if (status.getName() != null) {
+            builder.setName(status.getName());
+        }
         return builder.build();
     }
 

@@ -326,6 +326,8 @@ message JobDescription {
     string stdout = 12;
     // In Xenon named jobOptions
     map<string, string> options = 13;
+    string name = 14;
+    uint32 max_memory = 15;
 }
 
 message SubmitBatchJobRequest {
@@ -405,6 +407,7 @@ message JobStatus {
         OTHER = 6;
     }
     ErrorType error_type = 8;
+    string name = 9;
 }
 
 message GetJobStatusesResponse {
