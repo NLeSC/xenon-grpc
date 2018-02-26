@@ -24,7 +24,7 @@ public class MapJobStatusTest {
 
     @Test
     public void minimal() {
-        JobStatus request = new JobStatusImplementation("JOBID-1", "COMPLETED", null, null, false, false, null);
+        JobStatus request = new JobStatusImplementation("JOBID-1", null, "COMPLETED", null, null, false, false, null);
         XenonProto.JobStatus response = mapJobStatus(request);
 
         XenonProto.JobStatus expected = builder
@@ -42,7 +42,7 @@ public class MapJobStatusTest {
     public void completedOKWithInfo() {
         Map<String, String> info = new HashMap<>();
         info.put("runtime", "00:12:34");
-        JobStatus request = new JobStatusImplementation("JOBID-1", "COMPLETED", 0, null, false, true, info);
+        JobStatus request = new JobStatusImplementation("JOBID-1", null, "COMPLETED", 0, null, false, true, info);
         XenonProto.JobStatus response = mapJobStatus(request);
 
         XenonProto.JobStatus expected = builder
@@ -61,7 +61,7 @@ public class MapJobStatusTest {
 
     @Test
     public void completedWithException() {
-        JobStatus request = new JobStatusImplementation("JOBID-1", "ERROR", 1, new JobCanceledException("slurm", "Killed"), false, true, new HashMap<>());
+        JobStatus request = new JobStatusImplementation("JOBID-1", null, "ERROR", 1, new JobCanceledException("slurm", "Killed"), false, true, new HashMap<>());
         XenonProto.JobStatus response = mapJobStatus(request);
 
         XenonProto.JobStatus expected = builder

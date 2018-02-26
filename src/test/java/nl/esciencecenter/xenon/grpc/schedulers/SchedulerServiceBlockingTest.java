@@ -350,7 +350,7 @@ public class SchedulerServiceBlockingTest {
     public void cancelJob() throws Exception {
         String jobId = "JOBID-1";
         XenonProto.JobRequest request = buildJobRequest(jobId);
-        JobStatus status = new JobStatusImplementation(jobId, "COMPLETED", 0, null, false, true, new HashMap<>());
+        JobStatus status = new JobStatusImplementation(jobId, null, "COMPLETED", 0, null, false, true, new HashMap<>());
         when(scheduler.cancelJob(jobId)).thenReturn(status);
 
         XenonProto.JobStatus response = client.cancelJob(request);
@@ -384,7 +384,7 @@ public class SchedulerServiceBlockingTest {
     public void getJobStatus() throws Exception {
         String jobId = "JOBID-1";
         XenonProto.JobRequest request = buildJobRequest(jobId);
-        JobStatus status = new JobStatusImplementation(jobId, "COMPLETED", 0, null, false, true, new HashMap<>());
+        JobStatus status = new JobStatusImplementation(jobId, null, "COMPLETED", 0, null, false, true, new HashMap<>());
         when(scheduler.getJobStatus(jobId)).thenReturn(status);
 
         XenonProto.JobStatus response = client.getJobStatus(request);
@@ -411,7 +411,7 @@ public class SchedulerServiceBlockingTest {
                 .setScheduler(createScheduler())
                 .addJobs(buildJob(jobId))
                 .build();
-        JobStatus status = new JobStatusImplementation(jobId, "COMPLETED", 0, null, false, true, new HashMap<>());
+        JobStatus status = new JobStatusImplementation(jobId, null, "COMPLETED", 0, null, false, true, new HashMap<>());
         when(scheduler.getJobStatuses(jobId)).thenReturn(new JobStatus[]{status});
 
         XenonProto.GetJobStatusesResponse response = client.getJobStatuses(request);
@@ -444,7 +444,7 @@ public class SchedulerServiceBlockingTest {
                 .setScheduler(createScheduler())
                 .setTimeout(42L)
                 .build();
-        JobStatus status = new JobStatusImplementation(jobId, "COMPLETED", 0, null, false, true, new HashMap<>());
+        JobStatus status = new JobStatusImplementation(jobId, null, "COMPLETED", 0, null, false, true, new HashMap<>());
         when(scheduler.waitUntilDone(jobId, 42L)).thenReturn(status);
 
         XenonProto.JobStatus response = client.waitUntilDone(request);
@@ -476,7 +476,7 @@ public class SchedulerServiceBlockingTest {
                 .setScheduler(createScheduler())
                 .setTimeout(42L)
                 .build();
-        JobStatus status = new JobStatusImplementation(jobId, "COMPLETED", 0, null, false, true, new HashMap<>());
+        JobStatus status = new JobStatusImplementation(jobId, null, "COMPLETED", 0, null, false, true, new HashMap<>());
         when(scheduler.waitUntilRunning(jobId, 42L)).thenReturn(status);
 
         XenonProto.JobStatus response = client.waitUntilRunning(request);
