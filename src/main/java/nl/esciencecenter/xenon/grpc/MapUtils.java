@@ -7,6 +7,7 @@ import java.util.Map;
 
 import io.grpc.Status;
 import io.grpc.StatusException;
+import nl.esciencecenter.xenon.credentials.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,12 +20,6 @@ import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
-import nl.esciencecenter.xenon.credentials.CertificateCredential;
-import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.CredentialMap;
-import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.credentials.PasswordCredential;
-import nl.esciencecenter.xenon.credentials.UserCredential;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
@@ -100,6 +95,8 @@ public class MapUtils {
                 return mapDefaultCredential(request.getDefaultCredential());
             case CREDENTIAL_MAP:
                 return mapCredentialMap(request.getCredentialMap());
+            case KEYTAB_CREDENTIAL:
+                return mapKeyTabCredential(request.getKeytabCredential());
             case CREDENTIAL_NOT_SET:
                 break;
         }
@@ -117,6 +114,8 @@ public class MapUtils {
                 return mapDefaultCredential(request.getDefaultCredential());
             case CREDENTIAL_MAP:
                 return mapCredentialMap(request.getCredentialMap());
+            case KEYTAB_CREDENTIAL:
+                return mapKeyTabCredential(request.getKeytabCredential());
             case CREDENTIAL_NOT_SET:
                 break;
         }
@@ -136,6 +135,8 @@ public class MapUtils {
             case DEFAULT_CREDENTIAL:
                 cred = new CredentialMap(mapDefaultCredential(credentialMap.getDefaultCredential()));
                 break;
+            case KEYTAB_CREDENTIAL:
+                cred = new CredentialMap(mapKeyTabCredential(credentialMap.getKeytabCredential()));
             case FALLBACK_NOT_SET:
                 break;
         }
@@ -156,6 +157,8 @@ public class MapUtils {
                 return mapPasswordCredential(value.getPasswordCredential());
             case DEFAULT_CREDENTIAL:
                 return mapDefaultCredential(value.getDefaultCredential());
+            case KEYTAB_CREDENTIAL:
+                return mapKeyTabCredential(value.getKeytabCredential());
             case ENTRY_NOT_SET:
                 break;
         }
@@ -177,6 +180,10 @@ public class MapUtils {
         return new CertificateCredential(certificateCred.getUsername(), certificateCred.getCertfile(), certificateCred.getPassphrase().toCharArray());
     }
 
+    private static UserCredential mapKeyTabCredential(XenonProto.KeytabCredential keytabCredential) {
+        return new KeytabCredential(keytabCredential.getUsername(), keytabCredential.getKeytabfile());
+    }
+
     public static XenonProto.GetCredentialResponse toCredentialResponse(Credential credential) throws XenonException {
         XenonProto.GetCredentialResponse.Builder builder = XenonProto.GetCredentialResponse.newBuilder();
         if (credential instanceof CredentialMap) {
@@ -187,6 +194,8 @@ public class MapUtils {
             builder.setPasswordCredential(mapPasswordCredential((PasswordCredential) credential));
         } else if (credential instanceof DefaultCredential) {
             builder.setDefaultCredential(mapDefaultCredential((DefaultCredential) credential));
+        } else if (credential instanceof KeytabCredential) {
+            builder.setKeytabCredential(mapKeytabCredential((KeytabCredential) credential));
         } else {
             return catchUnknownCredential();
         }
@@ -213,6 +222,10 @@ public class MapUtils {
             .build();
     }
 
+    private static XenonProto.KeytabCredential mapKeytabCredential(KeytabCredential credential) {
+        return XenonProto.KeytabCredential.newBuilder().setUsername(credential.getUsername()).setKeytabfile(credential.getKeytabFile()).build();
+    }
+
     private static XenonProto.CredentialMap mapCredentialMap(CredentialMap credential) throws XenonException {
         XenonProto.CredentialMap.Builder builder = XenonProto.CredentialMap.newBuilder();
         UserCredential defaultCred = credential.getDefault();
@@ -223,6 +236,8 @@ public class MapUtils {
                 builder.setPasswordCredential(mapPasswordCredential((PasswordCredential) defaultCred));
             } else if (defaultCred instanceof DefaultCredential) {
                 builder.setDefaultCredential(mapDefaultCredential((DefaultCredential) defaultCred));
+            } else if (defaultCred instanceof KeytabCredential) {
+                builder.setKeytabCredential(mapKeytabCredential((KeytabCredential) defaultCred));
             } else {
                 catchUnknownCredential();
             }
@@ -241,6 +256,8 @@ public class MapUtils {
             builder.setPasswordCredential(mapPasswordCredential((PasswordCredential) credential));
         } else if (credential instanceof DefaultCredential) {
             builder.setDefaultCredential(mapDefaultCredential((DefaultCredential) credential));
+        } else if (credential instanceof KeytabCredential) {
+            builder.setKeytabCredential(mapKeytabCredential((KeytabCredential) credential));
         } else {
             catchUnknownCredential();
         }
