@@ -60,6 +60,11 @@ message FileSystemAdaptorDescription {
     bool can_read_symboliclinks = 7;
     bool is_connectionless = 8;
     repeated string supported_credentials = 9;
+    bool supports_reading_posix_permissions = 10;
+    bool supports_setting_posix_permissions = 11;
+    bool supports_rename = 12;
+    bool can_append = 13;
+    bool needs_size_beforehand = 14;
 }
 
 message FileSystemAdaptorDescriptions {
