@@ -42,6 +42,7 @@ message SchedulerAdaptorDescription {
     bool supports_interactive = 6;
     bool supports_batch = 7;
     bool uses_file_system = 8;
+    repeated string supported_credentials = 9;
 }
 
 message SchedulerAdaptorDescriptions {
@@ -58,6 +59,7 @@ message FileSystemAdaptorDescription {
     bool can_create_symboliclinks = 6;
     bool can_read_symboliclinks = 7;
     bool is_connectionless = 8;
+    repeated string supported_credentials = 9;
 }
 
 message FileSystemAdaptorDescriptions {
