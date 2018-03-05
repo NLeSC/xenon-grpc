@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [2018-03-05] 2.2.0
+
 ### Added
 
 * support for KeytabCredential (#33)
