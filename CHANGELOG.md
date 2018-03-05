@@ -9,10 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 * support for KeytabCredential (#33)
+* supportedCredentials (#35)
 
 ### Changed
 
 * Depends on Xenon 2.5.0
+
+### Fixed
+
+* FileSystemAdaptorDescription fields synced (#36)
 
 ## [2018-02-26] 2.1.0
 
