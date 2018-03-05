@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
@@ -131,6 +132,7 @@ public class MapUtils {
 
     public static XenonProto.SchedulerAdaptorDescription mapSchedulerAdaptorDescription(SchedulerAdaptorDescription desc) {
         List<XenonProto.PropertyDescription> supportedProperties = mapPropertyDescriptions(desc.getSupportedProperties());
+        List<String> supportedCredentials = Arrays.stream(desc.getSupportedCredentials()).map(Class::getSimpleName).collect(Collectors.toList());
         return XenonProto.SchedulerAdaptorDescription.newBuilder()
                 .setName(desc.getName())
                 .setDescription(desc.getDescription())
@@ -140,6 +142,7 @@ public class MapUtils {
                 .setSupportsBatch(desc.supportsBatch())
                 .setSupportsInteractive(desc.supportsInteractive())
                 .setUsesFileSystem(desc.usesFileSystem())
+                .addAllSupportedCredentials(supportedCredentials)
                 .build();
     }
 

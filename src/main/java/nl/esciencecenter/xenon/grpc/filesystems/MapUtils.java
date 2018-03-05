@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import io.grpc.Status;
 import io.grpc.StatusException;
@@ -94,19 +95,19 @@ public class MapUtils {
 
     static XenonProto.PathAttributes writeFileAttributes(PathAttributes a) {
         XenonProto.PathAttributes.Builder builder = XenonProto.PathAttributes.newBuilder()
-            .setPath(writePath(a.getPath()))
-            .setCreationTime(a.getCreationTime())
-            .setIsDirectory(a.isDirectory())
-            .setIsExecutable(a.isExecutable())
-            .setIsHidden(a.isHidden())
-            .setIsOther(a.isOther())
-            .setIsReadable(a.isReadable())
-            .setIsRegular(a.isRegular())
-            .setIsSymbolicLink(a.isSymbolicLink())
-            .setIsWritable(a.isWritable())
-            .setLastAccessTime(a.getLastAccessTime())
-            .setLastModifiedTime(a.getLastModifiedTime())
-            .setSize(a.getSize());
+                .setPath(writePath(a.getPath()))
+                .setCreationTime(a.getCreationTime())
+                .setIsDirectory(a.isDirectory())
+                .setIsExecutable(a.isExecutable())
+                .setIsHidden(a.isHidden())
+                .setIsOther(a.isOther())
+                .setIsReadable(a.isReadable())
+                .setIsRegular(a.isRegular())
+                .setIsSymbolicLink(a.isSymbolicLink())
+                .setIsWritable(a.isWritable())
+                .setLastAccessTime(a.getLastAccessTime())
+                .setLastModifiedTime(a.getLastModifiedTime())
+                .setSize(a.getSize());
 
         try {
             if (a.getPermissions() != null) {
@@ -178,8 +179,8 @@ public class MapUtils {
 
     private static XenonProto.FileSystem writeFileSystem(FileSystem fs) {
         return XenonProto.FileSystem.newBuilder()
-            .setId(getFileSystemId(fs, new DefaultCredential().getUsername()))
-            .build();
+                .setId(getFileSystemId(fs, new DefaultCredential().getUsername()))
+                .build();
     }
 
     static XenonProto.FileSystems writeFileSystems(FileSystem[] xenonfilesystems) {
@@ -192,15 +193,15 @@ public class MapUtils {
 
     static XenonProto.CopyStatus mapCopyStatus(CopyStatus status) {
         XenonProto.CopyOperation operation = XenonProto.CopyOperation.newBuilder()
-            .setId(status.getCopyIdentifier())
-            .build();
+                .setId(status.getCopyIdentifier())
+                .build();
         XenonProto.CopyStatus.Builder builder = XenonProto.CopyStatus.newBuilder()
-            .setBytesCopied(status.bytesCopied())
-            .setBytesToCopy(status.bytesToCopy())
-            .setCopyOperation(operation)
-            .setState(status.getState())
-            .setDone(status.isDone())
-            .setRunning(status.isRunning());
+                .setBytesCopied(status.bytesCopied())
+                .setBytesToCopy(status.bytesToCopy())
+                .setCopyOperation(operation)
+                .setState(status.getState())
+                .setDone(status.isDone())
+                .setRunning(status.isRunning());
         if (status.hasException()) {
             builder.setErrorMessage(status.getException().getMessage());
             builder.setErrorType(mapCopyStatusErrorType(status.getException()));
@@ -221,13 +222,24 @@ public class MapUtils {
         return XenonProto.CopyStatus.ErrorType.XENON;
     }
 
-    static XenonProto.FileSystemAdaptorDescription mapFileAdaptorDescription(FileSystemAdaptorDescription status) {
-        List<XenonProto.PropertyDescription> supportedProperties = mapPropertyDescriptions(status.getSupportedProperties());
+    public static XenonProto.FileSystemAdaptorDescription mapFileAdaptorDescription(FileSystemAdaptorDescription description) {
+        List<XenonProto.PropertyDescription> supportedProperties = mapPropertyDescriptions(description.getSupportedProperties());
+        List<String> supportedCredentials = Arrays.stream(description.getSupportedCredentials()).map(Class::getSimpleName).collect(Collectors.toList());
         return XenonProto.FileSystemAdaptorDescription.newBuilder()
-            .setName(status.getName())
-            .setDescription(status.getDescription())
-            .addAllSupportedLocations(Arrays.asList(status.getSupportedLocations()))
-            .addAllSupportedProperties(supportedProperties)
-            .build();
+                .setName(description.getName())
+                .setDescription(description.getDescription())
+                .addAllSupportedLocations(Arrays.asList(description.getSupportedLocations()))
+                .addAllSupportedProperties(supportedProperties)
+                .setSupportsThirdPartyCopy(description.supportsThirdPartyCopy())
+                .setCanReadSymboliclinks(description.canReadSymboliclinks())
+                .setCanCreateSymboliclinks(description.canCreateSymboliclinks())
+                .setIsConnectionless(description.isConnectionless())
+                .setSupportsReadingPosixPermissions(description.supportsReadingPosixPermissions())
+                .setSupportsSettingPosixPermissions(description.supportsSettingPosixPermissions())
+                .setSupportsRename(description.supportsRename())
+                .setCanAppend(description.canAppend())
+                .setNeedsSizeBeforehand(description.needsSizeBeforehand())
+                .addAllSupportedCredentials(supportedCredentials)
+                .build();
     }
 }
