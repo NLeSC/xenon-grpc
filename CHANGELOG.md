@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Added
+
+* support for KeytabCredential (#33)
+
 ### Changed
 
 * Depends on Xenon 2.4.1

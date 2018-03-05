@@ -10,18 +10,13 @@ import static org.junit.Assert.assertEquals;
 import java.util.Collections;
 import java.util.List;
 
+import nl.esciencecenter.xenon.credentials.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.credentials.CertificateCredential;
-import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.CredentialMap;
-import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.credentials.PasswordCredential;
-import nl.esciencecenter.xenon.credentials.UserCredential;
 
 public class MapUtilsTest {
     @Rule
@@ -137,6 +132,22 @@ public class MapUtilsTest {
     }
 
     @Test
+    public void mapCredential_filesystem_keytab() {
+        XenonProto.CreateFileSystemRequest request = XenonProto.CreateFileSystemRequest.newBuilder()
+                .setAdaptor("hdfs")
+                .setKeytabCredential(XenonProto.KeytabCredential.newBuilder()
+                        .setUsername("someone")
+                        .setKeytabfile("/home/someone/mycluster.keytab")
+                )
+                .build();
+
+        KeytabCredential result = (KeytabCredential) mapCredential(request);
+
+        KeytabCredential expected = new KeytabCredential("someone", "/home/someone/mycluster.keytab");
+        assertEquals(expected, result);
+    }
+
+    @Test
     public void map_Credential_filesystem_map_with_default_as_fallback() {
         XenonProto.DefaultCredential.Builder fallback = XenonProto.DefaultCredential.newBuilder();
         XenonProto.CreateSchedulerRequest request = XenonProto.CreateSchedulerRequest.newBuilder()
@@ -207,6 +218,26 @@ public class MapUtilsTest {
         Credential result = mapCredential(request);
 
         Credential expected = new CredentialMap(new CertificateCredential("someone", "/home/someone/.ssh/id_rsa", "mypassphrase".toCharArray()));
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void map_Credential_filesystem_map_with_keytab_as_fallback() {
+        XenonProto.KeytabCredential.Builder fallback = XenonProto.KeytabCredential.newBuilder()
+                .setUsername("someone")
+                .setKeytabfile("/home/someone/mycluster.keytab")
+                ;
+        XenonProto.CreateSchedulerRequest request = XenonProto.CreateSchedulerRequest.newBuilder()
+                .setAdaptor("file")
+                .setCredentialMap(XenonProto.CredentialMap.newBuilder()
+                        .setKeytabCredential(fallback)
+                        .build()
+                )
+                .build();
+
+        Credential result = mapCredential(request);
+
+        Credential expected = new CredentialMap(new KeytabCredential("someone", "/home/someone/mycluster.keytab"));
         assertEquals(expected, result);
     }
 
@@ -301,6 +332,28 @@ public class MapUtilsTest {
     }
 
     @Test
+    public void map_Credential_filesystem_map_with_keytab_entry() {
+        XenonProto.UserCredential credEntry = XenonProto.UserCredential.newBuilder()
+                .setKeytabCredential(XenonProto.KeytabCredential.newBuilder()
+                        .setUsername("someone")
+                        .setKeytabfile("/home/someone/mycluster.keytab")
+                ).build();
+        XenonProto.CreateSchedulerRequest request = XenonProto.CreateSchedulerRequest.newBuilder()
+                .setAdaptor("file")
+                .setCredentialMap(XenonProto.CredentialMap.newBuilder()
+                        .putEntries("somehost", credEntry)
+                        .build()
+                )
+                .build();
+
+        Credential result = mapCredential(request);
+
+        CredentialMap expected = new CredentialMap();
+        expected.put("somehost", new KeytabCredential("someone", "/home/someone/mycluster.keytab"));
+        assertEquals(expected, result);
+    }
+
+    @Test
     public void usernameOfCredential_usercredential() {
         UserCredential cred = new DefaultCredential("myusername");
 
@@ -373,6 +426,21 @@ public class MapUtilsTest {
     }
 
     @Test
+    public void toCredentialResponse_keytab() throws XenonException {
+        Credential cred = new KeytabCredential("someone","/home/someone/mycluster.keytab");
+
+        XenonProto.GetCredentialResponse response = toCredentialResponse(cred);
+
+        XenonProto.GetCredentialResponse expected = XenonProto.GetCredentialResponse.newBuilder()
+                .setKeytabCredential(XenonProto.KeytabCredential.newBuilder()
+                        .setUsername("someone")
+                        .setKeytabfile("/home/someone/mycluster.keytab")
+                )
+                .build();
+        assertEquals(expected, response);
+    }
+
+    @Test
     public void toCredentialResponse_map_emptyAndNoDefault() throws XenonException {
         Credential cred = new CredentialMap();
 
@@ -431,6 +499,22 @@ public class MapUtilsTest {
                 )
             )
             .build();
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void toCredentialResponse_map_keytabAsDefault() throws XenonException {
+        Credential cred = new CredentialMap(new KeytabCredential("someone", "/home/someone/mycluster.keytab"));
+
+        XenonProto.GetCredentialResponse response = toCredentialResponse(cred);
+
+        XenonProto.GetCredentialResponse expected = XenonProto.GetCredentialResponse.newBuilder()
+                .setCredentialMap(XenonProto.CredentialMap.newBuilder()
+                        .setKeytabCredential(XenonProto.KeytabCredential.newBuilder()
+                                .setUsername("someone")
+                                .setKeytabfile("/home/someone/mycluster.keytab"))
+                )
+                .build();
         assertEquals(expected, response);
     }
 
@@ -504,6 +588,27 @@ public class MapUtilsTest {
                 .build()
             )
             .build();
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void toCredentialResponse_map_keytabAsEntry() throws XenonException {
+        CredentialMap cred = new CredentialMap();
+        cred.put("somehost", new KeytabCredential("someone", "/home/someone/mycluster.keytab"));
+
+        XenonProto.GetCredentialResponse response = toCredentialResponse(cred);
+
+        XenonProto.UserCredential credEntry = XenonProto.UserCredential.newBuilder()
+                .setKeytabCredential(XenonProto.KeytabCredential.newBuilder()
+                        .setUsername("someone")
+                        .setKeytabfile("/home/someone/mycluster.keytab")
+                ).build();
+        XenonProto.GetCredentialResponse expected = XenonProto.GetCredentialResponse.newBuilder()
+                .setCredentialMap(XenonProto.CredentialMap.newBuilder()
+                        .putEntries("somehost", credEntry)
+                        .build()
+                )
+                .build();
         assertEquals(expected, response);
     }
 
