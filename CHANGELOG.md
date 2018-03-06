@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [2018-03-06] 2.2.1
+
+### Fixed
+
+* hadoop/grpc netty version conflict (#37)
+
 ## [2018-03-05] 2.2.0
 
 ### Added

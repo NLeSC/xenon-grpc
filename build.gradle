@@ -15,7 +15,7 @@ plugins {
     id 'de.fuerstenau.buildconfig' version '1.1.8'
 }
 
-version = '2.2.0'
+version = '2.2.1'
 applicationName = 'xenon-grpc'
 group = 'nl.esciencecenter.xenon.grpc'
 mainClassName = 'nl.esciencecenter.xenon.grpc.XenonServerWrapper'
@@ -37,7 +37,11 @@ dependencies {
     compile "io.grpc:grpc-stub:${grpcVersion}"
     compile "io.grpc:grpc-services:${grpcVersion}"
     compile 'org.slf4j:slf4j-api:1.7.25'
-    compile "nl.esciencecenter.xenon:xenon:${xenonLibVersion}"
+    compile("nl.esciencecenter.xenon:xenon:${xenonLibVersion}") {
+        exclude group: 'org.slf4j', module:'slf4j-log4j12'
+        exclude group: 'io.netty', module: 'netty'
+        exclude group: 'io.netty', module: 'netty-all'
+    }
     compile 'net.sourceforge.argparse4j:argparse4j:0.8.1'
     compile 'io.netty:netty-tcnative-boringssl-static:2.0.7.Final'
     testCompile 'junit:junit:4.12'
