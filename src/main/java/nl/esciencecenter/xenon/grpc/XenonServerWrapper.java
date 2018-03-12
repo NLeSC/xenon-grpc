@@ -85,7 +85,7 @@ public class XenonServerWrapper {
         }
     }
 
-    private void start(String[] args) throws IOException {
+    void start(String[] args) throws IOException {
         try {
             parseArgs(args);
         } catch (ArgumentParserException e) {
@@ -188,7 +188,7 @@ public class XenonServerWrapper {
         return ServerBuilder.forPort(port);
     }
 
-    private void stop() {
+    void stop() {
         if (server != null) {
             server.shutdown();
             try {

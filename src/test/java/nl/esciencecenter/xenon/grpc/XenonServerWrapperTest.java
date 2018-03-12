@@ -12,6 +12,8 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 
+import java.io.IOException;
+
 public class XenonServerWrapperTest {
     @Rule
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
@@ -65,5 +67,14 @@ public class XenonServerWrapperTest {
         XenonServerWrapper wrapper = new XenonServerWrapper();
 
         assertFalse(wrapper.getUseTLS());
+    }
+
+    @Test
+    public void startstop() throws IOException {
+        exit.checkAssertionAfterwards(() -> assertThat(systemOutRule.getLog(), containsString("Server started, listening on port")));
+
+        XenonServerWrapper wrapper = new XenonServerWrapper();
+        wrapper.start(new String[] {});
+        wrapper.stop();
     }
 }
