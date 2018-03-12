@@ -88,6 +88,9 @@ public class MapUtils {
         if (d.getMaxMemory() != 0) {
             description.setMaxMemory(d.getMaxMemory());
         }
+        if (d.getSchedulerArgumentsCount() > 0) {
+            description.setSchedulerArguments(d.getSchedulerArgumentsList().toArray(new String[0]));
+        }
         return description;
     }
 
