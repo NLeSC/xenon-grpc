@@ -112,4 +112,4 @@ Generates application tar/zip in `build/distributions/` directory.
 2. Create a new GitHub release
 3. Upload the files in `build/distributions/` directory to that release
 4. Publish release
-5. Edit Zenodo entry, correct license, add [Xenon doi](https://doi.org/10.5281/zenodo.597993) as `is referenced by this upload`.
+5. Edit Zenodo entry, add [Xenon doi](https://doi.org/10.5281/zenodo.597993) as `is referenced by this upload`.
