@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -35,6 +36,7 @@ public class MapJobDescriptionTest {
 
     @Test
     public void custom() {
+        List<String> schedulerArgs = Arrays.asList("schedarg1", "schedarg2");
         builder.setExecutable("calc")
             .addAllArguments(Arrays.asList("myarg1", "myarg2"))
             .setWorkingDirectory("/tmp/work/dir")
@@ -50,6 +52,7 @@ public class MapJobDescriptionTest {
             .putOptions("xenon.adaptors.schedulers.ssh.agent", "true")
             .setName("myjobname")
             .setMaxMemory(4096)
+            .addAllSchedulerArguments(schedulerArgs)
         ;
 
         XenonProto.JobDescription request = builder.build();
@@ -76,5 +79,6 @@ public class MapJobDescriptionTest {
         expected.setName("myjobname");
         expected.setMaxMemory(4096);
         assertEquals(expected, response);
+        assertEquals(schedulerArgs, response.getSchedulerArguments());
     }
 }
