@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-* scheduler argument for job (#38)
+* scheduler argument for job description (#38)
 
 ### Changed
 
