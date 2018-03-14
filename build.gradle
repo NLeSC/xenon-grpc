@@ -15,7 +15,7 @@ plugins {
     id 'de.fuerstenau.buildconfig' version '1.1.8'
 }
 
-version = '2.2.1'
+version = '2.3.0'
 applicationName = 'xenon-grpc'
 group = 'nl.esciencecenter.xenon.grpc'
 mainClassName = 'nl.esciencecenter.xenon.grpc.XenonServerWrapper'
