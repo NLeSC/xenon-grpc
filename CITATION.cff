@@ -2,7 +2,7 @@
 # Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
 cff-version: 1.0.3
 message: If you use this software, please cite it as below.
-title:Xenon gRPC server
+title: Xenon gRPC server
 doi: 10.5281/zenodo.1188706
 authors:
 - given-names: Stefan
