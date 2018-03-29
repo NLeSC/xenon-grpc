@@ -7,13 +7,14 @@ doi: 10.5281/zenodo.1188706
 authors:
 - given-names: Stefan
   family-names: Verhoeven
-  affiliation: Nederlands eScience Center
+  affiliation: Netherlands eScience Center
   orcid: https://orcid.org/0000-0002-5821-2060
 - given-names: Jason
   family-names: Maassen
   affiliation: Netherlands eScience Center
 - given-names: Atze
-  family-names: van der Ploeg
+  family-names: Ploeg
+  name-particle: van der
   affiliation: Netherlands eScience Center
 version: 2.2.0
 date-released: 2018-03-05
@@ -29,34 +30,36 @@ references:
     affiliation: Netherlands eScience Center
   - given-names: Stefan
     family-names: Verhoeven
-    affiliation: Nederlands eScience Center
+    affiliation: Netherlands eScience Center
   - given-names: Joris
     family-names: Borgdorff
-    affiliation: '@thehyve'
+    affiliation: Netherlands eScience Center
   - given-names: Niels
     family-names: Drost
     affiliation: Netherlands eScience Center
-  - given-names: Jurriaan
+  - given-names: Jurriaan H.
     family-names: Spaaks
-    name-particle: H.
     affiliation: Netherlands eScience Center
   - given-names: Christiaan
     family-names: Meijer
     affiliation: Netherlands eScience Center
-  - given-names: Rob
-    family-names: van Nieuwpoort
-    name-particle: V.
+  - given-names: Rob V.
+    family-names: Nieuwpoort
+    name-particle: van
     affiliation: Netherlands eScience center
   - given-names: Atze
-    family-names: van der Ploeg
+    family-names: Ploeg
+    name-particle: van der 
     affiliation: Netherlands eScience center
-  - given-names: Piter
-    family-names: de Boer
-    name-particle: T.
+  - given-names: Piter T.
+    family-names: Boer
+    name-particle: de
     affiliation: Netherlands eScience center
   - given-names: Ben
-    family-names: van Werkhoven
+    family-names: Werkhoven
+    name-particle: van
     affiliation: Netherlands eScience Center
   - given-names: Arnold
     family-names: Kuzniar
+    orcid: https://orcid.org/0000-0003-1711-7961
     affiliation: Netherlands eScience Center
