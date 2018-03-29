@@ -1,65 +1,81 @@
 # YAML 1.2
 # Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
-cff-version: 1.0.3
-message: If you use this software, please cite it as below.
-title: Xenon gRPC server
-doi: 10.5281/zenodo.1188706
-authors:
-- given-names: Stefan
-  family-names: Verhoeven
-  affiliation: Netherlands eScience Center
-  orcid: https://orcid.org/0000-0002-5821-2060
-- given-names: Jason
-  family-names: Maassen
-  affiliation: Netherlands eScience Center
-- given-names: Atze
-  family-names: Ploeg
-  name-particle: van der
-  affiliation: Netherlands eScience Center
-version: 2.2.0
-date-released: 2018-03-05
-repository-code: https://github.com/NLeSC/xenon-grpc
-license: Apache-2.0
-references:
-- type: software
-  doi: 10.5281/zenodo.597993
-  title: Xenon
-  authors:
-  - given-names: Jason
-    family-names: Maassen
-    affiliation: Netherlands eScience Center
-  - given-names: Stefan
+--- 
+authors: 
+  - 
+    affiliation: "Netherlands eScience Center"
     family-names: Verhoeven
-    affiliation: Netherlands eScience Center
-  - given-names: Joris
-    family-names: Borgdorff
-    affiliation: Netherlands eScience Center
-  - given-names: Niels
-    family-names: Drost
-    affiliation: Netherlands eScience Center
-  - given-names: Jurriaan H.
-    family-names: Spaaks
-    affiliation: Netherlands eScience Center
-  - given-names: Christiaan
-    family-names: Meijer
-    affiliation: Netherlands eScience Center
-  - given-names: Rob V.
-    family-names: Nieuwpoort
-    name-particle: van
-    affiliation: Netherlands eScience center
-  - given-names: Atze
+    given-names: Stefan
+    orcid: "https://orcid.org/0000-0002-5821-2060"
+  - 
+    affiliation: "Netherlands eScience Center"
+    family-names: Maassen
+    given-names: Jason
+  - 
+    affiliation: "Netherlands eScience Center"
     family-names: Ploeg
-    name-particle: van der 
-    affiliation: Netherlands eScience center
-  - given-names: Piter T.
-    family-names: Boer
-    name-particle: de
-    affiliation: Netherlands eScience center
-  - given-names: Ben
-    family-names: Werkhoven
-    name-particle: van
-    affiliation: Netherlands eScience Center
-  - given-names: Arnold
-    family-names: Kuzniar
-    orcid: https://orcid.org/0000-0003-1711-7961
-    affiliation: Netherlands eScience Center
+    given-names: Atze
+    name-particle: "van der"
+cff-version: "1.0.3"
+date-released: 2018-03-05
+doi: 10.5281/zenodo.1188706
+license: Apache-2.0
+message: "If you use this software, please cite it as below."
+references: 
+  - 
+    authors: 
+      - 
+        affiliation: "Netherlands eScience Center"
+        family-names: Maassen
+        given-names: Jason
+      - 
+        affiliation: "Netherlands eScience Center"
+        family-names: Verhoeven
+        given-names: Stefan
+      - 
+        affiliation: "Netherlands eScience Center"
+        family-names: Borgdorff
+        given-names: Joris
+      - 
+        affiliation: "Netherlands eScience Center"
+        family-names: Drost
+        given-names: Niels
+      - 
+        affiliation: "Netherlands eScience Center"
+        family-names: Spaaks
+        given-names: "Jurriaan H."
+      - 
+        affiliation: "Netherlands eScience Center"
+        family-names: Meijer
+        given-names: Christiaan
+      - 
+        affiliation: "Netherlands eScience center"
+        family-names: Nieuwpoort
+        given-names: "Rob V."
+        name-particle: van
+      - 
+        affiliation: "Netherlands eScience center"
+        family-names: Ploeg
+        given-names: Atze
+        name-particle: "van der"
+      - 
+        affiliation: "Netherlands eScience center"
+        family-names: Boer
+        given-names: "Piter T."
+        name-particle: de
+      - 
+        affiliation: "Netherlands eScience Center"
+        family-names: Werkhoven
+        given-names: Ben
+        name-particle: van
+      - 
+        affiliation: "Netherlands eScience Center"
+        family-names: Kuzniar
+        given-names: Arnold
+        orcid: "https://orcid.org/0000-0003-1711-7961"
+    doi: 10.5281/zenodo.597993
+    title: Xenon
+    type: software
+repository-code: "https://github.com/NLeSC/xenon-grpc"
+title: "Xenon gRPC server"
+version: "2.2.0"
