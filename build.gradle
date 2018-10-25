@@ -24,12 +24,13 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
+    mavenLocal()
     mavenCentral()
     jcenter()
     maven { url 'https://jitpack.io' }
 }
 
-ext.xenonLibVersion = '2.6.0'
+ext.xenonLibVersion = '3.0.0'
 
 dependencies {
     compile "io.grpc:grpc-netty:${grpcVersion}"
@@ -37,11 +38,12 @@ dependencies {
     compile "io.grpc:grpc-stub:${grpcVersion}"
     compile "io.grpc:grpc-services:${grpcVersion}"
     compile 'org.slf4j:slf4j-api:1.7.25'
-    compile("nl.esciencecenter.xenon:xenon:${xenonLibVersion}") {
-        exclude group: 'org.slf4j', module:'slf4j-log4j12'
-        exclude group: 'io.netty', module: 'netty'
-        exclude group: 'io.netty', module: 'netty-all'
-    }
+    compile group: 'nl.esciencecenter.xenon', name: 'xenon-all', version: xenonLibVersion
+    // compile("nl.esciencecenter.xenon:xenon:${xenonLibVersion}") {
+    //     exclude group: 'org.slf4j', module:'slf4j-log4j12'
+    //     exclude group: 'io.netty', module: 'netty'
+    //     exclude group: 'io.netty', module: 'netty-all'
+    // }
     compile 'net.sourceforge.argparse4j:argparse4j:0.8.1'
     compile 'io.netty:netty-tcnative-boringssl-static:2.0.7.Final'
     testCompile 'junit:junit:4.12'
