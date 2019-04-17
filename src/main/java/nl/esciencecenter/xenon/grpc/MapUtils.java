@@ -7,7 +7,6 @@ import java.util.Map;
 
 import io.grpc.Status;
 import io.grpc.StatusException;
-import nl.esciencecenter.xenon.credentials.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +19,13 @@ import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
+import nl.esciencecenter.xenon.credentials.CertificateCredential;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.CredentialMap;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.credentials.KeytabCredential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
+import nl.esciencecenter.xenon.credentials.UserCredential;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
@@ -137,6 +143,7 @@ public class MapUtils {
                 break;
             case KEYTAB_CREDENTIAL:
                 cred = new CredentialMap(mapKeyTabCredential(credentialMap.getKeytabCredential()));
+                break;
             case FALLBACK_NOT_SET:
                 break;
         }

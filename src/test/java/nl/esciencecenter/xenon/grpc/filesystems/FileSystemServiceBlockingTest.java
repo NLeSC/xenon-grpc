@@ -649,7 +649,7 @@ public class FileSystemServiceBlockingTest {
 
     @Test
     public void getAdaptorDescription_unknown() throws XenonException {
-        thrown.expectMessage("NOT_FOUND: nl.esciencecenter.xenon.UnknownAdaptorException: FileSystem adaptor: Adaptor 'bigstore' not found");
+        thrown.expectMessage("NOT_FOUND: nl.esciencecenter.xenon.UnknownAdaptorException: AdaptorLoader adaptor: Adaptor 'bigstore' not found");
 
         XenonProto.AdaptorName request = XenonProto.AdaptorName.newBuilder()
             .setName("bigstore")

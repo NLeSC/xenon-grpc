@@ -111,7 +111,7 @@ public class SchedulerServiceBlockingTest {
 
     @Test
     public void getAdaptorDescription_unknown() throws XenonException {
-        thrown.expectMessage("NOT_FOUND: nl.esciencecenter.xenon.UnknownAdaptorException: Scheduler adaptor: Adaptor 'bigcompute' not found");
+        thrown.expectMessage("NOT_FOUND: nl.esciencecenter.xenon.UnknownAdaptorException: AdaptorLoader adaptor: Adaptor 'bigcompute' not found");
 
         XenonProto.AdaptorName request = XenonProto.AdaptorName.newBuilder()
             .setName("bigcompute")

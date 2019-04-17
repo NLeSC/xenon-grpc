@@ -78,6 +78,7 @@ public class MapJobDescriptionTest {
         expected.setJobOptions(opts);
         expected.setName("myjobname");
         expected.setMaxMemory(4096);
+        expected.setSchedulerArguments("schedarg1", "schedarg2");
         assertEquals(expected, response);
         assertEquals(schedulerArgs, response.getSchedulerArguments());
     }
