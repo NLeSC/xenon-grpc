@@ -41,11 +41,12 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.25'
 
     implementation 'com.github.xenon-middleware:xenon:821dd645a0'
-//    implementation group: 'nl.esciencecenter.xenon', name: 'xenon', version: xenonLibVersion
+    // When Xenon v3 is released use jcenter, instead of jitpack builds above
+    // implementation group: 'nl.esciencecenter.xenon', name: 'xenon', version: xenonLibVersion
     // implementation group: 'nl.esciencecenter.xenon', name: 'xenon-all', version: xenonLibVersion
-    implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-cloud', version: xenonLibVersion
-//    implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-hadoop', version: xenonLibVersion
-//    implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-grid', version: xenonLibVersion
+    // implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-cloud', version: xenonLibVersion
+    // implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-hadoop', version: xenonLibVersion
+    // implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-grid', version: xenonLibVersion
 
     implementation 'net.sourceforge.argparse4j:argparse4j:0.8.1'
     runtimeOnly 'io.netty:netty-tcnative-boringssl-static:2.0.25.Final'
