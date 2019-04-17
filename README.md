@@ -51,12 +51,12 @@ java -jar xenon-grpc-*/lib/xenon-grpc-*-all.jar
 
 ## Run client
 
-For use polyglot
+For use [polyglot](https://github.com/grpc-ecosystem/polyglot)
 
 ```bash
-wget https://github.com/grpc-ecosystem/polyglot/releases/download/v1.4.0/polyglot.jar
-java -jar polyglot.jar --command=list_services  --proto_discovery_root=src/main/proto
-echo {} | java -jar polyglot.jar --command=call --endpoint=localhost:50051 --full_method=xenon.SchedulerService/getAdaptorDescriptions
+wget https://github.com/grpc-ecosystem/polyglot/releases/download/v2.0.0/polyglot.jar
+java -jar polyglot.jar --proto_discovery_root=src/main/proto list_services
+echo {} | java -jar polyglot.jar call --endpoint=localhost:50051 --full_method=xenon.SchedulerService/getAdaptorDescriptions
 ```
 
 ## Python client
@@ -80,6 +80,11 @@ See http://httpd.apache.org/docs/2.4/ssl/ssl_faq.html#selfcert
 ```bash
 openssl req -new -x509 -nodes -out server.crt -keyout server.key
 ./build/install/xenon-grpc/bin/xenon-grpc --server-cert-chain server.crt --server-private-key server.key --client-cert-chain server.crt
+```
+
+Test with polyglot
+```bash
+echo {} | java -jar polyglot.jar call --endpoint=<hostname as used in certificate>:50051 --full_method=xenon.FileSystemService/getAdaptorNames --use_tls=true --tls_client_cert_path=$PWD/server.crt --tls_client_key_path=$PWD/server.key --tls_ca_cert_path=$PWD/server.crt
 ```
 
 In a ipython shell with generated stubs in working directory:
