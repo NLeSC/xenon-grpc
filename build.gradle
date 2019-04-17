@@ -1,27 +1,27 @@
 plugins {
     id 'java'
-    id 'com.google.protobuf' version '0.8.5'
+    id 'com.google.protobuf' version '0.8.8'
     // distribution
     id 'application'
-    id 'com.github.johnrengelman.shadow' version '2.0.2'
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
     // ide
     id 'idea'
     id 'eclipse'
     // test coverage
     id 'jacoco'
     // quality
-    id 'org.sonarqube' version '2.6.2'
+    id 'org.sonarqube' version '2.7'
     // xenon --version reads version from this file
     id 'de.fuerstenau.buildconfig' version '1.1.8'
 }
 
-version = '2.3.0'
+version = '3.0.0'
 applicationName = 'xenon-grpc'
 group = 'nl.esciencecenter.xenon.grpc'
 mainClassName = 'nl.esciencecenter.xenon.grpc.XenonServerWrapper'
-ext.grpcVersion = '1.10.0'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+ext.grpcVersion = '1.20.0'
+sourceCompatibility = JavaVersion.VERSION_1_9
+targetCompatibility = JavaVersion.VERSION_1_9
 
 repositories {
     mavenLocal()
@@ -33,27 +33,30 @@ repositories {
 ext.xenonLibVersion = '3.0.0'
 
 dependencies {
-    compile "io.grpc:grpc-netty:${grpcVersion}"
-    compile "io.grpc:grpc-protobuf:${grpcVersion}"
-    compile "io.grpc:grpc-stub:${grpcVersion}"
-    compile "io.grpc:grpc-services:${grpcVersion}"
-    compile 'org.slf4j:slf4j-api:1.7.25'
-    compile group: 'nl.esciencecenter.xenon', name: 'xenon-all', version: xenonLibVersion
-    // compile("nl.esciencecenter.xenon:xenon:${xenonLibVersion}") {
-    //     exclude group: 'org.slf4j', module:'slf4j-log4j12'
-    //     exclude group: 'io.netty', module: 'netty'
-    //     exclude group: 'io.netty', module: 'netty-all'
-    // }
-    compile 'net.sourceforge.argparse4j:argparse4j:0.8.1'
-    compile 'io.netty:netty-tcnative-boringssl-static:2.0.7.Final'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.16.0'
-    testCompile 'com.github.stefanbirkner:system-rules:1.17.1'
+    implementation "io.grpc:grpc-netty:${grpcVersion}"
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    implementation "io.grpc:grpc-services:${grpcVersion}"
+    compileOnly "javax.annotation:javax.annotation-api:1.2"
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+
+    implementation 'com.github.xenon-middleware:xenon:821dd645a0'
+//    implementation group: 'nl.esciencecenter.xenon', name: 'xenon', version: xenonLibVersion
+    // implementation group: 'nl.esciencecenter.xenon', name: 'xenon-all', version: xenonLibVersion
+    implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-cloud', version: xenonLibVersion
+//    implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-hadoop', version: xenonLibVersion
+//    implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-grid', version: xenonLibVersion
+
+    implementation 'net.sourceforge.argparse4j:argparse4j:0.8.1'
+    runtimeOnly 'io.netty:netty-tcnative-boringssl-static:2.0.25.Final'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.27.0'
+    testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
 }
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.5.1-1'
+        artifact = 'com.google.protobuf:protoc:3.7.1'
     }
     plugins {
         grpc {
@@ -99,18 +102,19 @@ jacocoTestReport {
 
 sonarqube {
     properties {
-        property 'sonar.host.url', 'https://sonarqube.com'
-        property 'sonar.organization', project.group
+        property 'sonar.host.url', 'https://sonarcloud.io'
+        property 'sonar.organization', 'xenon-middleware'
+        property 'sonar.projectKey', 'xenon-middleware_xenon-grpc'
         property 'sonar.language', 'java'
-        property 'sonar.links.homepage', 'https://github.com/NLeSC/xenon-grpc'
+        property 'sonar.links.homepage', 'https://github.com/xenon-middleware/xenon-grpc'
     }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
 }
 
 buildConfig {
     appName = project.applicationName
     buildConfigField 'String', 'XENON_LIB_VERSION', "${xenonLibVersion}"
+}
+
+shadowJar {
+    mergeServiceFiles()
 }

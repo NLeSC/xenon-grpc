@@ -15,4 +15,3 @@ cache:
     - $HOME/.gradle/wrapper/
     - $HOME/.m2
     - $HOME/.sonar/cache
-
