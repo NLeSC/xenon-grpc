@@ -1,8 +1,8 @@
-sudo: false
-jdk: oraclejdk8
+language: java
+jdk: openjdk11
 addons:
   sonarcloud:
-    organization: nlesc
+    organization: xenon-middleware
 script:
   - ./gradlew check 
   - ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN
