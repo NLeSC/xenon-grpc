@@ -20,8 +20,8 @@ applicationName = 'xenon-grpc'
 group = 'nl.esciencecenter.xenon.grpc'
 mainClassName = 'nl.esciencecenter.xenon.grpc.XenonServerWrapper'
 ext.grpcVersion = '1.20.0'
-sourceCompatibility = JavaVersion.VERSION_1_9
-targetCompatibility = JavaVersion.VERSION_1_9
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 repositories {
     mavenLocal()
@@ -40,7 +40,7 @@ dependencies {
     compileOnly "javax.annotation:javax.annotation-api:1.2"
     implementation 'org.slf4j:slf4j-api:1.7.25'
 
-    implementation 'com.github.xenon-middleware:xenon:821dd645a0'
+    implementation 'com.github.xenon-middleware:xenon:de018e54d842c3fbf7f579e3975d41d2f5b598ee'
     // When Xenon v3 is released use jcenter, instead of jitpack builds above
     // implementation group: 'nl.esciencecenter.xenon', name: 'xenon', version: xenonLibVersion
     // implementation group: 'nl.esciencecenter.xenon', name: 'xenon-all', version: xenonLibVersion
