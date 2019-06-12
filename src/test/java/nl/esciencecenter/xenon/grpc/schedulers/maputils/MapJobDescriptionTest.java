@@ -43,13 +43,12 @@ public class MapJobDescriptionTest {
             .putEnvironment("MYKEY", "myvalue")
             .setQueueName("important")
             .setMaxRuntime(1024)
-            .setNodeCount(16)
-            .setProcessesPerNode(4)
-            .setStartSingleProcess(true)
+            .setCoresPerTask(16)
+            .setTasksPerNode(4)
+            .setStartPerTask(true)
             .setStdin("/tmp/stdin.txt")
             .setStderr("/tmp/stderr.txt")
             .setStdout("/tmp/stdout.txt")
-            .putOptions("xenon.adaptors.schedulers.ssh.agent", "true")
             .setName("myjobname")
             .setMaxMemory(4096)
             .addAllSchedulerArguments(schedulerArgs)
@@ -67,15 +66,12 @@ public class MapJobDescriptionTest {
         expected.setEnvironment(envs);
         expected.setQueueName("important");
         expected.setMaxRuntime(1024);
-        expected.setNodeCount(16);
-        expected.setProcessesPerNode(4);
-        expected.setStartSingleProcess(true);
+        expected.setCoresPerTask(16);
+        expected.setTasksPerNode(4);
+        expected.setStartPerTask();
         expected.setStdin("/tmp/stdin.txt");
         expected.setStdout("/tmp/stdout.txt");
         expected.setStderr("/tmp/stderr.txt");
-        Map<String, String> opts = new HashMap<>();
-        opts.put("xenon.adaptors.schedulers.ssh.agent", "true");
-        expected.setJobOptions(opts);
         expected.setName("myjobname");
         expected.setMaxMemory(4096);
         expected.setSchedulerArguments("schedarg1", "schedarg2");

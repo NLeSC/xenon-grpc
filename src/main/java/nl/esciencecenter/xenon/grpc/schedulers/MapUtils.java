@@ -71,17 +71,23 @@ public class MapUtils {
         if (d.getMaxRuntime() != 0) {
             description.setMaxRuntime(d.getMaxRuntime());
         }
-        if (d.getNodeCount() != 0) {
-            description.setNodeCount(d.getNodeCount());
+        if (d.getTasks() != 0) {
+            description.setTasks(d.getTasks());
         }
-        if (d.getProcessesPerNode() != 0) {
-            description.setProcessesPerNode(d.getProcessesPerNode());
+        if (d.getCoresPerTask() != 0) {
+            description.setCoresPerTask(d.getCoresPerTask());
         }
-        description.setStartSingleProcess(d.getStartSingleProcess());
+        if (d.getTasksPerNode() != 0) {
+            description.setTasksPerNode(d.getTasksPerNode());
+        }
+        if (d.getStartPerTask()) {
+            description.setStartPerTask();
+        } else {
+            description.setStartPerJob();
+        }
         description.setStderr(defaultValue(d.getStderr()));
         description.setStdin(defaultValue(d.getStdin()));
         description.setStdout(defaultValue(d.getStdout()));
-        description.setJobOptions(d.getOptionsMap());
         if (! d.getName().equals("")) {
             description.setName(d.getName());
         }

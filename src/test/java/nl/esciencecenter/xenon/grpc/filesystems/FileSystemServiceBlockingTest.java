@@ -96,7 +96,7 @@ public class FileSystemServiceBlockingTest {
         server = InProcessServerBuilder.forName(name).directExecutor().addService(service).build();
         server.start();
         // setup client
-        channel = InProcessChannelBuilder.forName(name).directExecutor().usePlaintext(true).build();
+        channel = InProcessChannelBuilder.forName(name).directExecutor().usePlaintext().build();
         client = FileSystemServiceGrpc.newBlockingStub(channel);
         MockitoAnnotations.initMocks(this);
     }
