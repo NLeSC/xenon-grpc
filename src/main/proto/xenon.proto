@@ -477,6 +477,13 @@ service FileSystemService {
     // Gives the description of the adaptor with the given name.
     rpc getAdaptorDescription(AdaptorName) returns (FileSystemAdaptorDescription) {}
     // Create a new FileSystem using the adaptor that connects to a data store at location using the credentials to get access.
+    // @throws NOT_FOUND UnknownPropertyException
+    // @throws NOT_FOUND UnknownAdaptorException
+    // @throws FAILED_PRECONDITION InvalidPropertyException
+    // @throws FAILED_PRECONDITION InvalidLocationException
+    // @throws FAILED_PRECONDITION InvalidCredentialException
+    // @throws INTERNAL XenonException
+    // @throws INVALID_ARGUMENT IllegalArgumentException
     rpc create(CreateFileSystemRequest) returns (FileSystem) {}
     // Get the name of the adaptor that created this FileSystem.
     rpc getAdaptorName(FileSystem) returns (AdaptorName) {}
