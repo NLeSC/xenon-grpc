@@ -65,7 +65,7 @@ Compile proto into python stubs
 ```
 pip install grpcio grpcio-tools
 xenon-grpc --proto > xenon.proto
-python -m grpc_tools.protoc -I../proto --python_out=. --grpc_python_out=. xenon.proto
+python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. xenon.proto
 ```
 
 Now use the generated stubs, see https://grpc.io/docs/tutorials/basic/python.html#creating-the-client
