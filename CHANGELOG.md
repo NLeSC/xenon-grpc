@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 
 * hdfs filesystem
+* options field in JobDescription message ([#630](https://github.com/xenon-middleware/xenon/issues/630))
 
 ## [2018-03-14] 2.3.0
 
