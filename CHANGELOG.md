@@ -17,8 +17,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 * Replaced tasks+cores+nodes fields in JobDescription message with nodes+processes+thread fields ([#625](https://github.com/xenon-middleware/xenon/issues/625)).
-* Require Java 11 or greater, as xenon package has same compatibility
-* Upgraded to Xenon 3.0.0
+* Require Java 11 or greater, as xenon package has same compatibility ([#42](https://github.com/xenon-middleware/xenon-grpc/issues/42https://github.com/xenon-middleware/xenon-grpc/issues/42))
+* Upgraded to Xenon 3.0.0 ([#40](https://github.com/xenon-middleware/xenon-grpc/issues/40))
 
 ### Removed
 
