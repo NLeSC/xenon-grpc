@@ -10,7 +10,7 @@ plugins {
     // test coverage
     id 'jacoco'
     // quality
-    id 'org.sonarqube' version '2.7'
+    id 'org.sonarqube' version '2.7.1'
     // xenon --version reads version from this file
     id 'de.fuerstenau.buildconfig' version '1.1.8'
 }
@@ -20,7 +20,7 @@ version = '3.0.0'
 applicationName = 'xenon-grpc'
 group = 'nl.esciencecenter.xenon.grpc'
 mainClassName = 'nl.esciencecenter.xenon.grpc.XenonServerWrapper'
-ext.grpcVersion = '1.20.0'
+ext.grpcVersion = '1.21.0'
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
