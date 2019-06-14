@@ -647,4 +647,10 @@ public class SchedulerServiceBlockingTest {
         client.getFileSystem(createScheduler());
     }
 
+    @Test
+    public void getDefaultRuntime() {
+        XenonProto.GetDefaultRuntimeResponse response = client.getDefaultRuntime(createScheduler());
+        int expected = 0;
+        assertEquals(expected, response.getValue());
+    }
 }

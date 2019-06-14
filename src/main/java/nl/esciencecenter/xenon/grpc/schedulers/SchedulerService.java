@@ -491,4 +491,19 @@ public class SchedulerService extends SchedulerServiceGrpc.SchedulerServiceImplB
             responseObserver.onError(mapException(e));
         }
     }
+
+    @Override
+    public void getDefaultRuntime(XenonProto.Scheduler request, StreamObserver<XenonProto.GetDefaultRuntimeResponse> responseObserver) {
+        try {
+            Scheduler scheduler = getScheduler(request);
+            int defaultRuntime = scheduler.getDefaultRuntime();
+            XenonProto.GetDefaultRuntimeResponse value = XenonProto.GetDefaultRuntimeResponse.newBuilder()
+                    .setValue(defaultRuntime)
+                    .build();
+            responseObserver.onNext(value);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(mapException(e));
+        }
+    }
 }

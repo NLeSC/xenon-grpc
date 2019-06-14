@@ -469,6 +469,10 @@ message Is {
     bool value = 1;
 }
 
+message GetDefaultRuntimeResponse {
+    uint32 value = 1;
+}
+
 // XenonFiles represents the Xenon nl.esciencecenter.xenon.filesystems.FileSystem class.
 // This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
 service FileSystemService {
@@ -593,6 +597,8 @@ service SchedulerService {
     rpc isOpen(Scheduler) returns (Is) {}
     // Cancel a job
     rpc cancelJob(JobRequest) returns (JobStatus) {}
+    // Get the default runtime of a job in minutes.
+    rpc getDefaultRuntime(Scheduler) returns (GetDefaultRuntimeResponse) {}
     // Retrieve the FileSystem used internally by this Scheduler.
     rpc getFileSystem(Scheduler) returns (FileSystem) {}
     // Close this Scheduler.

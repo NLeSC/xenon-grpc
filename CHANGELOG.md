@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+* getDefaultRuntime rpc to SchedulerService ([#44](https://github.com/xenon-middleware/xenon-grpc/issues/44))
 * start_time and temp_space fields to JobDescription message ([#43](https://github.com/xenon-middleware/xenon-grpc/issues/43))
 * [at](https://linux.die.net/man/1/at) scheduler
 
