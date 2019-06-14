@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.rpc.DebugInfo;
+import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.StatusException;
+import io.grpc.protobuf.ProtoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -304,7 +307,16 @@ public class MapUtils {
             LOGGER.debug("Unable to map exception failing back to INTERNAL status code", e);
             s = Status.INTERNAL;
         }
-        return s.withDescription(e.getClass().getName() + ": " + e.getMessage()).withCause(e).asException();
+        Metadata.Key<DebugInfo> DEBUG_INFO_TRAILER_KEY =
+                ProtoUtils.keyForProto(DebugInfo.getDefaultInstance());
+        DebugInfo.Builder builder = DebugInfo.newBuilder();
+        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+            builder.addStackEntries(stackTraceElement.toString());
+        }
+        DebugInfo DEBUG_INFO = builder.setDetail(e.getClass().getName()).build();
+        Metadata trailers = new Metadata();
+        trailers.put(DEBUG_INFO_TRAILER_KEY, DEBUG_INFO);
+        return s.withDescription(e.getClass().getName() + ": " + e.getMessage()).asException(trailers);
     }
 
     public static String usernameOfCredential(Credential credential) {

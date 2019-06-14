@@ -63,12 +63,26 @@ echo {} | java -jar polyglot.jar call --endpoint=localhost:50051 --full_method=x
 
 Compile proto into python stubs
 ```
-pip install grpcio grpcio-tools
+pip install grpcio grpcio-tools grpcio-status
 xenon-grpc --proto > xenon.proto
 python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. xenon.proto
 ```
 
 Now use the generated stubs, see https://grpc.io/docs/tutorials/basic/python.html#creating-the-client
+
+```python
+import grpc
+import xenon_pb2
+import xenon_pb2_grpc
+channel = grpc.insecure_channel('localhost:50051')
+stub = xenon_pb2_grpc.FileSystemServiceStub(channel)
+try:
+    stub.getAdaptorName(xenon_pb2.AdaptorName(name='foo'))
+except Exception as e:
+    exc = e
+from grpc_status import rpc_status
+status = rpc_status.from_call(exc)
+```
 
 ## Mutual TLS
 
