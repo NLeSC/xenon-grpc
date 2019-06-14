@@ -7,6 +7,8 @@ import static org.junit.Assert.assertThat;
 
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
@@ -76,5 +78,14 @@ public class XenonServerWrapperTest {
         XenonServerWrapper wrapper = new XenonServerWrapper();
         wrapper.start(new String[] {});
         wrapper.stop();
+    }
+
+    @Test
+    public void run_version() throws IOException {
+        exit.expectSystemExitWithStatus(0);
+        exit.checkAssertionAfterwards(() -> Assert.assertThat(systemOutRule.getLog(), CoreMatchers.containsString("Xenon gRPC v")));
+
+        XenonServerWrapper wrapper = new XenonServerWrapper();
+        wrapper.start(new String[]{"--version"});
     }
 }

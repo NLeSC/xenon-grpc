@@ -3,7 +3,7 @@ plugins {
     id 'com.google.protobuf' version '0.8.8'
     // distribution
     id 'application'
-    id 'com.github.johnrengelman.shadow' version '5.0.0'
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
     // ide
     id 'idea'
     id 'eclipse'
@@ -15,6 +15,7 @@ plugins {
     id 'de.fuerstenau.buildconfig' version '1.1.8'
 }
 
+description = 'Perform files and jobs operations with Xenon library from grpc service'
 version = '3.0.0'
 applicationName = 'xenon-grpc'
 group = 'nl.esciencecenter.xenon.grpc'
@@ -27,10 +28,10 @@ repositories {
     mavenLocal()
     mavenCentral()
     jcenter()
-    maven { url 'https://jitpack.io' }
 }
 
 ext.xenonLibVersion = '3.0.0'
+ext.xenonCloudLibVersion = '3.0.1'
 
 dependencies {
     implementation "io.grpc:grpc-netty:${grpcVersion}"
@@ -40,13 +41,11 @@ dependencies {
     compileOnly "javax.annotation:javax.annotation-api:1.2"
     implementation 'org.slf4j:slf4j-api:1.7.25'
 
-    implementation 'com.github.xenon-middleware:xenon:de018e54d842c3fbf7f579e3975d41d2f5b598ee'
-    // When Xenon v3 is released use jcenter, instead of jitpack builds above
-    // implementation group: 'nl.esciencecenter.xenon', name: 'xenon', version: xenonLibVersion
+    implementation group: 'nl.esciencecenter.xenon', name: 'xenon', version: xenonLibVersion
     // implementation group: 'nl.esciencecenter.xenon', name: 'xenon-all', version: xenonLibVersion
-    // implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-cloud', version: xenonLibVersion
-    // implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-hadoop', version: xenonLibVersion
-    // implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-grid', version: xenonLibVersion
+    implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-cloud', version: xenonCloudLibVersion
+//    implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-hadoop', version: xenonLibVersion
+//    implementation group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-grid', version: xenonLibVersion
 
     implementation 'net.sourceforge.argparse4j:argparse4j:0.8.1'
     runtimeOnly 'io.netty:netty-tcnative-boringssl-static:2.0.25.Final'
@@ -114,6 +113,7 @@ sonarqube {
 buildConfig {
     appName = project.applicationName
     buildConfigField 'String', 'XENON_LIB_VERSION', "${xenonLibVersion}"
+    buildConfigField 'String', 'XENON_CLOUD_LIB_VERSION', "${xenonCloudLibVersion}"
 }
 
 shadowJar {

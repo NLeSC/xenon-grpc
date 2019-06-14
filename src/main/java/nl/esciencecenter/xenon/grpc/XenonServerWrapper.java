@@ -55,7 +55,7 @@ public class XenonServerWrapper {
         ArgumentParser myparser = ArgumentParsers.newFor(BuildConfig.NAME).build()
                 .defaultHelp(true)
                 .description("gRPC (http://www.grpc.io/) server for Xenon (https://nlesc.github.io/Xenon/)")
-                .version("Xenon gRPC v" + BuildConfig.VERSION + ", Xenon Library v" + BuildConfig.XENON_LIB_VERSION);
+                .version(getVersion());
         myparser.addArgument("--version").action(Arguments.version()).help("Prints version and exists");
         myparser.addArgument("--verbose", "-v").help("Repeat for more verbose logging").action(Arguments.count());
         myparser.addArgument("--port", "-p")
@@ -77,6 +77,10 @@ public class XenonServerWrapper {
                 .help("Certificate chain file in PEM format for trusted client");
         myparser.addArgument("--proto").action(storeTrue()).help("Print proto file of server and exits");
         return myparser;
+    }
+
+    private String getVersion() {
+        return "Xenon gRPC v" + BuildConfig.VERSION + ", Xenon Library v" + BuildConfig.XENON_LIB_VERSION + ", Xenon cloud library v" + BuildConfig.XENON_CLOUD_LIB_VERSION;
     }
 
     private void blockUntilShutdown() throws InterruptedException {
