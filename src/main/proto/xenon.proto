@@ -346,6 +346,8 @@ message JobDescription {
     uint32 tasks_per_node = 19;
     // In Xenon if true then uses setStartPerTask else uses setStartPerJob to configure how to start executable
     bool start_per_task = 20;
+    string start_time = 21;
+    uint32 temp_space = 22;
 }
 
 message SubmitBatchJobRequest {

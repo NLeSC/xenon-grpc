@@ -97,6 +97,12 @@ public class MapUtils {
         if (d.getSchedulerArgumentsCount() > 0) {
             description.setSchedulerArguments(d.getSchedulerArgumentsList().toArray(new String[0]));
         }
+        if (!d.getStartTime().equals("")) {
+            description.setStartTime(d.getStartTime());
+        }
+        if (d.getTempSpace() != 0) {
+            description.setTempSpace(d.getTempSpace());
+        }
         return description;
     }
 

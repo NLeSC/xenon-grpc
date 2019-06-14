@@ -52,6 +52,8 @@ public class MapJobDescriptionTest {
             .setName("myjobname")
             .setMaxMemory(4096)
             .addAllSchedulerArguments(schedulerArgs)
+            .setStartTime("now")
+            .setTempSpace(512)
         ;
 
         XenonProto.JobDescription request = builder.build();
@@ -75,6 +77,8 @@ public class MapJobDescriptionTest {
         expected.setName("myjobname");
         expected.setMaxMemory(4096);
         expected.setSchedulerArguments("schedarg1", "schedarg2");
+        expected.setStartTime("now");
+        expected.setTempSpace(512);
         assertEquals(expected, response);
         assertEquals(schedulerArgs, response.getSchedulerArguments());
     }

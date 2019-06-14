@@ -6,6 +6,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [3.0.0] - 2019-06-14
+
+### Added
+
+* start_time and temp_space fields to JobDescription message ([#43](https://github.com/xenon-middleware/xenon-grpc/issues/43))
+* [at](https://linux.die.net/man/1/at) scheduler
+
+### Changed
+
+* Replaced tasks+cores+nodes fields in JobDescription message with nodes+processes+thread fields ([#625](https://github.com/xenon-middleware/xenon/issues/625)).
+* Require Java 11 or greater, as xenon package has same compatibility
+* Upgraded to Xenon 3.0.0
+
+### Removed
+
+* hdfs filesystem
+
 ## [2018-03-14] 2.3.0
 
 ### Added
