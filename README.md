@@ -6,7 +6,7 @@ For example pyxenon (https://github.com/NLeSC/pyxenon) uses the Xenon gRPC serve
 The server tries to mimic the Xenon library API as much as possible, differences are described in the [proto file](src/main/proto/xenon.proto) .
 
 [![Build Status](https://travis-ci.org/xenon-middleware/xenon-grpc.svg?branch=master)](https://travis-ci.org/xenon-middleware/xenon-grpc)
-[![Build status](https://ci.appveyor.com/api/projects/status/j9mamcf0jucy185a/branch/master?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon-grpc-rxyfd/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/tep8bad05e76a69w/branch/master?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon-grpc/branch/master)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=xenon-middleware_xenon-grpc&metric=alert_status)](https://sonarcloud.io/dashboard?id=xenon-middleware_xenon-grpc)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xenon-middleware_xenon-grpc&metric=coverage)](https://sonarcloud.io/dashboard?id=xenon-middleware_xenon-grpc)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1043481.svg)](https://doi.org/10.5281/zenodo.1043481)
