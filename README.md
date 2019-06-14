@@ -113,7 +113,7 @@ print(response)
 
 Generates application tar/zip in `build/distributions/` directory.
 
-1. Bump version in `build.gradle`, add version to `CHANGELOG.md` and commit/push
+1. Bump version in `build.gradle`, `CITATION.cff`, add version to `CHANGELOG.md` and commit/push
 2. Create a new GitHub release
 3. Upload the files in `build/distributions/` directory to that release
 4. Publish release
