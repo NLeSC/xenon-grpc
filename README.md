@@ -16,9 +16,11 @@ The server tries to mimic the Xenon library API as much as possible, differences
 On [releases page](https://github.com/xenon-middleware/xenon-grpc/releases) download a tarball (or zipfile).
 
 The tarball can be installed with:
+
 ```bash
 tar -xf xenon-grpc-shadow*.tar
 ```
+
 Add `xenon-grpc*/bin` to your PATH environment variable for easy usage.
 
 # Usage
@@ -36,6 +38,7 @@ To get help run
 ```
 
 Or call the jar directly with
+
 ```bash
 java -jar xenon-grpc-*/lib/xenon-grpc-*-all.jar
 ```
@@ -62,7 +65,8 @@ echo {} | java -jar polyglot.jar call --endpoint=localhost:50051 --full_method=x
 ## Python client
 
 Compile proto into python stubs
-```
+
+```sh
 pip install grpcio grpcio-tools
 xenon-grpc --proto > xenon.proto
 python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. xenon.proto
@@ -76,18 +80,19 @@ Create self-signed certificate and use for server and client on same machine.
 Make sure `Common Name` field is filled with hostname of machine.
 See http://httpd.apache.org/docs/2.4/ssl/ssl_faq.html#selfcert
 
-
 ```bash
 openssl req -new -x509 -nodes -out server.crt -keyout server.key
 ./build/install/xenon-grpc/bin/xenon-grpc --server-cert-chain server.crt --server-private-key server.key --client-cert-chain server.crt
 ```
 
 Test with polyglot
+
 ```bash
 echo {} | java -jar polyglot.jar call --endpoint=<hostname as used in certificate>:50051 --full_method=xenon.FileSystemService/getAdaptorNames --use_tls=true --tls_client_cert_path=$PWD/server.crt --tls_client_key_path=$PWD/server.key --tls_ca_cert_path=$PWD/server.crt
 ```
 
 In a ipython shell with generated stubs in working directory:
+
 ```python
 import grpc
 import xenon_pb2
@@ -107,7 +112,7 @@ print(response)
 
 ## New release
 
-```
+```sh
 ./gradlew build
 ```
 
