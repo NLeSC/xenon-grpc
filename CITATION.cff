@@ -2,7 +2,7 @@
 # Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
 --- 
 authors: 
-  - 
+  -
     affiliation: "Netherlands eScience Center"
     family-names: Verhoeven
     given-names: Stefan
@@ -11,14 +11,20 @@ authors:
     affiliation: "Netherlands eScience Center"
     family-names: Maassen
     given-names: Jason
+    orcid: "https://orcid.org/0000-0002-8172-4865"
   - 
     affiliation: "Netherlands eScience Center"
     family-names: Ploeg
     given-names: Atze
     name-particle: "van der"
+  - given-names: Jurriaan
+    family-names: Spaaks
+    name-particle: H.
+    affiliation: Netherlands eScience Center
+    orcid: "https://orcid.org/0000-0002-7064-4069"
 cff-version: "1.0.3"
 doi: 10.5281/zenodo.1043481
-date-released: 2019-06-14
+date-released: 2020-03-23
 license: Apache-2.0
 message: "If you use this software, please cite it as below."
 references: 
@@ -77,4 +83,4 @@ references:
     title: Xenon
     type: software
 title: "Xenon gRPC server"
-version: "3.0.1"
+version: "3.0.2"

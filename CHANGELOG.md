@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [3.0.2] - 2020-03-23
+
+### Changed
+
+* Depends on Xenon 3.1.0
+
 ## [3.0.1] - 2019-09-11
 
 ### Changed

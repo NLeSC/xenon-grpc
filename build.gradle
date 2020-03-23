@@ -16,7 +16,7 @@ plugins {
 }
 
 description = 'Perform files and jobs operations with Xenon library from grpc service'
-version = '3.0.1'
+version = '3.0.2'
 applicationName = 'xenon-grpc'
 group = 'nl.esciencecenter.xenon.grpc'
 mainClassName = 'nl.esciencecenter.xenon.grpc.XenonServerWrapper'
@@ -30,7 +30,7 @@ repositories {
     jcenter()
 }
 
-ext.xenonLibVersion = '3.0.4'
+ext.xenonLibVersion = '3.1.0'
 ext.xenonCloudLibVersion = '3.0.2'
 
 dependencies {
